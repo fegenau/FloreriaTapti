@@ -1,0 +1,38 @@
+
+---
+import Layout from "../components/Layout.astro";
+---
+<Layout title="Membresías — Tapti">
+  <section class="max-w-5xl mx-auto px-4 py-12">
+    <h1 class="font-serif text-3xl mb-2">Membresías Tapti</h1>
+    <p class="text-white/80 mb-8">Recibe un ramo Tapti cada 15 o 30 días. Cancela cuando quieras.</p>
+    <div class="grid md:grid-cols-2 gap-6">
+      <div class="p-6 rounded-2xl border border-white/10 bg-white/5">
+        <h2 class="font-serif text-2xl text-tapti-gold">Quincenal</h2>
+        <p class="text-sm opacity-90">Entrega cada 15 días</p>
+        <div class="text-3xl font-serif mt-4">$24.990 CLP</div>
+        <button id="btn15" class="mt-6 px-6 py-3 rounded-full bg-tapti-gold text-tapti-deep font-medium">Suscribirme</button>
+      </div>
+      <div class="p-6 rounded-2xl border border-white/10 bg-white/5">
+        <h2 class="font-serif text-2xl text-tapti-gold">Mensual</h2>
+        <p class="text-sm opacity-90">Entrega cada 30 días</p>
+        <div class="text-3xl font-serif mt-4">$39.990 CLP</div>
+        <button id="btn30" class="mt-6 px-6 py-3 rounded-full bg-tapti-gold text-tapti-deep font-medium">Suscribirme</button>
+      </div>
+    </div>
+  </section>
+  <script>
+    async function go(periodDays) {
+      const res = await fetch('/api/mp/create-preapproval', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reason: `Membresía Tapti ${periodDays}d`, amount: periodDays===15?24990:39990, frequency: periodDays, back_url: window.location.origin + '/confirmacion' })
+      });
+      const data = await res.json();
+      if (data.init_point) window.location.href = data.init_point;
+      else alert('No se pudo iniciar la suscripción');
+    }
+    document.getElementById('btn15')?.addEventListener('click', () => go(15));
+    document.getElementById('btn30')?.addEventListener('click', () => go(30));
+  </script>
+</Layout>

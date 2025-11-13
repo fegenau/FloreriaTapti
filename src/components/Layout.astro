@@ -1,0 +1,33 @@
+
+---
+const { title = 'Tapti Flores y Regalos' } = Astro.props;
+---
+<html lang="es" class="h-full">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body class="min-h-screen bg-tapti-deep text-tapti-ivory">
+    <header class="border-b border-white/10">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+        <a href="/" class="font-serif text-2xl tracking-wide text-tapti-gold">Tapti</a>
+        <nav class="flex gap-6 text-sm">
+          <a href="/catalogo" class="hover:text-tapti-gold">Ramos</a>
+          <a href="/membresias" class="hover:text-tapti-gold">Membresías</a>
+          <a href="/sobre" class="hover:text-tapti-gold">Sobre Tapti</a>
+          <a href="/contacto" class="hover:text-tapti-gold">Contacto</a>
+        </nav>
+      </div>
+    </header>
+    <main class="min-h-[70vh]">
+      <slot />
+    </main>
+    <footer class="border-t border-white/10">
+      <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex items-center justify-between">
+        <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
+        <a href="https://wa.me/56900000000" class="hover:text-tapti-gold">WhatsApp</a>
+      </div>
+    </footer>
+  </body>
+</html>

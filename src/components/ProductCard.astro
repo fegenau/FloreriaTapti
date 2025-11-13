@@ -1,0 +1,12 @@
+
+---
+const { product } = Astro.props;
+---
+<a href={`/producto/${product.slug}`} class="group block rounded-xl overflow-hidden bg-white/5 hover:bg-white/10 transition border border-white/10">
+  <img src={product.image} alt={product.name} class="aspect-[4/3] w-full object-cover opacity-90 group-hover:opacity-100 transition" />
+  <div class="p-4">
+    <h3 class="font-serif text-lg">{product.name}</h3>
+    <p class="text-sm opacity-90">${product.price.toLocaleString('es-CL')} CLP</p>
+    <div class="mt-2 text-xs text-tapti-lilac">Ver detalles →</div>
+  </div>
+</a>
