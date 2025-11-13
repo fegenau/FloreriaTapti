@@ -36,20 +36,22 @@ if (!product) throw new Error('Producto no encontrado');
         <button type="submit" class="px-5 py-3 rounded-full bg-tapti-gold text-tapti-deep font-medium">Agregar al carrito</button>
       </form>
       <script>
-        const form = document.getElementById('addToCart');
+        const productData = JSON.parse('{JSON.stringify(product)}');
+        const form = document.getElementById('addToCart') as HTMLFormElement | null;
         form?.addEventListener('submit', (e) => {
           e.preventDefault();
-          const data = Object.fromEntries(new FormData(form));
+          const targetForm = e.currentTarget as HTMLFormElement;
+          const data = Object.fromEntries(new FormData(targetForm));
           const item = {
-            slug: '{product.slug}',
-            name: '{product.name.replace("'", "\\'")}',
-            image: '{product.image}',
+            slug: productData.slug,
+            name: productData.name,
+            image: productData.image,
             size: data.size,
             note: data.note || '',
             date: data.date || '',
             comuna: data.comuna || '',
-            price: (product.sizes.find(s=>s.k===data.size)?.price) || {product.price}
-          };
+            price: (productData.sizes.find(s => s.k === data.size)?.price) || productData.price
+    };
           const cart = JSON.parse(localStorage.getItem('cart') || '[]');
           cart.push(item);
           localStorage.setItem('cart', JSON.stringify(cart));

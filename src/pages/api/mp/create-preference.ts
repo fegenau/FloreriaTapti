@@ -14,7 +14,7 @@ export const POST: APIRoute = async ({ request }) => {
     const res = await fetch('https://api.mercadopago.com/checkout/preferences', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.MP_ACCESS_TOKEN}`,
+        'Authorization': `Bearer TEST-7730205910513996-111221-691b751c86e6e9d240b249be2b10b9b4-116369376`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
