@@ -1,0 +1,14 @@
+---
+import Door from './Door.astro';
+---
+
+<div class="relative w-full h-full flex">
+  <!-- Puerta izquierda -->
+  <Door side="left" id="door-left" />
+  
+  <!-- Puerta derecha -->
+  <Door side="right" id="door-right" />
+</div>
+
+<!-- Marco central donde se unen las puertas -->
+<div class="absolute top-0 bottom-0 left-1/2 w-2 bg-gradient-to-b from-amber-800 via-amber-700 to-amber-800 transform -translate-x-1/2 shadow-lg z-10"></div>

@@ -1,0 +1,32 @@
+---
+import DoorsContainer from './DoorsContainer.astro';
+import EntranceLogo from './EntranceLogo.astro';
+---
+
+<div
+  id="entrance-animation"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-b from-slate-900 to-slate-800 cursor-pointer"
+>
+  <DoorsContainer />
+  <EntranceLogo />
+</div>
+
+<script>
+  import { EntranceAnimationController } from '../utils/entranceAnimation.js';
+  
+  window.addEventListener("DOMContentLoaded", () => {
+    const controller = new EntranceAnimationController();
+    controller.init();
+  });
+</script>
+
+<style>
+  #entrance-animation:hover {
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 23, 42, 0.95),
+      rgba(30, 41, 59, 0.95)
+    );
+    transition: background 0.3s ease;
+  }
+</style>

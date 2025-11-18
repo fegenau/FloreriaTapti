@@ -1,0 +1,53 @@
+---
+// Navegación flotante moderna para reemplazar el navbar tradicional
+---
+
+<nav class="fixed top-6 left-1/2 -translate-x-1/2 z-40 bg-tapti-deep/80 backdrop-blur-md border border-tapti-gold/20 rounded-full px-6 py-3 shadow-2xl">
+  <div class="flex items-center space-x-6">
+    <!-- Logo -->
+    <a href="/" class="font-serif text-xl text-tapti-gold hover:text-yellow-300 transition-colors">
+      Tapti
+    </a>
+    
+    <!-- Separador -->
+    <div class="w-px h-6 bg-tapti-gold/30"></div>
+    
+    <!-- Links de navegación -->
+    <div class="flex items-center space-x-4">
+      <a href="/catalogo" class="text-sm text-tapti-ivory hover:text-tapti-gold transition-colors px-3 py-1 rounded-full hover:bg-tapti-gold/10">
+        Catálogo
+      </a>
+      <a href="/membresias" class="text-sm text-tapti-ivory hover:text-tapti-gold transition-colors px-3 py-1 rounded-full hover:bg-tapti-gold/10">
+        Membresías
+      </a>
+      <a href="/sobre" class="text-sm text-tapti-ivory hover:text-tapti-gold transition-colors px-3 py-1 rounded-full hover:bg-tapti-gold/10">
+        Sobre
+      </a>
+      <a href="/contacto" class="text-sm text-tapti-ivory hover:text-tapti-gold transition-colors px-3 py-1 rounded-full hover:bg-tapti-gold/10">
+        Contacto
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Versión móvil -->
+<div class="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-tapti-deep/90 backdrop-blur-md border border-tapti-gold/20 rounded-2xl p-4 shadow-2xl">
+  <div class="grid grid-cols-4 gap-2">
+    <a href="/catalogo" class="text-center py-2 text-tapti-ivory hover:text-tapti-gold transition-colors">
+      <div class="text-lg mb-1">🌸</div>
+      <span class="text-xs">Catálogo</span>
+    </a>
+    <a href="/membresias" class="text-center py-2 text-tapti-ivory hover:text-tapti-gold transition-colors">
+      <div class="text-lg mb-1">💎</div>
+      <span class="text-xs">Membresías</span>
+    </a>
+    <a href="/sobre" class="text-center py-2 text-tapti-ivory hover:text-tapti-gold transition-colors">
+      <div class="text-lg mb-1">🌿</div>
+      <span class="text-xs">Sobre</span>
+    </a>
+    <a href="/contacto" class="text-center py-2 text-tapti-ivory hover:text-tapti-gold transition-colors">
+      <div class="text-lg mb-1">📞</div>
+      <span class="text-xs">Contacto</span>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,245 @@
+---
+interface Props {
+  images: Array<{
+    src: string;
+    alt: string;
+    title?: string;
+    description?: string;
+  }>;
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
+}
+
+const { images, autoPlay = true, autoPlayInterval = 4000 } = Astro.props;
+---
+
+<div id="carousel" class="relative w-full h-96 md:h-[500px] overflow-hidden rounded-lg shadow-2xl border border-tapti-gold/20">
+  <!-- Contenedor de imágenes -->
+  <div id="carousel-container" class="flex transition-transform duration-700 ease-in-out h-full">
+    {images.map((image, index) => (
+      <div class="min-w-full h-full relative">
+        <img
+          src={image.src}
+          alt={image.alt}
+          class="w-full h-full object-cover"
+          loading={index === 0 ? "eager" : "lazy"}
+        />
+        <!-- Overlay con gradiente -->
+        <div class="absolute inset-0 bg-gradient-to-t from-tapti-deep/70 via-transparent to-transparent"></div>
+        
+        <!-- Contenido de texto -->
+        {(image.title || image.description) && (
+          <div class="absolute bottom-8 left-8 right-8 text-white">
+            {image.title && (
+              <h3 class="font-serif text-2xl md:text-3xl text-tapti-gold mb-2 drop-shadow-lg">
+                {image.title}
+              </h3>
+            )}
+            {image.description && (
+              <p class="text-sm md:text-base text-tapti-ivory/90 drop-shadow">
+                {image.description}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+    ))}
+  </div>
+
+  <!-- Botones de navegación -->
+  <button
+    id="prev-btn"
+    class="absolute left-4 top-1/2 -translate-y-1/2 bg-tapti-deep/80 hover:bg-tapti-deep border border-tapti-gold/30 hover:border-tapti-gold text-tapti-gold p-3 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-110"
+    aria-label="Imagen anterior"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+    </svg>
+  </button>
+
+  <button
+    id="next-btn"
+    class="absolute right-4 top-1/2 -translate-y-1/2 bg-tapti-deep/80 hover:bg-tapti-deep border border-tapti-gold/30 hover:border-tapti-gold text-tapti-gold p-3 rounded-full backdrop-blur-sm transition-all duration-300 hover:scale-110"
+    aria-label="Siguiente imagen"
+  >
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+    </svg>
+  </button>
+
+  <!-- Indicadores -->
+  <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+    {images.map((_, index) => (
+      <button
+        class={`indicator w-3 h-3 rounded-full transition-all duration-300 ${index === 0 ? 'bg-tapti-gold' : 'bg-white/40 hover:bg-white/60'}`}
+        data-index={index}
+        aria-label={`Ir a imagen ${index + 1}`}
+      />
+    ))}
+  </div>
+
+  <!-- Control de pausa/reproducción (si autoPlay está activado) -->
+  {autoPlay && (
+    <button
+      id="play-pause-btn"
+      class="absolute top-4 right-4 bg-tapti-deep/80 hover:bg-tapti-deep border border-tapti-gold/30 hover:border-tapti-gold text-tapti-gold p-2 rounded-full backdrop-blur-sm transition-all duration-300"
+      aria-label="Pausar/Reproducir carrusel"
+    >
+      <svg id="pause-icon" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+      </svg>
+      <svg id="play-icon" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M8 5v14l11-7z"/>
+      </svg>
+    </button>
+  )}
+</div>
+
+<script define:vars={{ autoPlay, autoPlayInterval }}>
+  class CarouselController {
+    constructor() {
+      this.currentIndex = 0;
+      this.container = document.getElementById('carousel-container');
+      this.indicators = document.querySelectorAll('.indicator');
+      this.prevBtn = document.getElementById('prev-btn');
+      this.nextBtn = document.getElementById('next-btn');
+      this.playPauseBtn = document.getElementById('play-pause-btn');
+      this.pauseIcon = document.getElementById('pause-icon');
+      this.playIcon = document.getElementById('play-icon');
+      this.totalImages = this.indicators.length;
+      this.isPlaying = autoPlay;
+      this.autoPlayTimer = null;
+
+      this.init();
+    }
+
+    init() {
+      // Navegación con botones
+      this.prevBtn?.addEventListener('click', () => this.prev());
+      this.nextBtn?.addEventListener('click', () => this.next());
+
+      // Navegación con indicadores
+      this.indicators.forEach((indicator, index) => {
+        indicator.addEventListener('click', () => this.goTo(index));
+      });
+
+      // Control de pausa/reproducción
+      this.playPauseBtn?.addEventListener('click', () => this.toggleAutoPlay());
+
+      // Navegación con teclado
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') this.prev();
+        if (e.key === 'ArrowRight') this.next();
+        if (e.key === ' ') {
+          e.preventDefault();
+          this.toggleAutoPlay();
+        }
+      });
+
+      // Pausar autoplay al hacer hover
+      const carousel = document.getElementById('carousel');
+      carousel?.addEventListener('mouseenter', () => this.pauseAutoPlay());
+      carousel?.addEventListener('mouseleave', () => {
+        if (this.isPlaying) this.startAutoPlay();
+      });
+
+      // Iniciar autoplay si está activado
+      if (this.isPlaying) this.startAutoPlay();
+
+      // Soporte para gestos táctiles
+      this.initTouchSupport();
+    }
+
+    goTo(index) {
+      this.currentIndex = index;
+      this.updateCarousel();
+    }
+
+    next() {
+      this.currentIndex = (this.currentIndex + 1) % this.totalImages;
+      this.updateCarousel();
+    }
+
+    prev() {
+      this.currentIndex = (this.currentIndex - 1 + this.totalImages) % this.totalImages;
+      this.updateCarousel();
+    }
+
+    updateCarousel() {
+      // Actualizar posición del carrusel
+      const translateX = -this.currentIndex * 100;
+      this.container.style.transform = `translateX(${translateX}%)`;
+
+      // Actualizar indicadores
+      this.indicators.forEach((indicator, index) => {
+        if (index === this.currentIndex) {
+          indicator.classList.remove('bg-white/40');
+          indicator.classList.add('bg-tapti-gold');
+        } else {
+          indicator.classList.remove('bg-tapti-gold');
+          indicator.classList.add('bg-white/40');
+        }
+      });
+    }
+
+    startAutoPlay() {
+      if (!autoPlay) return;
+      this.autoPlayTimer = setInterval(() => this.next(), autoPlayInterval);
+    }
+
+    pauseAutoPlay() {
+      if (this.autoPlayTimer) {
+        clearInterval(this.autoPlayTimer);
+        this.autoPlayTimer = null;
+      }
+    }
+
+    toggleAutoPlay() {
+      this.isPlaying = !this.isPlaying;
+      
+      if (this.isPlaying) {
+        this.startAutoPlay();
+        this.pauseIcon?.classList.remove('hidden');
+        this.playIcon?.classList.add('hidden');
+      } else {
+        this.pauseAutoPlay();
+        this.pauseIcon?.classList.add('hidden');
+        this.playIcon?.classList.remove('hidden');
+      }
+    }
+
+    initTouchSupport() {
+      let startX = 0;
+      let endX = 0;
+
+      const carousel = document.getElementById('carousel');
+      
+      carousel?.addEventListener('touchstart', (e) => {
+        startX = e.touches[0].clientX;
+      });
+
+      carousel?.addEventListener('touchend', (e) => {
+        endX = e.changedTouches[0].clientX;
+        this.handleSwipe();
+      });
+    }
+
+    handleSwipe() {
+      const threshold = 50; // Mínimo de píxeles para considerar un swipe
+      const diff = startX - endX;
+
+      if (Math.abs(diff) > threshold) {
+        if (diff > 0) {
+          this.next(); // Swipe izquierda → siguiente
+        } else {
+          this.prev(); // Swipe derecha → anterior
+        }
+      }
+    }
+  }
+
+  // Inicializar cuando el DOM esté listo
+  document.addEventListener('DOMContentLoaded', () => {
+    new CarouselController();
+  });
+</script>

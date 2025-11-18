@@ -1,33 +1,78 @@
+---
+import EntranceAnimation from './EntranceAnimation.astro';
 
+interface Props {
+  title?: string;
+  hideHeader?: boolean;
+  hideFooter?: boolean;
+}
+
+const { 
+  title = "Tapti Flores y Regalos",
+  hideHeader = false,
+  hideFooter = false
+} = Astro.props;
 ---
-const { title = 'Tapti Flores y Regalos' } = Astro.props;
----
+
 <html lang="es" class="h-full">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
   </head>
-  <body class="min-h-screen bg-tapti-deep text-tapti-ivory">
-    <header class="border-b border-white/10">
-      <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="/" class="font-serif text-2xl tracking-wide text-tapti-gold">Tapti</a>
-        <nav class="flex gap-6 text-sm">
-          <a href="/catalogo" class="hover:text-tapti-gold">Ramos</a>
-          <a href="/membresias" class="hover:text-tapti-gold">Membresías</a>
-          <a href="/sobre" class="hover:text-tapti-gold">Sobre Tapti</a>
-          <a href="/contacto" class="hover:text-tapti-gold">Contacto</a>
-        </nav>
-      </div>
-    </header>
-    <main class="min-h-[70vh]">
-      <slot />
-    </main>
-    <footer class="border-t border-white/10">
-      <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex items-center justify-between">
-        <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
-        <a href="https://wa.me/56900000000" class="hover:text-tapti-gold">WhatsApp</a>
-      </div>
-    </footer>
+  <body class="min-h-screen bg-tapti-deep text-tapti-ivory overflow-hidden">
+    <EntranceAnimation />
+
+    <div id="main-content" class="opacity-0 transition-opacity duration-1000">
+      {!hideHeader && (
+        <header class="border-b border-white/10">
+          <div
+            class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between"
+          >
+            <a href="/" class="font-serif text-2xl tracking-wide text-tapti-gold"
+              >Tapti</a
+            >
+            <nav class="flex gap-6 text-sm">
+              <a href="/catalogo" class="hover:text-tapti-gold">Ramos</a>
+              <a href="/membresias" class="hover:text-tapti-gold">Membresías</a>
+              <a href="/sobre" class="hover:text-tapti-gold">Sobre Tapti</a>
+              <a href="/contacto" class="hover:text-tapti-gold">Contacto</a>
+            </nav>
+          </div>
+        </header>
+      )}
+      <main class={hideHeader ? "min-h-screen" : "min-h-[70vh]"}>
+        <slot />
+      </main>
+      {!hideFooter && (
+        <footer class="border-t border-white/10">
+          <div
+            class="max-w-6xl mx-auto px-4 py-8 text-sm flex items-center justify-between"
+          >
+            <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
+            <a href="https://wa.me/56900000000" class="hover:text-tapti-gold"
+              >WhatsApp</a
+            >
+          </div>
+        </footer>
+      )}
+    </div>
+
+    <style>
+      @keyframes gentle-fade {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      #main-content {
+        animation: gentle-fade 1s ease-out forwards;
+      }
+    </style>
   </body>
 </html>
