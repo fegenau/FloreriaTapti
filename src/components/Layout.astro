@@ -5,12 +5,14 @@ interface Props {
   title?: string;
   hideHeader?: boolean;
   hideFooter?: boolean;
+  showEntrance?: boolean;
 }
 
 const { 
   title = "Tapti Flores y Regalos",
   hideHeader = false,
-  hideFooter = false
+  hideFooter = false,
+  showEntrance = false
 } = Astro.props;
 ---
 
@@ -20,10 +22,10 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
   </head>
-  <body class="min-h-screen bg-tapti-deep text-tapti-ivory overflow-hidden">
-    <EntranceAnimation />
+  <body class={`min-h-screen bg-white text-gray-900 ${showEntrance ? 'overflow-hidden' : 'overflow-visible'}`}>
+    {showEntrance && <EntranceAnimation />}
 
-    <div id="main-content" class="opacity-0 transition-opacity duration-1000">
+    <div id="main-content" class={showEntrance ? "opacity-0 transition-opacity duration-1000" : "opacity-100"}>
       {!hideHeader && (
         <header class="border-b border-white/10">
           <div

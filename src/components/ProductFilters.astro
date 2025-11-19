@@ -1,0 +1,101 @@
+---
+export interface FilterTab {
+  id: string;
+  label: string;
+  count?: number;
+}
+
+export interface Props {
+  tabs: FilterTab[];
+  activeTab?: string;
+  className?: string;
+}
+
+const { tabs, activeTab = tabs[0]?.id, className = "" } = Astro.props;
+---
+
+<div class={`flex flex-wrap gap-2 justify-center mb-8 ${className}`}>
+  {tabs.map((tab) => (
+    <button 
+      data-tab={tab.id}
+      class={`px-6 py-3 rounded-full font-medium transition-all duration-300 hover:scale-105 ${
+        tab.id === activeTab 
+          ? 'bg-honey-bronze-500 text-midnight-violet-950 shadow-lg transform scale-105' 
+          : 'bg-midnight-violet-800/50 text-cherry-blossom-100 hover:bg-midnight-violet-700/60 backdrop-blur-md'
+      }`}
+    >
+      {tab.label}
+      {tab.count && (
+        <span class={`ml-2 px-2 py-1 rounded-full text-xs ${
+          tab.id === activeTab 
+            ? 'bg-midnight-violet-950/20 text-midnight-violet-950' 
+            : 'bg-cherry-blossom-500/20 text-cherry-blossom-300'
+        }`}>
+          {tab.count}
+        </span>
+      )}
+    </button>
+  ))}
+</div>
+
+<script>
+  // Manejo de clicks en tabs
+  document.addEventListener('DOMContentLoaded', () => {
+    const tabs = document.querySelectorAll('[data-tab]');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', (e) => {
+        const tabId = (e.target as HTMLElement).getAttribute('data-tab');
+        
+        // Remover clase activa de todos los tabs
+        tabs.forEach(t => {
+          t.classList.remove('bg-honey-bronze-500', 'text-midnight-violet-950', 'shadow-lg', 'scale-105');
+          t.classList.add('bg-midnight-violet-800/50', 'text-cherry-blossom-100');
+        });
+        
+        // Agregar clase activa al tab clickeado
+        (e.target as HTMLElement).classList.remove('bg-midnight-violet-800/50', 'text-cherry-blossom-100');
+        (e.target as HTMLElement).classList.add('bg-honey-bronze-500', 'text-midnight-violet-950', 'shadow-lg', 'scale-105');
+        
+        // Aquí puedes agregar lógica para filtrar productos
+        // Por ejemplo, mostrar/ocultar productos basado en tabId
+        const productCards = document.querySelectorAll('[data-category]');
+        productCards.forEach(card => {
+          const cardCategory = card.getAttribute('data-category');
+          if (tabId === 'todos' || cardCategory === tabId) {
+            (card as HTMLElement).style.display = 'block';
+          } else {
+            (card as HTMLElement).style.display = 'none';
+          }
+        });
+        
+        // Animación de entrada para productos visibles
+        setTimeout(() => {
+          const visibleProducts = document.querySelectorAll('[data-category]:not([style*="display: none"])');
+          visibleProducts.forEach((product, index) => {
+            setTimeout(() => {
+              product.classList.add('animate-fadeInUp');
+            }, index * 100);
+          });
+        }, 50);
+      });
+    });
+  });
+</script>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fadeInUp {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+</style>

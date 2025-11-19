@@ -1,23 +1,83 @@
 
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{astro,html,js,jsx,ts,tsx,vue,svelte,md,mdx}'],
-  theme: {
-    extend: {
-      colors: {
-        tapti: {
-          gold: '#C8A037',
-          deep: '#0D0720',
-          lilac: '#BFA5E3',
-          purple: '#6F4AA1',
-          ivory: '#F7F4EE'
-        }
-      },
-      fontFamily: {
-        serif: ['"Times New Roman"', 'ui-serif', 'Georgia', 'serif'],
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif']
-      }
-    }
-  },
-  plugins: []
+	content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
+	theme: {
+		extend: {
+			colors: {
+				'cherry-blossom': {
+					50: 'rgb(255 229 234)',
+					100: 'rgb(255 204 213)',
+					200: 'rgb(255 153 170)',
+					300: 'rgb(255 102 128)',
+					400: 'rgb(255 51 85)',
+					500: 'rgb(255 0 43)',
+					600: 'rgb(204 0 34)',
+					700: 'rgb(153 0 26)',
+					800: 'rgb(102 0 17)',
+					900: 'rgb(51 0 9)',
+					950: 'rgb(36 0 6)'
+				},
+				'midnight-violet': {
+					50: 'rgb(247 238 244)',
+					100: 'rgb(239 220 233)',
+					200: 'rgb(222 186 212)',
+					300: 'rgb(206 151 190)',
+					400: 'rgb(190 116 169)',
+					500: 'rgb(173 82 147)',
+					600: 'rgb(139 65 118)',
+					700: 'rgb(104 49 88)',
+					800: 'rgb(69 33 59)',
+					900: 'rgb(35 16 29)',
+					950: 'rgb(24 11 21)'
+				},
+				'honey-bronze': {
+					50: 'rgb(253 245 232)',
+					100: 'rgb(251 235 208)',
+					200: 'rgb(246 215 162)',
+					300: 'rgb(242 195 115)',
+					400: 'rgb(238 176 68)',
+					500: 'rgb(233 156 22)',
+					600: 'rgb(187 125 17)',
+					700: 'rgb(140 93 13)',
+					800: 'rgb(93 62 9)',
+					900: 'rgb(47 31 4)',
+					950: 'rgb(33 22 3)'
+				},
+				'carbon-black': {
+					50: 'rgb(239 246 240)',
+					100: 'rgb(223 236 225)',
+					200: 'rgb(191 217 195)',
+					300: 'rgb(159 198 165)',
+					400: 'rgb(126 180 135)',
+					500: 'rgb(94 161 105)',
+					600: 'rgb(75 129 84)',
+					700: 'rgb(57 96 63)',
+					800: 'rgb(38 64 42)',
+					900: 'rgb(19 32 21)',
+					950: 'rgb(13 22 15)'
+				},
+				'dusty-olive': {
+					50: 'rgb(241 243 242)',
+					100: 'rgb(227 232 228)',
+					200: 'rgb(200 208 201)',
+					300: 'rgb(172 185 174)',
+					400: 'rgb(145 161 147)',
+					500: 'rgb(117 138 120)',
+					600: 'rgb(94 110 96)',
+					700: 'rgb(70 83 72)',
+					800: 'rgb(47 55 48)',
+					900: 'rgb(23 28 24)',
+					950: 'rgb(16 19 17)'
+				},
+				// Alias para compatibilidad
+				'tapti': {
+					'deep': 'rgb(24 11 21)', // midnight-violet-950
+					'ivory': 'rgb(255 229 234)', // cherry-blossom-50
+					'gold': 'rgb(233 156 22)' // honey-bronze-500
+				}
+			}
+		},
+	},
+	plugins: [],
 }

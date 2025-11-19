@@ -1,0 +1,42 @@
+---
+export interface Props {
+  title: string;
+  image: string;
+  url: string;
+  className?: string;
+}
+
+const { title, image, url, className = "" } = Astro.props;
+---
+
+<a 
+  href={url} 
+  class={`group block relative overflow-hidden rounded-2xl bg-gradient-to-br from-midnight-violet-900/90 to-midnight-violet-800/90 backdrop-blur-md transition-all duration-500 hover:scale-105 hover:shadow-2xl ${className}`}
+>
+  <!-- Imagen de fondo -->
+  <div 
+    class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-110"
+    style={`background-image: url(${image})`}
+  ></div>
+  
+  <!-- Overlay gradiente -->
+  <div class="absolute inset-0 bg-gradient-to-t from-midnight-violet-950/80 via-midnight-violet-900/40 to-transparent"></div>
+  
+  <!-- Contenido -->
+  <div class="relative z-10 p-6 h-full flex flex-col justify-end min-h-[200px]">
+    <h3 class="font-serif text-xl lg:text-2xl text-cherry-blossom-50 mb-2 transform transition-transform duration-300 group-hover:translate-y-[-4px]">
+      {title}
+    </h3>
+    
+    <!-- Indicador de acción -->
+    <div class="flex items-center text-honey-bronze-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+      <span class="text-sm font-medium mr-2">Explorar</span>
+      <svg class="w-4 h-4 transform transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+      </svg>
+    </div>
+  </div>
+  
+  <!-- Brillo sutil al hover -->
+  <div class="absolute inset-0 opacity-0 group-hover:opacity-20 transition-all duration-700 bg-gradient-to-r from-transparent via-cherry-blossom-300/30 to-transparent transform -skew-x-12 translate-x-[-100%] group-hover:translate-x-[200%]"></div>
+</a>
