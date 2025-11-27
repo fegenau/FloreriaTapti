@@ -24,35 +24,6 @@
   <div class="absolute inset-0 rounded-full bg-green-400 animate-ping opacity-20"></div>
 </div>
 
-<script>
-  // Efecto sutil de movimiento con el scroll
-  let lastScrollY = window.scrollY;
-  const floatingWhatsapp = document.getElementById('floating-whatsapp');
-  
-  window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    const scrollDelta = scrollY - lastScrollY;
-    
-    if (floatingWhatsapp) {
-      // Movimiento muy sutil (máximo 10px)
-      const maxMove = 10;
-      const movement = Math.max(-maxMove, Math.min(maxMove, scrollDelta * 0.1));
-      
-      // Aplicar transformación sutil
-      floatingWhatsapp.style.transform = `translateY(${movement}px)`;
-      
-      // Resetear la transformación gradualmente
-      setTimeout(() => {
-        if (floatingWhatsapp) {
-          floatingWhatsapp.style.transform = 'translateY(0)';
-        }
-      }, 200);
-    }
-    
-    lastScrollY = scrollY;
-  });
-</script>
-
 <style>
   #floating-whatsapp {
     transition: transform 0.2s ease-out, opacity 0.3s ease;
