@@ -1,19 +1,20 @@
 ---
-import DoorsContainer from './DoorsContainer.astro';
-import EntranceLogo from './EntranceLogo.astro';
+import DoorsContainer from "./DoorsContainer.astro";
+import EntranceLogo from "./EntranceLogo.astro";
 ---
 
 <div
   id="entrance-animation"
   class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 cursor-pointer perspective-container"
+  style="background-image: url('/loading-bg3.png'); background-size: cover; background-position: center;"
 >
   <DoorsContainer />
   <EntranceLogo />
 </div>
 
 <script>
-  import { EntranceAnimationController } from '../utils/entranceAnimation.js';
-  
+  import { EntranceAnimationController } from "../utils/entranceAnimation.js";
+
   window.addEventListener("DOMContentLoaded", () => {
     const controller = new EntranceAnimationController();
     controller.init();

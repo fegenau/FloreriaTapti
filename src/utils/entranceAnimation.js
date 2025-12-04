@@ -17,7 +17,12 @@ export class EntranceAnimationController {
     this.mainContent = document.getElementById("main-content");
     this.body = document.body;
 
-    this.setupEventListeners();
+    // Check if animation has already been shown in this session
+    if (sessionStorage.getItem('tapti_intro_shown')) {
+      this.skipAnimation();
+    } else {
+      this.setupEventListeners();
+    }
   }
 
   setupEventListeners() {
@@ -36,6 +41,7 @@ export class EntranceAnimationController {
   openDoors() {
     if (this.isAnimating) return;
     this.isAnimating = true;
+    sessionStorage.setItem('tapti_intro_shown', 'true');
 
     // Fase 1: Desaparecer el logo primero
     if (this.logoReveal) {
@@ -82,6 +88,19 @@ export class EntranceAnimationController {
   cleanup() {
     if (this.entranceAnimation) {
       this.entranceAnimation.remove();
+    }
+  }
+
+  skipAnimation() {
+    if (this.entranceAnimation) {
+      this.entranceAnimation.style.display = 'none';
+    }
+    if (this.mainContent) {
+      this.mainContent.style.opacity = '1';
+      this.mainContent.style.transition = 'none';
+    }
+    if (this.body) {
+      this.body.style.overflow = 'visible';
     }
   }
 }

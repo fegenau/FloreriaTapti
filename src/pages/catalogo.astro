@@ -1,14 +1,23 @@
-
 ---
 import Layout from "../components/Layout.astro";
 import ProductCard from "../components/ProductCard.astro";
-const products = (await import('../data/products.json')).default;
+import BoutiqueCard from "../components/BoutiqueCard.astro";
+const products = (await import("../data/products.json")).default;
 ---
+
 <Layout title="Catálogo de Ramos — Tapti">
-  <section class="max-w-6xl mx-auto px-4 py-12">
-    <h1 class="font-serif text-3xl mb-6">Ramos disponibles</h1>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {products.map(p => <ProductCard product={p} />)}
-    </div>
-  </section>
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <BoutiqueCard
+      variant="services"
+      size="large"
+      className="!h-auto min-h-[70vh] p-8"
+    >
+      <h1 class="font-serif text-3xl mb-6 text-tapti-gold">
+        Ramos disponibles
+      </h1>
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {products.map((p) => <ProductCard product={p} />)}
+      </div>
+    </BoutiqueCard>
+  </div>
 </Layout>

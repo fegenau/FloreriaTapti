@@ -1,12 +1,16 @@
 ---
-import Door from './Door.astro';
-import SideWindow from './SideWindow.astro';
+import Door from "./Door.astro";
+import SideWindow from "./SideWindow.astro";
 ---
 
-<div class="relative w-full h-full flex justify-center items-center perspective-container">
+<div
+  class="relative w-full h-full flex justify-center items-center perspective-container"
+>
   <!-- Fachada de la tienda -->
-  <div class="relative flex items-end shadow-2xl" style="width: 90vw; max-width: 1200px; height: 85vh;">
-    
+  <div
+    class="relative flex items-end shadow-2xl"
+    style="width: 90vw; max-width: 1200px; height: 85vh;"
+  >
     <!-- Ventana Izquierda (20%) -->
     <div class="h-full w-1/5">
       <SideWindow side="left" />
@@ -16,7 +20,7 @@ import SideWindow from './SideWindow.astro';
     <div class="w-3/5 h-full relative flex transform-style-3d z-20">
       <!-- Puerta izquierda -->
       <Door side="left" id="door-left" />
-      
+
       <!-- Puerta derecha -->
       <Door side="right" id="door-right" />
     </div>
@@ -25,9 +29,12 @@ import SideWindow from './SideWindow.astro';
     <div class="h-full w-1/5">
       <SideWindow side="right" />
     </div>
-    
+
     <!-- Sombras de piso -->
-    <div class="absolute -bottom-4 left-0 right-0 h-4 bg-black/40 blur-lg rounded-[50%]"></div>
+    <div
+      class="absolute -bottom-4 left-0 right-0 h-4 bg-black/40 blur-lg rounded-[50%]"
+    >
+    </div>
   </div>
 </div>
 

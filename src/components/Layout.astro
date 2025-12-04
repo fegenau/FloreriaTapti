@@ -1,5 +1,6 @@
 ---
-import EntranceAnimation from './EntranceAnimation.astro';
+import EntranceAnimation from "./EntranceAnimation.astro";
+import FloatingNav from "./FloatingNav.astro";
 
 interface Props {
   title?: string;
@@ -8,11 +9,11 @@ interface Props {
   showEntrance?: boolean;
 }
 
-const { 
+const {
   title = "Tapti Flores y Regalos",
   hideHeader = false,
   hideFooter = false,
-  showEntrance = false
+  showEntrance = false,
 } = Astro.props;
 ---
 
@@ -22,47 +23,37 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
   </head>
-  <body class={`min-h-screen bg-white text-gray-900 ${showEntrance ? 'overflow-hidden' : 'overflow-visible'}`}>
+  <body
+    class={`min-h-screen bg-white text-gray-900 ${showEntrance ? "overflow-hidden" : "overflow-visible"}`}
+  >
     {showEntrance && <EntranceAnimation />}
 
-    <div id="main-content" class={showEntrance ? "opacity-0 transition-opacity duration-1000" : "opacity-100"}>
-      {!hideHeader && (
-        <header class="border-b border-white/10">
-          <div
-            class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between"
-          >
-            <a href="/" class="font-serif text-2xl tracking-wide text-tapti-gold"
-              >Tapti</a
-            >
-            <nav class="flex gap-6 text-sm">
-              <a href="/catalogo" class="hover:text-tapti-gold">Ramos</a>
-              <a href="/membresias" class="hover:text-tapti-gold">Membresías</a>
-              <a href="/sobre" class="hover:text-tapti-gold">Sobre Tapti</a>
-              <a href="/contacto" class="hover:text-tapti-gold">Contacto</a>
-            </nav>
-          </div>
-        </header>
-      )}
+    <div
+      id="main-content"
+      class={showEntrance
+        ? "opacity-0 transition-opacity duration-1000"
+        : "opacity-100"}
+    >
+      <FloatingNav />
       <main class={hideHeader ? "min-h-screen" : "min-h-[70vh]"}>
         <slot />
       </main>
-      {!hideFooter && (
-        <footer class="border-t border-white/10">
-          <div
-            class="max-w-6xl mx-auto px-4 py-8 text-sm flex items-center justify-between"
-          >
-            <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
-            <a href="https://wa.me/56900000000" class="hover:text-tapti-gold"
-              >WhatsApp</a
-            >
-          </div>
-        </footer>
-      )}
+      {
+        !hideFooter && (
+          <footer class="border-t border-white/10">
+            <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex items-center justify-between">
+              <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
+              <a href="https://wa.me/56900000000" class="hover:text-tapti-gold">
+                WhatsApp
+              </a>
+            </div>
+          </footer>
+        )
+      }
     </div>
 
     <style>
-    <style>
-      @keyframes gentle-fade {
+      <style > @keyframes gentle-fade {
         from {
           opacity: 0;
         }
