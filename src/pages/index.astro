@@ -184,47 +184,6 @@ const productFilters = [
       </div>
     </BoutiqueCard>
 
-    <!-- Servicios Principales - Cards Verticales usando datos -->
-    <div class="px-4 md:px-6">
-      <div class="max-w-7xl mx-auto">
-        <h2
-          class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
-        >
-          Nuestros Servicios
-        </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {
-            mainServices.map((service) => (
-              <BoutiqueCard
-                variant="gallery"
-                size="medium"
-                background={service.image}
-              >
-                <div class="p-6 text-center relative z-10">
-                  <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">
-                    {service.title}
-                  </h3>
-                  <p class="text-cherry-blossom-100 text-sm mb-4">
-                    {service.description}
-                  </p>
-                  <a
-                    href={service.url}
-                    class="inline-block px-6 py-2 bg-honey-bronze-500 text-midnight-violet-950 rounded-full text-sm font-medium hover:bg-honey-bronze-400 transition-colors relative z-10"
-                  >
-                    {service.url.includes("catalogo")
-                      ? "Ver Catálogo"
-                      : service.url.includes("contacto")
-                        ? "Contactar"
-                        : "Ver Planes"}
-                  </a>
-                </div>
-              </BoutiqueCard>
-            ))
-          }
-        </div>
-      </div>
-    </div>
-
     <!-- Ocasiones Especiales -->
     <div class="px-4 md:px-6">
       <div class="max-w-7xl mx-auto">
@@ -296,6 +255,47 @@ const productFilters = [
                         d="M17 8l4 4m0 0l-4 4m4-4H3"
                       />
                     </svg>
+                  </a>
+                </div>
+              </BoutiqueCard>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Servicios Principales - Cards Verticales usando datos -->
+    <div class="px-4 md:px-6">
+      <div class="max-w-7xl mx-auto">
+        <h2
+          class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
+        >
+          Nuestros Servicios
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {
+            mainServices.map((service) => (
+              <BoutiqueCard
+                variant="gallery"
+                size="medium"
+                background={service.image}
+              >
+                <div class="p-6 text-center relative z-10">
+                  <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">
+                    {service.title}
+                  </h3>
+                  <p class="text-cherry-blossom-100 text-sm mb-4">
+                    {service.description}
+                  </p>
+                  <a
+                    href={service.url}
+                    class="inline-block px-6 py-2 bg-honey-bronze-500 text-midnight-violet-950 rounded-full text-sm font-medium hover:bg-honey-bronze-400 transition-colors relative z-10"
+                  >
+                    {service.url.includes("catalogo")
+                      ? "Ver Catálogo"
+                      : service.url.includes("contacto")
+                        ? "Contactar"
+                        : "Ver Planes"}
                   </a>
                 </div>
               </BoutiqueCard>

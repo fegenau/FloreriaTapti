@@ -12,6 +12,13 @@ import EntranceLogo from "./EntranceLogo.astro";
   <EntranceLogo />
 </div>
 
+<script is:inline>
+  if (sessionStorage.getItem("tapti_intro_shown")) {
+    const el = document.getElementById("entrance-animation");
+    if (el) el.style.display = "none";
+  }
+</script>
+
 <script>
   import { EntranceAnimationController } from "../utils/entranceAnimation.js";
 

@@ -1,0 +1,288 @@
+{
+  "currency": "CLP",
+  "flowers": [
+    {
+      "image": [
+        "images/Flores/Astromelias Surtidas/Astromelias Surtidas.png"
+      ],
+      "name": "Astromelias surtidas",
+      "unit_price": 200,
+      "sizes": {
+        "S": {
+          "qty": 55,
+          "total": 36000
+        },
+        "M": {
+          "qty": 78,
+          "total": 52500
+        },
+        "L": {
+          "qty": 102,
+          "total": 71500
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Astromelia Lilium/Astromelia Lilium.png"
+      ],
+      "name": "Astromelias  lilium",
+      "unit_price": 1000,
+      "sizes": {
+        "S": {
+          "qty": 42,
+          "total": 25000
+        },
+        "M": {
+          "qty": 63,
+          "total": 37500
+        },
+        "L": {
+          "qty": 74,
+          "total": 45000
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Hortensias lisianthus celestes/Hortensias lisianthus celestes.png"
+      ],
+      "name": "Hortensias lisianthus celestes",
+      "unit_price": 800,
+      "sizes": {
+        "S": {
+          "qty": 8,
+          "total": 25000
+        },
+        "M": {
+          "qty": 13,
+          "total": 41750
+        },
+        "L": {
+          "qty": 19,
+          "total": 62000
+        },
+        "XL": null
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Hortensias minirosas/Hortensias minirosas.png"
+      ],
+      "name": "Hortensias minirosas",
+      "unit_price": 800,
+      "sizes": {
+        "S": {
+          "qty": 9,
+          "total": 25500
+        },
+        "M": {
+          "qty": 16,
+          "total": 45500
+        },
+        "L": {
+          "qty": 23,
+          "total": 65500
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Coloridos gerberas/Coloridos gerberas.png"
+      ],
+      "name": "Coloridos gerberas",
+      "unit_price": 800,
+      "sizes": {
+        "S": {
+          "qty": 17,
+          "total": 30750
+        },
+        "M": {
+          "qty": 19,
+          "total": 36500
+        },
+        "L": {
+          "qty": 25,
+          "total": 47000
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Colorido calido/Colorido calido.png"
+      ],
+      "name": "Colorido calido",
+      "unit_price": 1000,
+      "sizes": {
+        "S": {
+          "qty": 17,
+          "total": 30750
+        },
+        "M": {
+          "qty": 24,
+          "total": 42750
+        },
+        "L": {
+          "qty": 33,
+          "total": 61750
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Pastel nude/Pastel nude.png"
+      ],
+      "name": "Pastel nude",
+      "unit_price": 1000,
+      "sizes": {
+        "S": {
+          "qty": 17,
+          "total": 33750
+        },
+        "M": {
+          "qty": 25,
+          "total": 48000
+        },
+        "L": {
+          "qty": 38,
+          "total": 75250
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Gerberas pastel/Gerberas pastel.png"
+      ],
+      "name": "Gerberas pastel",
+      "unit_price": 3000,
+      "sizes": {
+        "S": {
+          "qty": 15,
+          "total": 30750
+        },
+        "M": {
+          "qty": 23,
+          "total": 47500
+        },
+        "L": {
+          "qty": 32,
+          "total": 67250
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Girasoles clasico/Girasoles clasico.png"
+      ],
+      "name": "Girasoles clasico",
+      "unit_price": 1000,
+      "sizes": {
+        "S": {
+          "qty": 11,
+          "total": 22500
+        },
+        "M": {
+          "qty": 16,
+          "total": 32500
+        },
+        "L": {
+          "qty": 25,
+          "total": 50500
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Girasol rosado/Girasol rosado.png"
+      ],
+      "name": "Girasoles rosado",
+      "unit_price": 800,
+      "sizes": {
+        "S": {
+          "qty": 12,
+          "total": 24250
+        },
+        "M": {
+          "qty": 17,
+          "total": 34000
+        },
+        "L": {
+          "qty": 25,
+          "total": 49500
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Tulipanes/Tulipanes.png"
+      ],
+      "name": "Tulipan",
+      "unit_price": 1400,
+      "sizes": {
+        "S": null,
+        "M": {
+          "qty": 7,
+          "total": 22500
+        },
+        "L": {
+          "qty": 11,
+          "total": 34500
+        },
+        "XL": {
+          "qty": 16,
+          "total": 50000
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Rosas rojas/Rosas rojas.png"
+      ],
+      "name": "Rosas rojas",
+      "unit_price": 800,
+      "sizes": {
+        "S": {
+          "qty": 10,
+          "total": 21250
+        },
+        "M": {
+          "qty": 21,
+          "total": 45000
+        },
+        "L": {
+          "qty": 37,
+          "total": 82500
+        },
+        "XL": {
+          "qty": 65,
+          "total": 150000
+        }
+      }
+    },
+    {
+      "image": [
+        "images/Flores/Rosas rosadas/Rosas rosadas.png"
+      ],
+      "name": "Rosas rosadas",
+      "unit_price": 800,
+      "sizes": {
+        "S": {
+          "qty": 12,
+          "total": 24250
+        },
+        "M": {
+          "qty": 25,
+          "total": 51500
+        },
+        "L": {
+          "qty": 43,
+          "total": 92000
+        },
+        "XL": {
+          "qty": 73,
+          "total": 162500
+        }
+      }
+    }
+  ]
+}

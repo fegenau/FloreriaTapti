@@ -34,6 +34,17 @@ const {
         ? "opacity-0 transition-opacity duration-1000"
         : "opacity-100"}
     >
+      <script is:inline>
+        if (sessionStorage.getItem("tapti_intro_shown")) {
+          const main = document.getElementById("main-content");
+          if (main) {
+            main.classList.remove("opacity-0");
+            main.classList.add("opacity-100");
+            main.style.transition = "none";
+          }
+          document.body.style.overflow = "visible";
+        }
+      </script>
       <FloatingNav />
       <main class={hideHeader ? "min-h-screen" : "min-h-[70vh]"}>
         <slot />

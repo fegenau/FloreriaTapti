@@ -93,7 +93,7 @@ export class EntranceAnimationController {
 
   skipAnimation() {
     if (this.entranceAnimation) {
-      this.entranceAnimation.style.display = 'none';
+      this.entranceAnimation.remove();
     }
     if (this.mainContent) {
       this.mainContent.style.opacity = '1';

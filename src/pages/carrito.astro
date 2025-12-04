@@ -1,46 +1,143 @@
-
 ---
 import Layout from "../components/Layout.astro";
+import BoutiqueCard from "../components/BoutiqueCard.astro";
 ---
-<Layout title="Carrito — Tapti">
-  <section class="max-w-4xl mx-auto px-4 py-12">
-    <h1 class="font-serif text-3xl mb-6">Tu Carrito</h1>
-    <div id="cartList" class="space-y-4"></div>
-    <div class="mt-6 flex items-center justify-between">
-      <div class="text-lg">Total: <span id="total">$0</span></div>
-      <a id="checkoutBtn" href="#" class="px-6 py-3 rounded-full bg-tapti-gold text-tapti-deep font-medium">Pagar</a>
-    </div>
-  </section>
-  <script>
-    const list = document.getElementById('cartList');
-    const totalEl = document.getElementById('total');
-    const btn = document.getElementById('checkoutBtn');
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    let total = 0;
-    list.innerHTML = cart.map((i)=>{
-      total += i.price;
-      return `<div class="p-4 border border-white/10 rounded-xl flex items-center justify-between">
-          <div>
-            <div class="font-serif">${i.name} — ${i.size}</div>
-            <div class="text-sm opacity-80">${i.comuna ? i.comuna + ' · ' : ''}${i.date || ''}</div>
+
+<Layout title="Tu Carrito | Tapti">
+  <div class="min-h-screen pt-24 pb-12 px-4">
+    <BoutiqueCard
+      variant="services"
+      size="large"
+      className="!h-auto min-h-[60vh] p-8 max-w-4xl mx-auto"
+    >
+      <h1 class="font-serif text-4xl text-honey-bronze-400 mb-8 text-center">
+        Tu Carrito de Compras
+      </h1>
+
+      <div id="cart-empty" class="hidden text-center py-12">
+        <p class="text-xl text-cherry-blossom-100 mb-6">
+          Tu carrito está vacío.
+        </p>
+        <a
+          href="/catalogo"
+          class="inline-block px-6 py-2 bg-honey-bronze-500 text-midnight-violet-950 rounded-full hover:bg-honey-bronze-400 transition-colors font-medium"
+        >
+          Ir al Catálogo
+        </a>
+      </div>
+
+      <div id="cart-content" class="hidden">
+        <div class="space-y-4 mb-8" id="cart-items-container">
+          <!-- Items will be injected here -->
+        </div>
+
+        <div class="border-t border-white/10 pt-6 mt-8">
+          <div
+            class="flex justify-between items-center text-2xl font-serif text-honey-bronze-100 mb-8"
+          >
+            <span>Total</span>
+            <span id="cart-total">$0</span>
           </div>
-          <div>$${i.price.toLocaleString('es-CL')}</div>
-        </div>`;
-    }).join('');
-    totalEl.textContent = `$${total.toLocaleString('es-CL')}`;
-    btn.addEventListener('click', async (e)=>{
-      e.preventDefault();
-      const res = await fetch('/api/mp/create-preference', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cart })
-      });
-      const data = await res.json();
-      if (data.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        alert('No se pudo iniciar el pago');
-      }
-    });
-  </script>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              id="btn-cancel"
+              class="px-6 py-3 border border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/10 transition-colors"
+            >
+              Cancelar Compra
+            </button>
+            <a
+              href="/catalogo"
+              class="px-6 py-3 border border-honey-bronze-500/50 text-honey-bronze-300 rounded-lg hover:bg-honey-bronze-500/10 transition-colors text-center"
+            >
+              Modificar (Seguir comprando)
+            </a>
+            <button
+              id="btn-pay"
+              class="px-6 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-lg hover:bg-honey-bronze-400 transition-colors font-bold shadow-lg shadow-honey-bronze-500/20"
+            >
+              Ir a Pagar
+            </button>
+          </div>
+        </div>
+      </div>
+    </BoutiqueCard>
+  </div>
 </Layout>
+
+<script>
+  import { cartItems, clearCart, removeCartItem } from "../store/cartStore";
+
+  const cartEmpty = document.getElementById("cart-empty");
+  const cartContent = document.getElementById("cart-content");
+  const itemsContainer = document.getElementById("cart-items-container");
+  const cartTotal = document.getElementById("cart-total");
+  const btnCancel = document.getElementById("btn-cancel");
+  const btnPay = document.getElementById("btn-pay");
+
+  function renderCart(items) {
+    const itemsList = Object.values(items);
+
+    if (itemsList.length === 0) {
+      cartEmpty.classList.remove("hidden");
+      cartContent.classList.add("hidden");
+      return;
+    }
+
+    cartEmpty.classList.add("hidden");
+    cartContent.classList.remove("hidden");
+    itemsContainer.innerHTML = "";
+
+    let total = 0;
+
+    itemsList.forEach((item: any) => {
+      const itemTotal = item.price * item.quantity;
+      total += itemTotal;
+
+      const itemEl = document.createElement("div");
+      itemEl.className =
+        "flex items-center gap-4 bg-white/5 p-4 rounded-lg border border-white/5";
+      itemEl.innerHTML = `
+        <div class="w-20 h-20 bg-black/20 rounded overflow-hidden flex-shrink-0">
+          ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-2xl">🌸</div>'}
+        </div>
+        <div class="flex-grow">
+          <h3 class="font-serif text-lg text-honey-bronze-100">${item.name}</h3>
+          <p class="text-sm text-gray-400">Tamaño: ${item.size}</p>
+          <p class="text-sm text-cherry-blossom-100">Cantidad: ${item.quantity}</p>
+        </div>
+        <div class="text-right">
+          <p class="font-bold text-honey-bronze-400">$${itemTotal.toLocaleString("es-CL")}</p>
+          <button class="text-xs text-red-400 hover:text-red-300 mt-1 underline btn-remove" data-id="${item.id}">
+            Eliminar
+          </button>
+        </div>
+      `;
+      itemsContainer.appendChild(itemEl);
+    });
+
+    cartTotal.innerText = `$${total.toLocaleString("es-CL")}`;
+
+    // Re-attach event listeners for remove buttons
+    document.querySelectorAll(".btn-remove").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const id = (e.target as HTMLElement).getAttribute("data-id");
+        if (id) removeCartItem(id);
+      });
+    });
+  }
+
+  // Subscribe to store updates
+  cartItems.subscribe(renderCart);
+
+  // Button actions
+  btnCancel?.addEventListener("click", () => {
+    if (confirm("¿Estás seguro de que quieres vaciar tu carrito?")) {
+      clearCart();
+    }
+  });
+
+  btnPay?.addEventListener("click", () => {
+    alert("¡Funcionalidad de pago próximamente! Gracias por probar la demo.");
+  });
+</script>
