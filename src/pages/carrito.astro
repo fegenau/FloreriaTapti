@@ -75,17 +75,17 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
   const btnCancel = document.getElementById("btn-cancel");
   const btnPay = document.getElementById("btn-pay");
 
-  function renderCart(items) {
+  function renderCart(items: any) {
     const itemsList = Object.values(items);
 
     if (itemsList.length === 0) {
-      cartEmpty.classList.remove("hidden");
-      cartContent.classList.add("hidden");
+      cartEmpty?.classList.remove("hidden");
+      cartContent?.classList.add("hidden");
       return;
     }
 
-    cartEmpty.classList.add("hidden");
-    cartContent.classList.remove("hidden");
+    cartEmpty?.classList.add("hidden");
+    cartContent?.classList.remove("hidden");
     itemsContainer.innerHTML = "";
 
     let total = 0;
