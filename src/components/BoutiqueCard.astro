@@ -1,52 +1,74 @@
 ---
 interface Props {
-  variant?: 'hero' | 'gallery' | 'info' | 'contact' | 'services';
-  size?: 'small' | 'medium' | 'large' | 'hero';
+  variant?: "hero" | "gallery" | "info" | "contact" | "services";
+  size?: "small" | "medium" | "large" | "hero";
   background?: string;
   className?: string;
+  disableAnimation?: boolean;
 }
 
-const { 
-  variant = 'info', 
-  size = 'medium', 
-  background, 
-  className = '' 
+const {
+  variant = "info",
+  size = "medium",
+  background,
+  className = "",
+  disableAnimation = false,
 } = Astro.props;
 
 const sizeClasses = {
-  small: 'h-64 md:h-80',
-  medium: 'h-80 md:h-96', 
-  large: 'h-96 md:h-[500px]',
-  hero: 'h-screen max-h-[900px] min-h-[600px]'
+  small: "h-64 md:h-80",
+  medium: "h-80 md:h-96",
+  large: "h-96 md:h-[500px]",
+  hero: "h-screen max-h-[900px] min-h-[600px]",
 };
 
 const variantClasses = {
-  hero: 'bg-gradient-to-br from-tapti-deep via-slate-900 to-tapti-deep',
-  gallery: 'bg-tapti-deep/90 backdrop-blur-md border border-tapti-gold/30',
-  info: 'bg-tapti-deep/70 backdrop-blur-md border border-tapti-gold/20',
-  contact: 'bg-gradient-to-br from-tapti-deep to-slate-800 border border-tapti-gold/20',
-  services: 'bg-tapti-deep/50 backdrop-blur-lg border border-tapti-gold/30'
+  hero: "bg-gradient-to-br from-tapti-deep via-slate-900 to-tapti-deep",
+  gallery: "bg-tapti-deep/90 backdrop-blur-md border border-tapti-gold/30",
+  info: "bg-tapti-deep/70 backdrop-blur-md border border-tapti-gold/20",
+  contact:
+    "bg-gradient-to-br from-tapti-deep to-slate-800 border border-tapti-gold/20",
+  services: "bg-tapti-deep/50 backdrop-blur-lg border border-tapti-gold/30",
 };
+
+const animationClasses = disableAnimation
+  ? ""
+  : "hover:scale-[1.01] hover:shadow-3xl";
 ---
 
-<div 
-  class={`relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 hover:scale-[1.01] hover:shadow-3xl group ${sizeClasses[size]} ${variantClasses[variant]} ${className}`}
-  style={background ? `background-image: url(${background}); background-size: cover; background-position: center;` : ''}
+<div
+  class={`relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group ${sizeClasses[size]} ${variantClasses[variant]} ${animationClasses} ${className}`}
+  style={background
+    ? `background-image: url(${background}); background-size: cover; background-position: center;`
+    : ""}
 >
   <!-- Overlay gradient si hay background image -->
-  {background && (
-    <div class="absolute inset-0 bg-gradient-to-t from-tapti-deep/90 via-tapti-deep/50 to-tapti-deep/20 pointer-events-none"></div>
-  )}
-  
+  {
+    background && (
+      <div class="absolute inset-0 bg-gradient-to-t from-tapti-deep/90 via-tapti-deep/50 to-tapti-deep/20 pointer-events-none" />
+    )
+  }
+
   <!-- Contenido -->
-  <div class="relative h-full flex flex-col justify-end p-6 md:p-8 lg:p-12 text-white z-20">
+  <div
+    class="relative h-full flex flex-col justify-end p-6 md:p-8 lg:p-12 text-white z-20"
+  >
     <slot />
   </div>
 
   <!-- Efectos decorativos mejorados -->
-  <div class="absolute top-0 right-0 w-40 h-40 bg-tapti-gold/10 rounded-full -translate-y-20 translate-x-20 blur-2xl group-hover:bg-tapti-gold/15 transition-colors duration-500 pointer-events-none"></div>
-  <div class="absolute bottom-0 left-0 w-32 h-32 bg-tapti-gold/15 rounded-full translate-y-16 -translate-x-16 blur-xl group-hover:bg-tapti-gold/20 transition-colors duration-500 pointer-events-none"></div>
-  
+  <div
+    class="absolute top-0 right-0 w-40 h-40 bg-tapti-gold/10 rounded-full -translate-y-20 translate-x-20 blur-2xl group-hover:bg-tapti-gold/15 transition-colors duration-500 pointer-events-none"
+  >
+  </div>
+  <div
+    class="absolute bottom-0 left-0 w-32 h-32 bg-tapti-gold/15 rounded-full translate-y-16 -translate-x-16 blur-xl group-hover:bg-tapti-gold/20 transition-colors duration-500 pointer-events-none"
+  >
+  </div>
+
   <!-- Borde brillante sutil -->
-  <div class="absolute inset-0 rounded-3xl ring-1 ring-tapti-gold/20 group-hover:ring-tapti-gold/40 transition-all duration-300 pointer-events-none"></div>
+  <div
+    class="absolute inset-0 rounded-3xl ring-1 ring-tapti-gold/20 group-hover:ring-tapti-gold/40 transition-all duration-300 pointer-events-none"
+  >
+  </div>
 </div>
