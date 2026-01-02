@@ -97,6 +97,26 @@ const products = catalogData.flowers;
                           ${details.total.toLocaleString("es-CL")}
                         </span>
                         <button
+                          class="decrease-cart-btn hidden bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 rounded-full p-1 transition-colors"
+                          data-product={JSON.stringify(product)}
+                          data-size={size}
+                          title="Quitar del carrito"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                        <button
                           class="add-to-cart-btn bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 rounded-full p-1 transition-colors"
                           data-product={JSON.stringify(product)}
                           data-size={size}
@@ -265,9 +285,32 @@ const products = catalogData.flowers;
 </Layout>
 
 <script>
-  import { addCartItem } from "../store/cartStore";
+  import { cartItems, addCartItem, decreaseCartItem } from "../store/cartStore";
 
-  // Cart Logic
+  // Re-render logic to show/hide decrease buttons
+  function updateButtons(items) {
+    document.querySelectorAll(".decrease-cart-btn").forEach((btn) => {
+      const productStr = btn.getAttribute("data-product");
+      const size = btn.getAttribute("data-size");
+      if (!productStr || !size) return;
+
+      const product = JSON.parse(productStr);
+      const itemId = `${product.name}-${size}`
+        .replace(/\s+/g, "-")
+        .toLowerCase();
+
+      if (items[itemId]) {
+        btn.classList.remove("hidden");
+      } else {
+        btn.classList.add("hidden");
+      }
+    });
+  }
+
+  // Subscribe
+  cartItems.subscribe(updateButtons);
+
+  // Add Item Logic
   const buttons = document.querySelectorAll(".add-to-cart-btn");
   buttons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -292,6 +335,23 @@ const products = catalogData.flowers;
         btn.classList.remove("bg-green-500", "text-white");
         btn.classList.add("bg-honey-bronze-500", "text-midnight-violet-950");
       }, 1000);
+    });
+  });
+
+  // Decrease Item Logic
+  const decButtons = document.querySelectorAll(".decrease-cart-btn");
+  decButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const productStr = btn.getAttribute("data-product");
+      const size = btn.getAttribute("data-size");
+
+      if (productStr && size) {
+        const product = JSON.parse(productStr);
+        const itemId = `${product.name}-${size}`
+          .replace(/\s+/g, "-")
+          .toLowerCase();
+        decreaseCartItem(itemId);
+      }
     });
   });
 

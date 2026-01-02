@@ -40,6 +40,25 @@ export function removeCartItem(itemId) {
     cartItems.set(rest);
 }
 
+export function decreaseCartItem(itemId) {
+    const currentItems = cartItems.get();
+    const existingItem = currentItems[itemId];
+
+    if (existingItem) {
+        if (existingItem.quantity > 1) {
+            cartItems.set({
+                ...currentItems,
+                [itemId]: {
+                    ...existingItem,
+                    quantity: existingItem.quantity - 1,
+                }
+            });
+        } else {
+            removeCartItem(itemId);
+        }
+    }
+}
+
 export function clearCart() {
     cartItems.set({});
 }

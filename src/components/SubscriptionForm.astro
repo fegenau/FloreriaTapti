@@ -190,12 +190,21 @@
 
         if (response.ok) {
           const result = await response.json();
-          alert("Orden creada exitosamente! ID: " + result.id);
-          // Here we would redirect to Webpay or clear form
-          if (form) form.reset();
-          isAddressValid = false;
-          addressInput.classList.remove("border-green-500");
-          addressInput.classList.add("border-purple-300/30");
+          // Redirect to Transbank
+          if (result.url && result.token) {
+            const form = document.createElement("form");
+            form.action = result.url;
+            form.method = "POST";
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "token_ws";
+            input.value = result.token;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+          } else {
+            alert("Error: No se recibió URL de pago");
+          }
         } else {
           alert("Error al crear la orden. Intente nuevamente.");
         }

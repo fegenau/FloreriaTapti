@@ -75,7 +75,7 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
   const btnCancel = document.getElementById("btn-cancel");
   const btnPay = document.getElementById("btn-pay");
 
-  function renderCart(items: any) {
+  function renderCart(items) {
     const itemsList = Object.values(items);
 
     if (itemsList.length === 0) {
@@ -138,6 +138,15 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
   });
 
   btnPay?.addEventListener("click", () => {
-    alert("¡Funcionalidad de pago próximamente! Gracias por probar la demo.");
+    // Mock checkout flow
+    // In the future this should gather cart items and send to /api/orders/create-cart
+
+    alert("¡Iniciando pago simulado!");
+
+    // Simulate redirection to Payment Gateway (or our Return URL for testing)
+    window.location.href = "/webpay/return?token_ws=MOCK_TOKEN";
+
+    // Clear cart (optional for demo)
+    // clearCart();
   });
 </script>

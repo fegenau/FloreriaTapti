@@ -4,7 +4,6 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
 import FloatingNav from "../components/FloatingNav.astro";
 import FloatingWhatsApp from "../components/FloatingWhatsApp.astro";
 import OccasionCard from "../components/OccasionCard.astro";
-import ProductFilters from "../components/ProductFilters.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 
 // Servicios principales
@@ -12,9 +11,8 @@ const mainServices = [
   {
     title: "Ramos Personalizados",
     description: "Diseños únicos adaptados a tus gustos y ocasión especial",
-    image:
-      "https://images.unsplash.com/photo-1563181797-e2024fc5ca63?w=400&h=500&fit=crop&crop=center",
-    url: "/catalogo",
+    image: "../public/images/Flores/Armando.png",
+    url: "/contacto",
   },
   {
     title: "Eventos Especiales",
@@ -42,63 +40,14 @@ const mainServices = [
   },
 ];
 
-// Datos para productos destacados
-const featuredProducts = [
-  {
-    title: "Ramos de Lujo",
-    description:
-      "Combinaciones únicas de flores premium que capturan la esencia de la elegancia",
-    image:
-      "https://images.unsplash.com/photo-1563181797-e2024fc5ca63?w=600&h=400&fit=crop&crop=center",
-    category: "ramos",
-    action: { text: "Explorar Ramos", url: "/catalogo?categoria=ramos" },
-  },
-  {
-    title: "Arreglos en Florero",
-    description:
-      "Diseños sofisticados que transforman cualquier espacio en un jardín de ensueño",
-    image:
-      "https://images.unsplash.com/photo-1487070183336-b863922373d4?w=600&h=400&fit=crop&crop=center",
-    category: "floreros",
-    action: { text: "Ver Floreros", url: "/catalogo?categoria=floreros" },
-  },
-  {
-    title: "Canastos Artesanales",
-    description:
-      "Creaciones rústicas y naturales perfectas para regalos especiales",
-    image:
-      "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=600&h=400&fit=crop&crop=center",
-    category: "canastos",
-    action: { text: "Ver Canastos", url: "/catalogo?categoria=canastos" },
-  },
-  {
-    title: "Flores Premium",
-    description:
-      "Selección exclusiva de flores importadas de la más alta calidad",
-    image:
-      "https://images.unsplash.com/photo-1518709268805-4e9042af2176?w=600&h=400&fit=crop&crop=center",
-    category: "premium",
-    action: { text: "Flores Premium", url: "/catalogo?categoria=premium" },
-  },
-  {
-    title: "Plantas de Interior",
-    description:
-      "Compañeros verdes que purifican tu hogar y alegran tu día a día",
-    image:
-      "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=600&h=400&fit=crop&crop=center",
-    category: "plantas",
-    action: { text: "Ver Plantas", url: "/catalogo?categoria=plantas" },
-  },
-  {
-    title: "Suscripciones Florales",
-    description:
-      "Recibe belleza fresca en tu puerta cada semana, mes o temporada",
-    image:
-      "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=600&h=400&fit=crop&crop=center",
-    category: "suscripciones",
-    action: { text: "Planes de Suscripción", url: "/membresias" },
-  },
-];
+import catalogData from "../data/catalog.json";
+
+// Seleccionar 6 flores más vendidas (o las que desees destacar)
+// Indices: 0 (Astromelias), 8 (Girasoles), 11 (Rosas Rojas), 10 (Tulipan), 4 (Gerberas), 6 (Pastel Nude)
+const selectedIndices = [0, 8, 11, 10, 4, 6];
+const bestSellers = selectedIndices
+  .map((index) => catalogData.flowers[index])
+  .filter(Boolean);
 
 // Ocasiones especiales
 const specialOccasions = [
@@ -116,27 +65,14 @@ const specialOccasions = [
   },
   {
     title: "Condolencias",
-    image:
-      "https://images.unsplash.com/photo-1571771319027-c8c69d065cad?w=400&h=300&fit=crop&crop=center",
+    image: "/images/Flores/Condolencias.png",
     url: "/catalogo?ocasion=condolencias",
   },
   {
     title: "San Valentín",
-    image:
-      "https://images.unsplash.com/photo-1518895312237-a9e0114f4902?w=400&h=300&fit=crop&crop=center",
+    image: "/images/Flores/Rosas rojas/Rosas rojas.png",
     url: "/catalogo?ocasion=san-valentin",
   },
-];
-
-// Filtros para productos
-const productFilters = [
-  { id: "todos", label: "Todos", count: featuredProducts.length },
-  { id: "ramos", label: "Ramos", count: 1 },
-  { id: "floreros", label: "Floreros", count: 1 },
-  { id: "canastos", label: "Canastos", count: 1 },
-  { id: "premium", label: "Premium", count: 1 },
-  { id: "plantas", label: "Plantas", count: 1 },
-  { id: "suscripciones", label: "Suscripciones", count: 1 },
 ];
 ---
 
@@ -213,35 +149,32 @@ const productFilters = [
         <h2
           class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
         >
-          Productos Destacados
+          Nuestros Favoritos
         </h2>
 
-        <!-- Filtros de productos -->
-        <ProductFilters tabs={productFilters} />
-
-        <!-- Grid de productos con categorías -->
+        <!-- Grid de productos destacados (6 flores más vendidas) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {
-            featuredProducts.map((product) => (
+            bestSellers.map((product) => (
               <BoutiqueCard
                 variant="gallery"
                 size="large"
-                background={product.image}
-                className="min-h-[400px] group"
-                data-category={product.category}
+                background={product.image[0].replace(/ /g, "%20")}
+                className="min-h-[400px] group cursor-pointer"
+                onclick="window.location.href='/catalogo'"
               >
                 <div class="space-y-4 relative z-10">
                   <h3 class="font-serif text-2xl md:text-3xl text-honey-bronze-400 mb-3 group-hover:text-honey-bronze-300 transition-colors">
-                    {product.title}
+                    {product.name}
                   </h3>
-                  <p class="text-cherry-blossom-100 mb-4 text-base md:text-lg group-hover:text-cherry-blossom-50 transition-colors">
-                    {product.description}
+                  <p class="text-cherry-blossom-100 mb-4 text-sm md:text-base line-clamp-3 group-hover:text-cherry-blossom-50 transition-colors">
+                    {product.Description}
                   </p>
                   <a
-                    href={product.action.url}
+                    href="/catalogo"
                     class="inline-flex items-center text-honey-bronze-400 hover:text-honey-bronze-300 font-medium transition-colors group/link text-lg relative z-10"
                   >
-                    {product.action.text}
+                    Ver Detalles
                     <svg
                       class="ml-2 w-5 h-5 transform group-hover/link:translate-x-1 transition-transform"
                       fill="none"
