@@ -11,7 +11,7 @@ const mainServices = [
   {
     title: "Ramos Personalizados",
     description: "Diseños únicos adaptados a tus gustos y ocasión especial",
-    image: "../public/images/Flores/Armando.png",
+    image: "../images/Flores/Armando.png",
     url: "/contacto",
   },
   {
@@ -65,12 +65,12 @@ const specialOccasions = [
   },
   {
     title: "Condolencias",
-    image: "/images/Flores/Condolencias.png",
+    image: "../public/images/Flores/Condolencias.jpeg",
     url: "/catalogo?ocasion=condolencias",
   },
   {
     title: "San Valentín",
-    image: "/images/Flores/Rosas rojas/Rosas rojas.png",
+    image: "/images/Flores/Rosas rojas/Rosas rojas.jpeg",
     url: "/catalogo?ocasion=san-valentin",
   },
 ];
@@ -152,7 +152,6 @@ const specialOccasions = [
           Nuestros Favoritos
         </h2>
 
-        <!-- Grid de productos destacados (6 flores más vendidas) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {
             bestSellers.map((product) => (

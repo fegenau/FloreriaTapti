@@ -3,7 +3,7 @@
   "flowers": [
     {
       "image": [
-        "images/Flores/Astromelias Surtidas/Astromelias Surtidas.png"
+        "images/Flores/Astromelias Surtidas/Astromelias Surtidas1.PNG"
       ],
       "Description": "Ramo de Astromelias de diferentes colores según disponibilidad por la temporada, acompañado de gypsophila. Para toda ocasión. ",
       "name": "Astromelias surtidas",
@@ -47,7 +47,8 @@
     },
     {
       "image": [
-        "images/Flores/Hortensias lisianthus celestes/Hortensias lisianthus celestes.png"
+        "images/Flores/Hortensias lisianthus celestes/Hortensias lisianthus celestes.png",
+        "images/Flores/Hortensias lisianthus celestes/Ramo Hortensias y lisianthus 2.PNG"
       ],
       "Description": "Es un ramo muy diferente, si quieres realmente sorprender a alguien que siempre reciba flores, este es el ramo que buscas!. Ramo de Hortencias en tonos celestes o azules, cardo azul, lisianthus claro y claveles blancos.",
       "name": "Hortensias lisianthus celestes",
@@ -70,7 +71,8 @@
     },
     {
       "image": [
-        "images/Flores/Hortensias minirosas/Hortensias minirosas.png"
+        "images/Flores/Hortensias minirosas/Hortensias minirosas.png",
+        "images/Flores/Hortensias minirosas/Ramo Hortensias y lisianthus rosado.PNG"
       ],
       "Description": "Es un ramo muy alegre y romantico, si quieres sorprender con un ramo diferente, elige este. Ramo de Hortencias en tonos claros y rosados, perritos, mini rosas y claveles verdes.",
       "name": "Hortensias minirosas",
@@ -92,7 +94,8 @@
     },
     {
       "image": [
-        "images/Flores/Coloridos gerberas/Coloridos gerberas.png"
+        "images/Flores/Coloridos gerberas/Coloridos gerberas.png",
+        "images/Flores/Coloridos gerberas/Ramo Girasoles y Gerberas 2.PNG"
       ],
       "Description": "Es un ramo para celebraciones, con él expresas mucha felicidad, cualquier espacio se llenará de alegría con este ramo. Ramo de girasoles, gerberas, mini rosas de colores vivos, claveles verdes, cardo azul, hypericum y follaje",
       "name": "Coloridos gerberas",
@@ -114,7 +117,9 @@
     },
     {
       "image": [
-        "images/Flores/Colorido calido/Colorido calido.png"
+        "images/Flores/Colorido calido/Colorido calido.png",
+        "images/Flores/Colorido calido/Ramo colorido 2.PNG",
+        "images/Flores/Colorido calido/Ramo colorido.mp4"
       ],
       "Description": "Este es el ramo favorito de muchas, debido a sus colores vibrantes y diferente. Ramo con mini rosas, claveles verdes y rosas, hypericum, cremón blanco craspedia y follaje.",
       "name": "Colorido calido",
@@ -180,7 +185,8 @@
     },
     {
       "image": [
-        "images/Flores/Girasoles clasico/Girasoles clasico.png"
+        "images/Flores/Girasoles clasico/Girasoles clasico.png",
+        "images/Flores/Girasoles clasico/Ramo girasoles clásico.PNG"
       ],
       "Description": "Este es uno de los ramos favoritos de todos para todos. Ramo de girasoles, mini rosas en color damasco, gypsophilia y follaje.",
       "name": "Girasoles clasico",
@@ -202,7 +208,8 @@
     },
     {
       "image": [
-        "images/Flores/Girasol rosado/Girasol rosado.png"
+        "images/Flores/Girasol rosado/Girasol rosado.png",
+        "images/Flores/Girasol rosado/Ramo Girasoles y claveles 3.PNG"
       ],
       "Description": "Este es un ramo romántico y alegre. Ramo de girasoles, mini rosas en tonos rosados, claveles, hypericum y follaje.",
       "name": "Girasoles rosado",
@@ -224,7 +231,8 @@
     },
     {
       "image": [
-        "images/Flores/Tulipanes/Tulipanes.png"
+        "images/Flores/Tulipanes/Tulipanes.jpeg",
+        "images/Flores/Tulipanes/Tulipanes 2.PNG"
       ],
       "Description": "Este es un ramo clásico pero muy elegante. Ramo de tulipanes y gypsophilia.",
       "name": "Tulipan",
@@ -247,7 +255,7 @@
     },
     {
       "image": [
-        "images/Flores/Rosas rojas/Rosas rojas.png"
+        "images/Flores/Rosas rojas/Rosas rojas.jpeg"
       ],
       "Description": "Este es un ramo clásico pero muy elegante. Ramo de rosas rojas, eucalipto y gypsophilia.",
       "name": "Rosas rojas",
@@ -273,7 +281,8 @@
     },
     {
       "image": [
-        "images/Flores/Rosas rosadas/Rosas rosadas.png"
+        "images/Flores/Rosas rosadas/Rosas rosadas.PNG",
+        "images/Flores/Rosas rosadas/Rosas rosadas 2.PNG"
       ],
       "Description": "Este es un ramo romántico pero muy elegante. Ramo de rosas rosadas, mini rosas, hypericum y eucalipto.",
       "name": "Rosas rosadas",
