@@ -42,14 +42,11 @@ const mainServices = [
 
 import catalogData from "../data/catalog.json";
 
-// Seleccionar 6 flores más vendidas (o las que desees destacar)
-// Indices: 0 (Astromelias), 8 (Girasoles), 11 (Rosas Rojas), 10 (Tulipan), 4 (Gerberas), 6 (Pastel Nude)
 const selectedIndices = [0, 8, 11, 10, 4, 6];
 const bestSellers = selectedIndices
   .map((index) => catalogData.flowers[index])
   .filter(Boolean);
 
-// Ocasiones especiales
 const specialOccasions = [
   {
     title: "Bodas y Aniversarios",
