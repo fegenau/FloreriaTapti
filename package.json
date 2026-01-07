@@ -9,6 +9,7 @@
     "format": "prettier --write ."
   },
   "dependencies": {
+    "@astrojs/node": "^8.3.4",
     "@astrojs/tailwind": "^5.1.0",
     "@nanostores/persistent": "^1.2.0",
     "@supabase/supabase-js": "^2.89.0",
@@ -17,7 +18,8 @@
     "nanostores": "^1.1.0",
     "tailwindcss": "^3.4.10",
     "transbank-sdk": "^6.1.1",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "prettier": "^3.3.3"

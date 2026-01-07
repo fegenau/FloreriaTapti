@@ -1,30 +1,50 @@
-
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 // @ts-ignore
 import { WebpayPlus, Options, IntegrationApiKeys, Environment, IntegrationCommerceCodes } from 'transbank-sdk';
+import { z } from 'zod';
+
+// Define Zod schema for input validation
+const OrderSchema = z.object({
+  name: z.string().min(3, "El nombre es muy corto"),
+  rut: z.string().min(8, "RUT inválido"), 
+  address: z.string().min(5, "Dirección inválida"),
+  duration: z.string().refine((val) => ['15', '30'].includes(val), {
+    message: "Duración inválida (debe ser 15 o 30 días)",
+  }),
+});
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
-    const { name, rut, address, duration } = data;
 
-    if (!name || !rut || !address || !duration) {
-      return new Response(JSON.stringify({ error: 'Faltan campos requeridos' }), { status: 400 });
+    // 1. Zod Validation
+    const validation = OrderSchema.safeParse(data);
+    if (!validation.success) {
+      return new Response(JSON.stringify({ 
+        error: 'Datos inválidos', 
+        details: validation.error.flatten() 
+      }), { status: 400 });
     }
 
-    // 1. Save local Order
-    // Calculate amount: 20000 for 15 days, 15000 for 30 days (Example)
+    const { name, rut, address, duration } = validation.data;
+
+    // 2. Calculate amount
     const amount = duration === '15' ? 20000 : 15000;
     
-    /* 
-    // TRANSBANK IMPLEMENTATION (Commented out waiting for credentials)
-    // Using explicit transaction keys for Development/Test
-    // For Production, user should switch to production keys
+    // 3. Transbank Configuration (Env Vars -> Fallback to Integration)
+    // Use WEBPAY_CC and WEBPAY_KEY from .env if available, otherwise default to SDK Integration keys
+    const commerceCode = import.meta.env.WEBPAY_CC || IntegrationCommerceCodes.WEBPAY_PLUS;
+    const apiKey = import.meta.env.WEBPAY_KEY || IntegrationApiKeys.WEBPAY;
+    const environment = import.meta.env.PROD 
+      ? Environment.Production 
+      : Environment.Integration;
+
+    /*
     const tx = new WebpayPlus.Transaction(new Options(
-      IntegrationCommerceCodes.WEBPAY_PLUS,
-      IntegrationApiKeys.WEBPAY,
-      Environment.Integration
+      commerceCode,
+      apiKey,
+      environment
     ));
     */
 
@@ -42,7 +62,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     if (orderError) {
       console.error('Supabase Order Error:', orderError);
-      return new Response(JSON.stringify({ error: 'Error BD' }), { status: 500 });
+      return new Response(JSON.stringify({ error: 'Error al crear orden en BD' }), { status: 500 });
     }
 
     const { error: subError } = await supabase
@@ -56,10 +76,10 @@ export const POST: APIRoute = async ({ request }) => {
     if (subError) console.error('Supabase Sub Error:', subError);
 
     /*
-    // 2. Init Transbank Transaction
-    const buyOrder = "O-" + Math.floor(Math.random() * 100000); // Unique ID for Transbank
-    const sessionId = orderData.id; // We use our UUID as session ID to link back
-    const returnUrl = new URL(request.url).origin + '/webpay/return'; // http://localhost:4321/webpay/return
+    // 4. Init Transbank Transaction
+    const buyOrder = "O-" + Math.floor(Math.random() * 100000); 
+    const sessionId = orderData.id; 
+    const returnUrl = new URL(request.url).origin + '/webpay/return';
 
     const createResponse = await tx.create(
       buyOrder, 
@@ -86,4 +106,3 @@ export const POST: APIRoute = async ({ request }) => {
     return new Response(JSON.stringify({ error: 'Server error: ' + String(e) }), { status: 500 });
   }
 }
-

@@ -1,0 +1,33 @@
+import { c as createComponent, a as createAstro, m as maybeRenderHead, b as addAttribute, e as renderSlot, r as renderTemplate } from './astro/server_BMt-k9YQ.mjs';
+import 'kleur/colors';
+import 'clsx';
+
+const $$Astro = createAstro();
+const $$BoutiqueCard = createComponent(($$result, $$props, $$slots) => {
+  const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
+  Astro2.self = $$BoutiqueCard;
+  const {
+    variant = "info",
+    size = "medium",
+    background,
+    className = "",
+    disableAnimation = false
+  } = Astro2.props;
+  const sizeClasses = {
+    small: "h-64 md:h-80",
+    medium: "h-80 md:h-96",
+    large: "h-96 md:h-[500px]",
+    hero: "h-screen max-h-[900px] min-h-[600px]"
+  };
+  const variantClasses = {
+    hero: "bg-gradient-to-br from-tapti-deep via-slate-900 to-tapti-deep",
+    gallery: "bg-tapti-deep/90 backdrop-blur-md border border-tapti-gold/30",
+    info: "bg-tapti-deep/70 backdrop-blur-md border border-tapti-gold/20",
+    contact: "bg-gradient-to-br from-tapti-deep to-slate-800 border border-tapti-gold/20",
+    services: "bg-tapti-deep/50 backdrop-blur-lg border border-tapti-gold/30"
+  };
+  const animationClasses = disableAnimation ? "" : "hover:scale-[1.01] hover:shadow-3xl";
+  return renderTemplate`${maybeRenderHead()}<div${addAttribute(`relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group ${sizeClasses[size]} ${variantClasses[variant]} ${animationClasses} ${className}`, "class")}${addAttribute(background ? `background-image: url(${background}); background-size: cover; background-position: center;` : "", "style")}> <!-- Overlay gradient si hay background image --> ${background && renderTemplate`<div class="absolute inset-0 bg-gradient-to-t from-tapti-deep/90 via-tapti-deep/50 to-tapti-deep/20 pointer-events-none"></div>`} <!-- Contenido --> <div class="relative h-full flex flex-col justify-end p-6 md:p-8 lg:p-12 text-white z-20"> ${renderSlot($$result, $$slots["default"])} </div> <!-- Efectos decorativos mejorados --> <div class="absolute top-0 right-0 w-40 h-40 bg-tapti-gold/10 rounded-full -translate-y-20 translate-x-20 blur-2xl group-hover:bg-tapti-gold/15 transition-colors duration-500 pointer-events-none"></div> <div class="absolute bottom-0 left-0 w-32 h-32 bg-tapti-gold/15 rounded-full translate-y-16 -translate-x-16 blur-xl group-hover:bg-tapti-gold/20 transition-colors duration-500 pointer-events-none"></div> <!-- Borde brillante sutil --> <div class="absolute inset-0 rounded-3xl ring-1 ring-tapti-gold/20 group-hover:ring-tapti-gold/40 transition-all duration-300 pointer-events-none"></div> </div>`;
+}, "D:/Trabajos/FloreriaTapti/src/components/BoutiqueCard.astro", void 0);
+
+export { $$BoutiqueCard as $ };
