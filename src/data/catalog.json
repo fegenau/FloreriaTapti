@@ -21,7 +21,8 @@
           "qty": 102,
           "total": 71500
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -43,7 +44,8 @@
           "qty": 74,
           "total": 45000
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -67,7 +69,8 @@
           "total": 62000
         },
         "XL": null
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -90,7 +93,8 @@
           "qty": 23,
           "total": 65500
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -113,7 +117,8 @@
           "qty": 25,
           "total": 47000
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -137,7 +142,8 @@
           "qty": 33,
           "total": 61750
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -159,7 +165,8 @@
           "qty": 38,
           "total": 75250
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -181,7 +188,8 @@
           "qty": 32,
           "total": 67250
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -204,7 +212,8 @@
           "qty": 25,
           "total": 50500
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -227,7 +236,8 @@
           "qty": 25,
           "total": 49500
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -251,7 +261,8 @@
           "qty": 16,
           "total": 50000
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -277,7 +288,8 @@
           "qty": 65,
           "total": 150000
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -304,7 +316,8 @@
           "qty": 73,
           "total": 162500
         }
-      }
+      },
+      "category": "Colección General"
     },
     {
       "image": [
@@ -318,7 +331,8 @@
           "qty": 1,
           "total": 70000
         }
-      }
+      },
+      "category": "Canastos"
     },
     {
       "image": [
@@ -332,7 +346,137 @@
           "qty": 1,
           "total": 70000
         }
-      }
+      },
+      "category": "Canastos"
+    },
+    {
+      "image": [
+        "images/Flores/Ramo novia/Ramo Novia rosa-damasco.jpg"
+      ],
+      "Description": "Un ramo de rosas rosadas, para el dia mas maravilloso de su vida.",
+      "name": "Ramo de novia rosas rosadas",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Matrimonio"
+    },
+    {
+      "image": [
+        "images/Flores/Ramo novia/Ramo novia rosas-Peonías 2.jpg"
+      ],
+      "Description": "Un ramo de peonías, para el dia mas maravilloso de su vida.",
+      "name": "Ramo de novia peonías",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Matrimonio"
+    },
+    {
+      "image": [
+        "images/Flores/Graduaciones/colorido S.PNG",
+        "images/Flores/Graduaciones/colorido.PNG"
+      ],
+      "Description": "Birrete con flores.",
+      "name": "Colorido",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Graduaciones"
+    },
+    {
+      "image": [
+        "images/Flores/Graduaciones/Caja Birrete.PNG",
+        "images/Flores/Graduaciones/Caja Birrete 2.PNG",
+        "images/Flores/Graduaciones/Caja Birrete 3.PNG"
+      ],
+      "Description": "Birrete con flores.",
+      "name": "Caja Birrete",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Graduaciones"
+    },
+    {
+      "image": [
+        "images/Flores/Graduaciones/Girasol Clásico S.PNG",
+        "images/Flores/Graduaciones/Girasol Clásico S 2.PNG"
+      ],
+      "Description": "Birrete con flores.",
+      "name": "Girasol Clásico S",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Graduaciones"
+    },
+    {
+      "image": [
+        "images/Flores/Graduaciones/girasoles y clavel.PNG"
+      ],
+      "Description": "Birrete con flores.",
+      "name": "Girasoles y claveles",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Graduaciones"
+    },
+    {
+      "image": [
+        "images/Flores/Graduaciones/IMG_0163.PNG",
+        "images/Flores/Graduaciones/IMG_0166.PNG",
+        "images/Flores/Graduaciones/IMG_0167.PNG",
+        "images/Flores/Graduaciones/IMG_0168.PNG"
+      ],
+      "Description": "Birrete con flores.",
+      "name": "Graduacion Feliz",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Graduaciones"
+    },
+    {
+      "image": [
+        "images/Flores/Graduaciones/pink.PNG",
+        "images/Flores/Graduaciones/pink 2.PNG"
+      ],
+      "Description": "Birrete con flores.",
+      "name": "Graduacion Pink",
+      "unit_price": 800,
+      "sizes": {
+        "Unico": {
+          "qty": 1,
+          "total": 0
+        }
+      },
+      "category": "Graduaciones"
     }
+
   ]
 }

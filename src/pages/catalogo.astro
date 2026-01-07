@@ -38,10 +38,45 @@ const products = catalogData.flowers;
         Catálogo de Flores
       </h1>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Tabs Navigation */}
+      <div class="flex flex-wrap justify-center gap-4 mb-12">
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300 bg-honey-bronze-500/10 active-tab"
+          data-category="all"
+        >
+          Todos
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Matrimonio"
+        >
+          Matrimonio
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Graduaciones"
+        >
+          Graduaciones
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Canastos"
+        >
+          Canastos
+        </button>
+      </div>
+
+      {/* Catalog Grid */}
+      <div
+        id="catalog-grid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 min-h-[50vh]"
+      >
         {
           products.map((product) => (
-            <div class="bg-white/5 p-6 rounded-lg border border-white/10 hover:border-honey-bronze-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:bg-white/10 group relative">
+            <div
+              class="catalog-item bg-white/5 p-6 rounded-lg border border-white/10 hover:border-honey-bronze-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:bg-white/10 group relative"
+              data-category={product.category || "Canastos"}
+            >
               <h2 class="font-serif text-2xl text-honey-bronze-100 mb-4">
                 {product.name}
               </h2>
@@ -49,10 +84,11 @@ const products = catalogData.flowers;
               {/* Image Carousel Container */}
               <div
                 class="relative h-64 overflow-hidden rounded-lg cursor-pointer group/carousel"
-                data-images={JSON.stringify([
-                  product.image[0],
-                  product.image[0],
-                ])}
+                data-images={JSON.stringify(
+                  product.image.length > 1
+                    ? product.image
+                    : [product.image[0], product.image[0]]
+                )}
                 data-name={product.name}
               >
                 {/* Carousel Track */}
@@ -63,9 +99,9 @@ const products = catalogData.flowers;
                     alt={product.name}
                     class="w-full h-full object-cover flex-shrink-0"
                   />
-                  {/* Duplicate Image (Demo) */}
+                  {/* Duplicate Image (Demo) or Second Image */}
                   <img
-                    src={product.image[0]}
+                    src={product.image[1] || product.image[0]}
                     alt={`${product.name} alt`}
                     class="w-full h-full object-cover flex-shrink-0"
                   />
@@ -78,7 +114,7 @@ const products = catalogData.flowers;
                 </div>
               </div>
 
-              <div class="space-y-4">
+              <div class="space-y-4 mt-6">
                 <div class="flex justify-between text-sm text-cherry-blossom-100 border-b border-white/10 pb-2">
                   <span>Tamaño</span>
                   <span>Varas</span>
@@ -510,5 +546,33 @@ const products = catalogData.flowers;
       }
     });
   }
+  // Tab Filtering Logic
+  const tabs = document.querySelectorAll(".tab-btn");
+  const items = document.querySelectorAll(".catalog-item");
+
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      // 1. Remove active state from all tabs
+      tabs.forEach((t) => {
+        t.classList.remove("bg-honey-bronze-500/10", "active-tab");
+      });
+
+      // 2. Add active state to clicked tab
+      tab.classList.add("bg-honey-bronze-500/10", "active-tab");
+
+      // 3. Filter items
+      const category = tab.getAttribute("data-category");
+
+      items.forEach((item) => {
+        const itemCategory = item.getAttribute("data-category");
+
+        if (category === "all" || itemCategory === category) {
+          item.classList.remove("hidden");
+        } else {
+          item.classList.add("hidden");
+        }
+      });
+    });
+  });
 </script>
 ```
