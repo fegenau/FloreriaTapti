@@ -1,11 +1,11 @@
 /* empty css                                   */
-import { c as createComponent, m as maybeRenderHead, r as renderTemplate, a as createAstro, b as addAttribute, d as renderComponent } from '../chunks/astro/server_BMt-k9YQ.mjs';
-import 'kleur/colors';
-import { $ as $$Layout } from '../chunks/Layout_CBWgi9Oy.mjs';
-import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B1XAydSN.mjs';
+import { e as createComponent, m as maybeRenderHead, r as renderTemplate, f as createAstro, h as addAttribute, l as renderComponent } from '../chunks/astro/server_JR3jxAAG.mjs';
+import 'piccolore';
+import { $ as $$Layout } from '../chunks/Layout_LUfXM-1N.mjs';
+import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B3zIEEWi.mjs';
 import 'clsx';
 /* empty css                                 */
-import { c as catalogData } from '../chunks/catalog_CMf3dlVN.mjs';
+import { c as catalogData } from '../chunks/catalog_Emdk47vd.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$FloatingWhatsApp = createComponent(($$result, $$props, $$slots) => {

@@ -10,61 +10,20 @@ import {
   IntegrationCommerceCodes,
 } from "transbank-sdk";
 
-const token = Astro.url.searchParams.get("token_ws");
+const status = Astro.url.searchParams.get("status") || "unknown";
+const messageFromUrl = Astro.url.searchParams.get("message");
+const orderId = Astro.url.searchParams.get("orderId");
 
-let status = "error";
-let message = "Error en la transacción.";
-let orderId = "";
-
-if (token) {
-  /*
-  try {
-    const tx = new WebpayPlus.Transaction(
-      new Options(
-        IntegrationCommerceCodes.WEBPAY_PLUS,
-        IntegrationApiKeys.WEBPAY,
-        Environment.Integration
-      )
-    );
-
-    // Commit the transaction to check status
-    const response = await tx.commit(token);
-
-    if (response.status === "AUTHORIZED") {
-      status = "success";
-      message = "Pago exitoso! Tu suscripción ha sido activada.";
-      orderId = response.sessionId; // We stored UUID in sessionId
-
-      // Update Supabase
-      const { error } = await supabase
-        .from("orders")
-        .update({ status: "paid" })
-        .eq("id", orderId);
-
-      if (error) console.error("Error updating order:", error);
-
-      // Activate subscription
-      await supabase
-        .from("subscriptions")
-        .update({ is_active: true })
-        .eq("order_id", orderId);
-    } else {
-      status = "failed";
-      message = "El pago fue rechazado o anulado.";
-    }
-  } catch (e) {
-    console.error(e);
-    message = "Error al confirmar la transacción con Transbank.";
-  }
-  */
-  status = "pending";
-  message = "Transacción simulada (Transbank desactivado).";
+let message = "";
+if (messageFromUrl) {
+  message = decodeURIComponent(messageFromUrl);
 } else {
-  // TBK_TOKEN implies user aborted
-  if (Astro.url.searchParams.get("TBK_TOKEN")) {
-    status = "aborted";
-    message = "Anulaste la compra.";
-  }
+  if (status === "success")
+    message = "Pago exitoso! Tu suscripción ha sido activada.";
+  else if (status === "aborted") message = "Anulaste la compra.";
+  else if (status === "timeout") message = "El tiempo para pagar expiró.";
+  else if (status === "failed") message = "El pago fue rechazado.";
+  else message = "Error desconocido.";
 }
 ---
 

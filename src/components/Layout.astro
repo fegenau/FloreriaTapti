@@ -24,6 +24,10 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <ViewTransitions />
+    <script
+      is:inline
+      src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.GOOGLE_MAPS_API_KEY}&libraries=places`}
+    ></script>
   </head>
   <body
     class={`min-h-screen bg-white text-gray-900 ${showEntrance ? "overflow-hidden" : "overflow-visible"}`}
