@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
-import { initTransaction } from '../../../lib/webpay';
+import { initTransaction, startOneclick } from '../../../lib/webpay';
 import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
 
@@ -44,33 +44,49 @@ export const POST: APIRoute = async ({ request }) => {
     if (orderError) throw new Error(`Error creating order: ${orderError.message}`);
 
     // 2. Create Subscription (Inactive)
-    // ... subscription creation ...
+    const startDate = new Date();
+    const endDate = new Date();
+    const durationDays = parseInt(duration);
+    endDate.setDate(startDate.getDate() + durationDays);
 
-    // 3. Init Webpay
-    const returnUrl = `http://${request.headers.get('host')}/api/webpay/return`;
-    const { url, token } = await initTransaction(price, buyOrder, sessionId, returnUrl);
+    const { error: subError } = await supabase
+      .from('subscriptions')
+      .insert([{
+        order_id: order.id,
+        duration_days: durationDays,
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        is_active: false
+      }]);
 
-    // 4. Update Order to PENDING_PAYMENT (using sessionId as link if needed, or by ID)
-    // IMPORTANT: Webpay return uses session_id to identify order. We stored order.id in session_id concept previously or need to link them.
-    // In previous code, we didn't explicitly link sessionId to orderId in DB, but return.ts uses "session_id" from Webpay response as orderId.
-    // So distinct from "sessionId" var here? 
-    // Let's ensure we send order.id as session_id to Webpay so return.ts works.
+    if (subError) throw new Error(`Error creating subscription: ${subError.message}`);
+
+    // 3. Start Oneclick Enrollment
+    // We pass orderId in the URL to identify the order on return, as Oneclick finish only returns the token
+    const returnUrl = `http://${request.headers.get('host')}/api/webpay/return?orderId=${order.id}`;
     
-    // Re-init transaction with order.id as session_id for consistency with return logic
-    const { url: urlFinal, token: tokenFinal } = await initTransaction(price, buyOrder, order.id, returnUrl);
+    // Oneclick requires a unique username per user. We use user-{order.id} to map 1-to-1 with the subscription attempt.
+    const username = `user-${order.id}`;
+    
+    // Switch to Oneclick Enrollment
+    const { token, url_webpay } = await startOneclick(username, email, returnUrl);
 
+    // Update order status to indicate pending enrollment (optional, or keep pending_payment)
     await supabase
         .from('orders')
-        .update({ status: 'pending_payment' })
+        .update({ status: 'pending_payment' }) // Or 'pending_enrollment'
         .eq('id', order.id);
 
-    return new Response(JSON.stringify({ url: urlFinal, token: tokenFinal }), {
+    // Frontend expects { url, token }. Oneclick returns url_webpay.
+    return new Response(JSON.stringify({ url: url_webpay, token: token }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
     });
 
   } catch (e) {
-    console.error(e);
-    return new Response(JSON.stringify({ error: 'Server error: ' + String(e) }), { status: 500 });
+    console.error('Error in orders/create:', e);
+    // Safer error message conversion
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return new Response(JSON.stringify({ error: 'Server error: ' + errorMessage }), { status: 500 });
   }
 }
