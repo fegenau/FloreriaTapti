@@ -71,59 +71,70 @@ const accessories = catalog.accessories || [];
 <script>
   import { addCartItem } from "../store/cartStore";
 
-  const modal = document.getElementById("accessories-modal");
-  const btnSkip = document.getElementById("btn-skip-accessories");
-  const btnConfirm = document.getElementById("btn-confirm-accessories");
-  const addButtons = document.querySelectorAll(".btn-add-accessory");
+  document.addEventListener("astro:page-load", () => {
+    const modal = document.getElementById("accessories-modal");
+    const btnSkip = document.getElementById("btn-skip-accessories");
+    const btnConfirm = document.getElementById("btn-confirm-accessories");
+    const addButtons = document.querySelectorAll(".btn-add-accessory");
 
-  // Logic to show/hide modal is handled by parent or custom events
+    // Logic to show/hide modal is handled by parent or custom events
 
-  // Add Accessory Logic
-  addButtons.forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      const target = e.currentTarget as HTMLButtonElement;
-      const { id, name, price, image } = target.dataset;
+    // Add Accessory Logic
+    addButtons.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const { id, name, price, image } = target.dataset;
 
-      addCartItem({
-        id: id!,
-        name: name!,
-        price: parseInt(price!),
-        image: image!,
-        quantity: 1,
-        size: "Único",
+        if (id && name && price) {
+          addCartItem({
+            id: id,
+            name: name,
+            price: parseInt(price),
+            image: image || "", // Handle missing image if needed
+            quantity: 1,
+            size: "Único",
+          });
+
+          target.textContent = "¡Agregado!";
+          target.classList.add(
+            "bg-green-500/20",
+            "text-green-300",
+            "border-green-500/50",
+          ); // Fixed classList syntax
+
+          target.classList.add(
+            "bg-green-500/20",
+            "text-green-300",
+            "border-green-500/50",
+          );
+
+          setTimeout(() => {
+            target.textContent = "Agregar";
+            target.classList.remove(
+              "bg-green-500/20",
+              "text-green-300",
+              "border-green-500/50",
+            );
+          }, 2000);
+        }
       });
+    });
 
-      target.textContent = "¡Agregado!";
-      target.classList.add(
-        "bg-green-500/20",
-        "text-green-300",
-        "border-green-500/50"
-      );
-      setTimeout(() => {
-        target.textContent = "Agregar";
-        target.classList.remove(
-          "bg-green-500/20",
-          "text-green-300",
-          "border-green-500/50"
-        );
-      }, 2000);
+    function closeModal() {
+      modal?.classList.add("opacity-0", "pointer-events-none");
+    }
+
+    // Navigation Logic
+    btnSkip?.addEventListener("click", () => {
+      // Dispatch event to continue checkout without adding more
+      document.dispatchEvent(new CustomEvent("accessories-complete"));
+      closeModal();
+    });
+
+    btnConfirm?.addEventListener("click", () => {
+      // Dispatch event to continue checkout
+      document.dispatchEvent(new CustomEvent("accessories-complete"));
+      closeModal();
     });
   });
-
-  // Navigation Logic
-  btnSkip?.addEventListener("click", () => {
-    // Dispatch event to continue checkout without adding more
-    document.dispatchEvent(new CustomEvent("accessories-complete"));
-    closeModal();
-  });
-
-  btnConfirm?.addEventListener("click", () => {
-    // Dispatch event to continue checkout
-    document.dispatchEvent(new CustomEvent("accessories-complete"));
-    closeModal();
-  });
-
-  function closeModal() {
-    modal?.classList.add("opacity-0", "pointer-events-none");
-  }
 </script>

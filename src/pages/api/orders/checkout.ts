@@ -65,6 +65,23 @@ export const POST: APIRoute = async ({ request }) => {
 
   } catch (e: any) {
     console.error("Checkout Error (Safe Log):");
+    
+    if (e instanceof z.ZodError) {
+      const fieldErrors: Record<string, string> = {};
+      e.errors.forEach((err) => {
+        if (err.path) {
+          fieldErrors[err.path[0]] = err.message;
+        }
+      });
+      return new Response(JSON.stringify({ 
+        error: "Error de validación", 
+        fieldErrors 
+      }), { 
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
     console.error(e?.message || String(e));
     if (e?.stack) console.error(e.stack);
     
