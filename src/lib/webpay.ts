@@ -29,14 +29,12 @@ export const confirmTransaction = async (token: string) => {
 };
 
 // Oneclick Mall (Recurring payments for Subscriptions)
-// Mall Code: 597055555530 (Integration)
-// Store Code: 597055555532 (Integration - Child)
 
 const getOneclickConfig = () => {
     const commerceCode = import.meta.env.ONECLICK_MALL_CC || IntegrationCommerceCodes.ONECLICK_MALL;
     const apiKey = import.meta.env.ONECLICK_KEY || IntegrationApiKeys.WEBPAY; // Usually same key for integration
     const environment = import.meta.env.PROD ? Environment.Production : Environment.Integration;
-    const childCommerceCode = import.meta.env.ONECLICK_CHILD_CC || "597055555532"; // Standard child code helper
+    const childCommerceCode = import.meta.env.ONECLICK_CHILD_CC;
     
     return { commerceCode, apiKey, environment, childCommerceCode };
 };
