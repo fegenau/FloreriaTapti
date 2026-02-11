@@ -1,4 +1,4 @@
-import { s as supabase, i as initTransaction } from '../../../chunks/webpay_BAl_En9i.mjs';
+import { s as supabase, i as initTransaction } from '../../../chunks/webpay_CGIi10RO.mjs';
 import { z } from 'zod';
 import { v as validateRut } from '../../../chunks/rutValidator_CFmsqFmV.mjs';
 export { renderers } from '../../../renderers.mjs';
@@ -45,6 +45,21 @@ const POST = async ({ request }) => {
     });
   } catch (e) {
     console.error("Checkout Error (Safe Log):");
+    if (e instanceof z.ZodError) {
+      const fieldErrors = {};
+      e.errors.forEach((err) => {
+        if (err.path) {
+          fieldErrors[err.path[0]] = err.message;
+        }
+      });
+      return new Response(JSON.stringify({
+        error: "Error de validación",
+        fieldErrors
+      }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
     console.error(e?.message || String(e));
     if (e?.stack) console.error(e.stack);
     return new Response(JSON.stringify({ error: "Server error: " + (e?.message || String(e)) }), { status: 500 });

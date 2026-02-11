@@ -1,13 +1,16 @@
 /* empty css                                   */
-import { e as createComponent, l as renderComponent, k as renderScript, r as renderTemplate, m as maybeRenderHead, h as addAttribute } from '../chunks/astro/server_JR3jxAAG.mjs';
+import { e as createComponent, f as createAstro, l as renderComponent, k as renderScript, r as renderTemplate, m as maybeRenderHead, h as addAttribute } from '../chunks/astro/server_JR3jxAAG.mjs';
 import 'piccolore';
-import { $ as $$Layout } from '../chunks/Layout_LUfXM-1N.mjs';
+import { $ as $$Layout } from '../chunks/Layout_CGBRDME9.mjs';
 import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B3zIEEWi.mjs';
 import { $ as $$SubscriptionForm } from '../chunks/SubscriptionForm_S-epma5z.mjs';
 import { c as catalogData } from '../chunks/catalog_Emdk47vd.mjs';
 export { renderers } from '../renderers.mjs';
 
+const $$Astro = createAstro();
 const $$Catalogo = createComponent(($$result, $$props, $$slots) => {
+  const Astro2 = $$result.createAstro($$Astro, $$props, $$slots);
+  Astro2.self = $$Catalogo;
   const products = catalogData.flowers;
   return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "Cat\xE1logo Completo | Tapti" }, { "default": ($$result2) => renderTemplate` ${maybeRenderHead()}<div class="min-h-screen pt-24 pb-12 px-4"> ${renderComponent($$result2, "BoutiqueCard", $$BoutiqueCard, { "variant": "services", "size": "large", "className": "!h-auto min-h-[70vh] p-8 max-w-7xl mx-auto", "disableAnimation": true }, { "default": ($$result3) => renderTemplate` <div class="mb-16 text-center"> <h2 class="font-serif text-3xl text-honey-bronze-100 mb-6">
 Suscripciones Florales

@@ -1,7 +1,7 @@
 /* empty css                                   */
 import { e as createComponent, l as renderComponent, r as renderTemplate, m as maybeRenderHead, k as renderScript } from '../chunks/astro/server_JR3jxAAG.mjs';
 import 'piccolore';
-import { $ as $$Layout } from '../chunks/Layout_LUfXM-1N.mjs';
+import { $ as $$Layout } from '../chunks/Layout_CGBRDME9.mjs';
 import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B3zIEEWi.mjs';
 import { $ as $$SubscriptionForm } from '../chunks/SubscriptionForm_S-epma5z.mjs';
 export { renderers } from '../renderers.mjs';

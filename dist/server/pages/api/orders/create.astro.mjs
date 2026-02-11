@@ -1,4 +1,4 @@
-import { s as supabase, i as initTransaction } from '../../../chunks/webpay_BAl_En9i.mjs';
+import { s as supabase, a as startOneclick } from '../../../chunks/webpay_CGIi10RO.mjs';
 import { z } from 'zod';
 import { v as validateRut } from '../../../chunks/rutValidator_CFmsqFmV.mjs';
 export { renderers } from '../../../renderers.mjs';
@@ -30,17 +30,30 @@ const POST = async ({ request }) => {
       status: "draft"
     }]).select().single();
     if (orderError) throw new Error(`Error creating order: ${orderError.message}`);
-    const returnUrl = `http://${request.headers.get("host")}/api/webpay/return`;
-    const { url, token } = await initTransaction(price, buyOrder, sessionId, returnUrl);
-    const { url: urlFinal, token: tokenFinal } = await initTransaction(price, buyOrder, order.id, returnUrl);
+    const startDate = /* @__PURE__ */ new Date();
+    const endDate = /* @__PURE__ */ new Date();
+    const durationDays = parseInt(duration);
+    endDate.setDate(startDate.getDate() + durationDays);
+    const { error: subError } = await supabase.from("subscriptions").insert([{
+      order_id: order.id,
+      duration_days: durationDays,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      is_active: false
+    }]);
+    if (subError) throw new Error(`Error creating subscription: ${subError.message}`);
+    const returnUrl = `http://${request.headers.get("host")}/api/webpay/return?orderId=${order.id}`;
+    const username = `user-${order.id}`;
+    const { token, url_webpay } = await startOneclick(username, email, returnUrl);
     await supabase.from("orders").update({ status: "pending_payment" }).eq("id", order.id);
-    return new Response(JSON.stringify({ url: urlFinal, token: tokenFinal }), {
+    return new Response(JSON.stringify({ url: url_webpay, token }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
     });
   } catch (e) {
-    console.error(e);
-    return new Response(JSON.stringify({ error: "Server error: " + String(e) }), { status: 500 });
+    console.error("Error in orders/create:", e);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return new Response(JSON.stringify({ error: "Server error: " + errorMessage }), { status: 500 });
   }
 };
 
