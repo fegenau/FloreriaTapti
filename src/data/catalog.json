@@ -3,7 +3,7 @@
   "flowers": [
     {
       "image": [
-        "images/Flores/Astromelias Surtidas/Astromelias Surtidas1.PNG"
+        "images/Flores/Astromelias Surtidas/Astromelias Surtidas1.webp"
       ],
       "Description": "Ramo de Astromelias de diferentes colores según disponibilidad por la temporada, acompañado de gypsophila. Para toda ocasión. ",
       "name": "Astromelias surtidas",
@@ -50,7 +50,7 @@
     {
       "image": [
         "images/Flores/Hortensias lisianthus celestes/Hortensias lisianthus celestes.png",
-        "images/Flores/Hortensias lisianthus celestes/Ramo Hortensias y lisianthus 2.PNG"
+        "images/Flores/Hortensias lisianthus celestes/Ramo Hortensias y lisianthus 2.webp"
       ],
       "Description": "Es un ramo muy diferente, si quieres realmente sorprender a alguien que siempre reciba flores, este es el ramo que buscas!. Ramo de Hortencias en tonos celestes o azules, cardo azul, lisianthus claro y claveles blancos.",
       "name": "Hortensias lisianthus celestes",
@@ -123,8 +123,7 @@
     {
       "image": [
         "images/Flores/Colorido calido/Colorido calido.png",
-        "images/Flores/Colorido calido/Ramo colorido 2.PNG",
-        "images/Flores/Colorido calido/Ramo colorido.mp4"
+        "images/Flores/Colorido calido/Ramo colorido 2.webp"
       ],
       "Description": "Este es el ramo favorito de muchas, debido a sus colores vibrantes y diferente. Ramo con mini rosas, claveles verdes y rosas, hypericum, cremón blanco craspedia y follaje.",
       "name": "Colorido calido",
@@ -194,7 +193,7 @@
     {
       "image": [
         "images/Flores/Girasoles clasico/Girasoles clasico.png",
-        "images/Flores/Girasoles clasico/Ramo girasoles clásico.PNG"
+        "images/Flores/Girasoles clasico/Ramo girasoles clásico.webp"
       ],
       "Description": "Este es uno de los ramos favoritos de todos para todos. Ramo de girasoles, mini rosas en color damasco, gypsophilia y follaje.",
       "name": "Girasoles clasico",
@@ -242,7 +241,7 @@
     {
       "image": [
         "images/Flores/Tulipanes/Tulipanes.jpeg",
-        "images/Flores/Tulipanes/Tulipanes 2.PNG"
+        "images/Flores/Tulipanes/Tulipanes 2.webp"
       ],
       "Description": "Este es un ramo clásico pero muy elegante. Ramo de tulipanes y gypsophilia.",
       "name": "Tulipan",
@@ -477,6 +476,28 @@
       },
       "category": "Graduaciones"
     }
-
+  ],
+  "accessories": [
+    {
+      "id": "acc-chocolates",
+      "name": "Caja de Chocolates",
+      "price": 5000,
+      "image": "/images/accessories/chocolates.png",
+      "description": "Exquisita selección de chocolates para endulzar el momento."
+    },
+    {
+      "id": "acc-peluche",
+      "name": "Peluche Pequeño",
+      "price": 8000,
+      "image": "/images/accessories/peluche.png",
+      "description": "Un tierno compañero para acompañar tus flores."
+    },
+    {
+      "id": "acc-globo",
+      "name": "Globo Metálico",
+      "price": 3000,
+      "image": "/images/accessories/globo.png",
+      "description": "Globo decorativo para toda ocasión (Feliz Cumpleaños, Amor, etc)."
+    }
   ]
 }

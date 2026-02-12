@@ -1,0 +1,140 @@
+---
+interface Props {
+  isOpen: boolean;
+}
+
+const { isOpen } = Astro.props;
+import catalog from "../data/catalog.json";
+
+const accessories = catalog.accessories || [];
+---
+
+<div
+  id="accessories-modal"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+  aria-hidden="true"
+>
+  <div
+    class="bg-midnight-violet-900 border border-white/10 rounded-xl p-6 max-w-2xl w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300"
+  >
+    <h2 class="text-2xl font-serif text-honey-bronze-100 mb-2 text-center">
+      ¿Deseas agregar algo más?
+    </h2>
+    <p class="text-gray-300 text-center mb-6">
+      Complementa tu regalo con estos detalles especiales.
+    </p>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      {
+        accessories.map((item) => (
+          <div class="bg-white/5 rounded-lg p-4 border border-white/10 flex flex-col items-center text-center hover:bg-white/10 transition-colors">
+            <div class="w-20 h-20 bg-black/20 rounded-full mb-3 flex items-center justify-center overflow-hidden">
+              {/* Placeholder or actual image if available */}
+              <span class="text-3xl">🎁</span>
+            </div>
+            <h3 class="font-medium text-honey-bronze-200 mb-1">{item.name}</h3>
+            <p class="text-sm text-gray-400 mb-3">{item.description}</p>
+            <p class="font-bold text-white mb-3">
+              ${item.price.toLocaleString("es-CL")}
+            </p>
+            <button
+              class="btn-add-accessory px-4 py-2 bg-white/10 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 rounded-full text-sm transition-all border border-white/20"
+              data-id={item.id}
+              data-name={item.name}
+              data-price={item.price}
+              data-image={item.image}
+            >
+              Agregar
+            </button>
+          </div>
+        ))
+      }
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4 border-t border-white/10">
+      <button
+        id="btn-skip-accessories"
+        class="px-6 py-2 text-gray-400 hover:text-white transition-colors"
+      >
+        No, gracias
+      </button>
+      <button
+        id="btn-confirm-accessories"
+        class="px-6 py-2 bg-honey-bronze-500 text-midnight-violet-950 rounded-lg hover:bg-honey-bronze-400 transition-colors font-bold"
+      >
+        Continuar al Pago
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  import { addCartItem } from "../store/cartStore";
+
+  document.addEventListener("astro:page-load", () => {
+    const modal = document.getElementById("accessories-modal");
+    const btnSkip = document.getElementById("btn-skip-accessories");
+    const btnConfirm = document.getElementById("btn-confirm-accessories");
+    const addButtons = document.querySelectorAll(".btn-add-accessory");
+
+    // Logic to show/hide modal is handled by parent or custom events
+
+    // Add Accessory Logic
+    addButtons.forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const target = e.currentTarget as HTMLButtonElement;
+        const { id, name, price, image } = target.dataset;
+
+        if (id && name && price) {
+          addCartItem({
+            id: id,
+            name: name,
+            price: parseInt(price),
+            image: image || "", // Handle missing image if needed
+            quantity: 1,
+            size: "Único",
+          });
+
+          target.textContent = "¡Agregado!";
+          target.classList.add(
+            "bg-green-500/20",
+            "text-green-300",
+            "border-green-500/50",
+          ); // Fixed classList syntax
+
+          target.classList.add(
+            "bg-green-500/20",
+            "text-green-300",
+            "border-green-500/50",
+          );
+
+          setTimeout(() => {
+            target.textContent = "Agregar";
+            target.classList.remove(
+              "bg-green-500/20",
+              "text-green-300",
+              "border-green-500/50",
+            );
+          }, 2000);
+        }
+      });
+    });
+
+    function closeModal() {
+      modal?.classList.add("opacity-0", "pointer-events-none");
+    }
+
+    // Navigation Logic
+    btnSkip?.addEventListener("click", () => {
+      // Dispatch event to continue checkout without adding more
+      document.dispatchEvent(new CustomEvent("accessories-complete"));
+      closeModal();
+    });
+
+    btnConfirm?.addEventListener("click", () => {
+      // Dispatch event to continue checkout
+      document.dispatchEvent(new CustomEvent("accessories-complete"));
+      closeModal();
+    });
+  });
+</script>

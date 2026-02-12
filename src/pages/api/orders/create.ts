@@ -1,108 +1,92 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
-// @ts-ignore
-import { WebpayPlus, Options, IntegrationApiKeys, Environment, IntegrationCommerceCodes } from 'transbank-sdk';
+import { initTransaction, startOneclick } from '../../../lib/webpay';
 import { z } from 'zod';
+import { validateRut } from '../../../lib/rutValidator';
 
 // Define Zod schema for input validation
-const OrderSchema = z.object({
-  name: z.string().min(3, "El nombre es muy corto"),
-  rut: z.string().min(8, "RUT inválido"), 
-  address: z.string().min(5, "Dirección inválida"),
-  duration: z.string().refine((val) => ['15', '30'].includes(val), {
-    message: "Duración inválida (debe ser 15 o 30 días)",
-  }),
+const bodySchema = z.object({
+  name: z.string().min(2),
+  rut: z.string().refine(validateRut, "RUT inválido"),
+  address: z.string().min(5),
+  email: z.string().email(),
+  phone: z.string().min(8),
+  commune: z.string().min(3),
+  duration: z.string().refine((val) => ["15", "30"].includes(val)),
 });
 
 export const POST: APIRoute = async ({ request }) => {
   try {
-    const data = await request.json();
-
-    // 1. Zod Validation
-    const validation = OrderSchema.safeParse(data);
-    if (!validation.success) {
-      return new Response(JSON.stringify({ 
-        error: 'Datos inválidos', 
-        details: validation.error.flatten() 
-      }), { status: 400 });
-    }
-
-    const { name, rut, address, duration } = validation.data;
-
-    // 2. Calculate amount
-    const amount = duration === '15' ? 20000 : 15000;
+    const body = await request.json();
+    const { name, rut, address, email, phone, commune, duration } = bodySchema.parse(body);
     
-    // 3. Transbank Configuration (Env Vars -> Fallback to Integration)
-    // Use WEBPAY_CC and WEBPAY_KEY from .env if available, otherwise default to SDK Integration keys
-    const commerceCode = import.meta.env.WEBPAY_CC || IntegrationCommerceCodes.WEBPAY_PLUS;
-    const apiKey = import.meta.env.WEBPAY_KEY || IntegrationApiKeys.WEBPAY;
-    const environment = import.meta.env.PROD 
-      ? Environment.Production 
-      : Environment.Integration;
+    // ... price calculation ...
+    const price = duration === "15" ? 20000 : 15000;
+    const buyOrder = `SUB-${Date.now()}`;
+    const sessionId = `s-${Math.random().toString(36).substring(7)}`;
 
-    /*
-    const tx = new WebpayPlus.Transaction(new Options(
-      commerceCode,
-      apiKey,
-      environment
-    ));
-    */
-
-    const { data: orderData, error: orderError } = await supabase
+    // 1. Create Order in DRAFT
+    const { data: order, error: orderError } = await supabase
       .from('orders')
-      .insert([{ 
-          customer_name: name,
-          customer_rut: rut,
-          shipping_address: address,
-          total_amount: amount,
-          status: 'pending' 
+      .insert([{
+        customer_name: name,
+        customer_rut: rut,
+        customer_email: email,
+        customer_phone: phone,
+        shipping_address: address,
+        shipping_commune: commune,
+        total_amount: price,
+        status: 'draft' 
       }])
       .select()
       .single();
 
-    if (orderError) {
-      console.error('Supabase Order Error:', orderError);
-      return new Response(JSON.stringify({ error: 'Error al crear orden en BD' }), { status: 500 });
-    }
+    if (orderError) throw new Error(`Error creating order: ${orderError.message}`);
+
+    // 2. Create Subscription (Inactive)
+    const startDate = new Date();
+    const endDate = new Date();
+    const durationDays = parseInt(duration);
+    endDate.setDate(startDate.getDate() + durationDays);
 
     const { error: subError } = await supabase
       .from('subscriptions')
       .insert([{
-          order_id: orderData.id,
-          duration_days: parseInt(duration),
-          start_date: new Date().toISOString(),
+        order_id: order.id,
+        duration_days: durationDays,
+        start_date: startDate.toISOString(),
+        end_date: endDate.toISOString(),
+        is_active: false
       }]);
 
-    if (subError) console.error('Supabase Sub Error:', subError);
+    if (subError) throw new Error(`Error creating subscription: ${subError.message}`);
 
-    /*
-    // 4. Init Transbank Transaction
-    const buyOrder = "O-" + Math.floor(Math.random() * 100000); 
-    const sessionId = orderData.id; 
-    const returnUrl = new URL(request.url).origin + '/webpay/return';
+    // 3. Start Oneclick Enrollment
+    // We pass orderId in the URL to identify the order on return, as Oneclick finish only returns the token
+    const returnUrl = `http://${request.headers.get('host')}/api/webpay/return?orderId=${order.id}`;
+    
+    // Oneclick requires a unique username per user. We use user-{order.id} to map 1-to-1 with the subscription attempt.
+    const username = `user-${order.id}`;
+    
+    // Switch to Oneclick Enrollment
+    const { token, url_webpay } = await startOneclick(username, email, returnUrl);
 
-    const createResponse = await tx.create(
-      buyOrder, 
-      sessionId, 
-      amount, 
-      returnUrl
-    );
-    */
+    // Update order status to indicate pending enrollment (optional, or keep pending_payment)
+    await supabase
+        .from('orders')
+        .update({ status: 'pending_payment' }) // Or 'pending_enrollment'
+        .eq('id', order.id);
 
-    // MOCK RESPONSE
-    return new Response(JSON.stringify({ 
-      success: true, 
-      id: orderData.id,
-      // url: createResponse.url,
-      // token: createResponse.token,
-      message: 'Orden creada (Pago desactivado temporalmente)'
-    }), {
+    // Frontend expects { url, token }. Oneclick returns url_webpay.
+    return new Response(JSON.stringify({ url: url_webpay, token: token }), {
       status: 200,
-      headers: { 'Content-Type': 'application/json' }
+      headers: { "Content-Type": "application/json" }
     });
 
   } catch (e) {
-    console.error(e);
-    return new Response(JSON.stringify({ error: 'Server error: ' + String(e) }), { status: 500 });
+    console.error('Error in orders/create:', e);
+    // Safer error message conversion
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return new Response(JSON.stringify({ error: 'Server error: ' + errorMessage }), { status: 500 });
   }
 }

@@ -1,65 +1,59 @@
-import { createClient } from '@supabase/supabase-js';
-import { IntegrationCommerceCodes, IntegrationApiKeys, Environment } from 'transbank-sdk';
+import { s as supabase, a as startOneclick } from '../../../chunks/webpay_CGIi10RO.mjs';
 import { z } from 'zod';
+import { v as validateRut } from '../../../chunks/rutValidator_CFmsqFmV.mjs';
 export { renderers } from '../../../renderers.mjs';
 
-const supabaseUrl = "https://hmpeohszbimivcyguwte.supabase.co";
-const supabaseKey = "sb_publishable_N-kiGR-t8iSXERVt7trodw_Fy-x-v6V";
-const supabase = createClient(supabaseUrl, supabaseKey);
-
-const OrderSchema = z.object({
-  name: z.string().min(3, "El nombre es muy corto"),
-  rut: z.string().min(8, "RUT inválido"),
-  address: z.string().min(5, "Dirección inválida"),
-  duration: z.string().refine((val) => ["15", "30"].includes(val), {
-    message: "Duración inválida (debe ser 15 o 30 días)"
-  })
+const bodySchema = z.object({
+  name: z.string().min(2),
+  rut: z.string().refine(validateRut, "RUT inválido"),
+  address: z.string().min(5),
+  email: z.string().email(),
+  phone: z.string().min(8),
+  commune: z.string().min(3),
+  duration: z.string().refine((val) => ["15", "30"].includes(val))
 });
 const POST = async ({ request }) => {
   try {
-    const data = await request.json();
-    const validation = OrderSchema.safeParse(data);
-    if (!validation.success) {
-      return new Response(JSON.stringify({
-        error: "Datos inválidos",
-        details: validation.error.flatten()
-      }), { status: 400 });
-    }
-    const { name, rut, address, duration } = validation.data;
-    const amount = duration === "15" ? 2e4 : 15e3;
-    const commerceCode = undefined                          || IntegrationCommerceCodes.WEBPAY_PLUS;
-    const apiKey = undefined                           || IntegrationApiKeys.WEBPAY;
-    const environment = true ? Environment.Production : Environment.Integration;
-    const { data: orderData, error: orderError } = await supabase.from("orders").insert([{
+    const body = await request.json();
+    const { name, rut, address, email, phone, commune, duration } = bodySchema.parse(body);
+    const price = duration === "15" ? 2e4 : 15e3;
+    const buyOrder = `SUB-${Date.now()}`;
+    const sessionId = `s-${Math.random().toString(36).substring(7)}`;
+    const { data: order, error: orderError } = await supabase.from("orders").insert([{
       customer_name: name,
       customer_rut: rut,
+      customer_email: email,
+      customer_phone: phone,
       shipping_address: address,
-      total_amount: amount,
-      status: "pending"
+      shipping_commune: commune,
+      total_amount: price,
+      status: "draft"
     }]).select().single();
-    if (orderError) {
-      console.error("Supabase Order Error:", orderError);
-      return new Response(JSON.stringify({ error: "Error al crear orden en BD" }), { status: 500 });
-    }
+    if (orderError) throw new Error(`Error creating order: ${orderError.message}`);
+    const startDate = /* @__PURE__ */ new Date();
+    const endDate = /* @__PURE__ */ new Date();
+    const durationDays = parseInt(duration);
+    endDate.setDate(startDate.getDate() + durationDays);
     const { error: subError } = await supabase.from("subscriptions").insert([{
-      order_id: orderData.id,
-      duration_days: parseInt(duration),
-      start_date: (/* @__PURE__ */ new Date()).toISOString()
+      order_id: order.id,
+      duration_days: durationDays,
+      start_date: startDate.toISOString(),
+      end_date: endDate.toISOString(),
+      is_active: false
     }]);
-    if (subError) console.error("Supabase Sub Error:", subError);
-    return new Response(JSON.stringify({
-      success: true,
-      id: orderData.id,
-      // url: createResponse.url,
-      // token: createResponse.token,
-      message: "Orden creada (Pago desactivado temporalmente)"
-    }), {
+    if (subError) throw new Error(`Error creating subscription: ${subError.message}`);
+    const returnUrl = `http://${request.headers.get("host")}/api/webpay/return?orderId=${order.id}`;
+    const username = `user-${order.id}`;
+    const { token, url_webpay } = await startOneclick(username, email, returnUrl);
+    await supabase.from("orders").update({ status: "pending_payment" }).eq("id", order.id);
+    return new Response(JSON.stringify({ url: url_webpay, token }), {
       status: 200,
       headers: { "Content-Type": "application/json" }
     });
   } catch (e) {
-    console.error(e);
-    return new Response(JSON.stringify({ error: "Server error: " + String(e) }), { status: 500 });
+    console.error("Error in orders/create:", e);
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    return new Response(JSON.stringify({ error: "Server error: " + errorMessage }), { status: 500 });
   }
 };
 

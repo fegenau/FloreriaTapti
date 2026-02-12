@@ -81,26 +81,28 @@
 <script>
   import { cartItems } from "../store/cartStore";
 
-  const desktopCount = document.getElementById("cart-count-desktop");
-  const mobileCount = document.getElementById("cart-count-mobile");
+  document.addEventListener("astro:page-load", () => {
+    const desktopCount = document.getElementById("cart-count-desktop");
+    const mobileCount = document.getElementById("cart-count-mobile");
 
-  cartItems.subscribe((items) => {
-    const count = Object.values(items).reduce(
-      (acc: any, item: any) => acc + item.quantity,
-      0,
-    );
+    cartItems.subscribe((items) => {
+      const count = Object.values(items).reduce(
+        (acc: any, item: any) => acc + item.quantity,
+        0,
+      );
 
-    if (desktopCount) {
-      desktopCount.innerText = (count as number).toString();
-      if ((count as number) > 0) desktopCount.classList.remove("hidden");
-      else desktopCount.classList.add("hidden");
-    }
+      if (desktopCount) {
+        desktopCount.innerText = (count as number).toString();
+        if ((count as number) > 0) desktopCount.classList.remove("hidden");
+        else desktopCount.classList.add("hidden");
+      }
 
-    if (mobileCount) {
-      mobileCount.innerText = (count as number).toString();
-      if ((count as number) > 0) mobileCount.classList.remove("hidden");
-      else mobileCount.classList.add("hidden");
-    }
+      if (mobileCount) {
+        mobileCount.innerText = (count as number).toString();
+        if ((count as number) > 0) mobileCount.classList.remove("hidden");
+        else mobileCount.classList.add("hidden");
+      }
+    });
   });
 </script>
 

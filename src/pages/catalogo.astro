@@ -87,7 +87,7 @@ const products = catalogData.flowers;
                 data-images={JSON.stringify(
                   product.image.length > 1
                     ? product.image
-                    : [product.image[0], product.image[0]]
+                    : [product.image[0], product.image[0]],
                 )}
                 data-name={product.name}
               >
@@ -343,234 +343,243 @@ const products = catalogData.flowers;
     });
   }
 
-  // Subscribe
-  cartItems.subscribe(updateButtons);
+  document.addEventListener("astro:page-load", () => {
+    // Subscribe
+    const unsubscribe = cartItems.subscribe(updateButtons);
+    // Clean up subscription on page unload (optional but good practice, though with ViewTransitions page-load fires on every nav)
+    // In Astro ViewTransitions, scripts run once, but we are wrapping in page-load.
+    // Ideally we should cleanup previous listeners if this were a SPA framework, but Astro replaces body content.
+    // However, store subscriptions might persist if not handled.
+    // For simplicity in this context, we'll let nanostores handle it or just re-subscribe.
+    // A better approach for nanostores in Astro ViewTransitions is to clean up on `astro:before-swap` if needed,
+    // but here we just want to ensure UI updates.
 
-  // Add Item Logic
-  const buttons = document.querySelectorAll(".add-to-cart-btn");
-  buttons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const productStr = btn.getAttribute("data-product");
-      const size = btn.getAttribute("data-size");
-      const priceStr = btn.getAttribute("data-price");
+    // Add Item Logic
+    const buttons = document.querySelectorAll(".add-to-cart-btn");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productStr = btn.getAttribute("data-product");
+        const size = btn.getAttribute("data-size");
+        const priceStr = btn.getAttribute("data-price");
 
-      if (productStr && size && priceStr) {
-        const product = JSON.parse(productStr);
-        const price = parseInt(priceStr);
-        addCartItem(product, size, price);
-      }
+        if (productStr && size && priceStr) {
+          const product = JSON.parse(productStr);
+          const price = parseInt(priceStr);
+          addCartItem(product, size, price);
+        }
 
-      // Visual feedback
-      const originalContent = btn.innerHTML;
-      btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
-      btn.classList.add("bg-green-500", "text-white");
-      btn.classList.remove("bg-honey-bronze-500", "text-midnight-violet-950");
+        // Visual feedback
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        btn.classList.add("bg-green-500", "text-white");
+        btn.classList.remove("bg-honey-bronze-500", "text-midnight-violet-950");
+
+        setTimeout(() => {
+          btn.innerHTML = originalContent;
+          btn.classList.remove("bg-green-500", "text-white");
+          btn.classList.add("bg-honey-bronze-500", "text-midnight-violet-950");
+        }, 1000);
+      });
+    });
+
+    // Decrease Item Logic
+    const decButtons = document.querySelectorAll(".decrease-cart-btn");
+    decButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productStr = btn.getAttribute("data-product");
+        const size = btn.getAttribute("data-size");
+
+        if (productStr && size) {
+          const product = JSON.parse(productStr);
+          const itemId = `${product.name}-${size}`
+            .replace(/\s+/g, "-")
+            .toLowerCase();
+          decreaseCartItem(itemId);
+        }
+      });
+    });
+
+    // Carousel Logic on Hover
+    const carousels = document.querySelectorAll(".group\\/carousel");
+
+    carousels.forEach((carousel) => {
+      const track = carousel.querySelector(".carousel-track") as HTMLElement;
+      let interval: any;
+
+      carousel.addEventListener("mouseenter", () => {
+        // Start sliding
+        let index = 0;
+        interval = setInterval(() => {
+          index = index === 0 ? 1 : 0;
+          track.style.transform = `translateX(-${index * 100}%)`;
+        }, 2000); // Switch every 2 seconds
+      });
+
+      carousel.addEventListener("mouseleave", () => {
+        clearInterval(interval);
+        track.style.transform = "translateX(0)"; // Reset
+      });
+
+      // Lightbox Logic
+      carousel.addEventListener("click", () => {
+        const imagesStr = carousel.getAttribute("data-images");
+        if (imagesStr) {
+          const images = JSON.parse(imagesStr);
+          openLightbox(images);
+        }
+      });
+    });
+
+    // Lightbox Implementation
+    const lightbox = document.getElementById("lightbox");
+    const closeBtn = document.getElementById("lightbox-close");
+    const prevBtn = document.getElementById("lightbox-prev");
+    const nextBtn = document.getElementById("lightbox-next");
+    const imgElement = document.getElementById(
+      "lightbox-img",
+    ) as HTMLImageElement;
+    const currentCounter = document.getElementById("lightbox-current");
+    const totalCounter = document.getElementById("lightbox-total");
+
+    let currentImages: string[] = [];
+    let currentIndex = 0;
+
+    function updateLightboxImage() {
+      if (!imgElement) return;
+
+      // Quick fade effect
+      imgElement.style.opacity = "0.5";
 
       setTimeout(() => {
-        btn.innerHTML = originalContent;
-        btn.classList.remove("bg-green-500", "text-white");
-        btn.classList.add("bg-honey-bronze-500", "text-midnight-violet-950");
-      }, 1000);
-    });
-  });
+        imgElement.src = currentImages[currentIndex];
+        imgElement.style.opacity = "1";
+      }, 150);
 
-  // Decrease Item Logic
-  const decButtons = document.querySelectorAll(".decrease-cart-btn");
-  decButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const productStr = btn.getAttribute("data-product");
-      const size = btn.getAttribute("data-size");
-
-      if (productStr && size) {
-        const product = JSON.parse(productStr);
-        const itemId = `${product.name}-${size}`
-          .replace(/\s+/g, "-")
-          .toLowerCase();
-        decreaseCartItem(itemId);
-      }
-    });
-  });
-
-  // Carousel Logic on Hover
-  const carousels = document.querySelectorAll(".group\\/carousel");
-
-  carousels.forEach((carousel) => {
-    const track = carousel.querySelector(".carousel-track") as HTMLElement;
-    let interval: any;
-
-    carousel.addEventListener("mouseenter", () => {
-      // Start sliding
-      let index = 0;
-      interval = setInterval(() => {
-        index = index === 0 ? 1 : 0;
-        track.style.transform = `translateX(-${index * 100}%)`;
-      }, 2000); // Switch every 2 seconds
-    });
-
-    carousel.addEventListener("mouseleave", () => {
-      clearInterval(interval);
-      track.style.transform = "translateX(0)"; // Reset
-    });
-
-    // Lightbox Logic
-    carousel.addEventListener("click", () => {
-      const imagesStr = carousel.getAttribute("data-images");
-      if (imagesStr) {
-        const images = JSON.parse(imagesStr);
-        openLightbox(images);
-      }
-    });
-  });
-
-  // Lightbox Implementation
-  const lightbox = document.getElementById("lightbox");
-  const closeBtn = document.getElementById("lightbox-close");
-  const prevBtn = document.getElementById("lightbox-prev");
-  const nextBtn = document.getElementById("lightbox-next");
-  const imgElement = document.getElementById(
-    "lightbox-img"
-  ) as HTMLImageElement;
-  const currentCounter = document.getElementById("lightbox-current");
-  const totalCounter = document.getElementById("lightbox-total");
-
-  let currentImages: string[] = [];
-  let currentIndex = 0;
-
-  function updateLightboxImage() {
-    if (!imgElement) return;
-
-    // Quick fade effect
-    imgElement.style.opacity = "0.5";
-
-    setTimeout(() => {
-      imgElement.src = currentImages[currentIndex];
-      imgElement.style.opacity = "1";
-    }, 150);
-
-    if (currentCounter)
-      currentCounter.textContent = (currentIndex + 1).toString();
-  }
-
-  function openLightbox(images: string[]) {
-    if (!lightbox || !imgElement) return;
-
-    currentImages = images;
-    // Fallback if somehow empty, though data ensures at least 1 (and we duped to 2)
-    if (currentImages.length < 2) {
-      // Ensure at least 2 for demo if source was just 1 and we passed the array
-      if (currentImages.length === 1) currentImages.push(currentImages[0]);
+      if (currentCounter)
+        currentCounter.textContent = (currentIndex + 1).toString();
     }
 
-    currentIndex = 0;
+    function openLightbox(images: string[]) {
+      if (!lightbox || !imgElement) return;
 
-    if (totalCounter)
-      totalCounter.textContent = currentImages.length.toString();
-    updateLightboxImage();
-
-    lightbox.classList.remove("invisible", "opacity-0");
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeLightbox() {
-    if (!lightbox) return;
-    lightbox.classList.add("invisible", "opacity-0");
-    document.body.style.overflow = "";
-  }
-
-  function nextImage(e?: Event) {
-    e?.stopPropagation();
-    currentIndex = (currentIndex + 1) % currentImages.length;
-    updateLightboxImage();
-  }
-
-  function prevImage(e?: Event) {
-    e?.stopPropagation();
-    currentIndex =
-      (currentIndex - 1 + currentImages.length) % currentImages.length;
-    updateLightboxImage();
-  }
-
-  // Event Listeners
-  if (closeBtn) closeBtn.addEventListener("click", closeLightbox);
-  if (nextBtn) nextBtn.addEventListener("click", nextImage);
-  if (prevBtn) prevBtn.addEventListener("click", prevImage);
-
-  // Click on image to advance
-  if (imgElement) imgElement.addEventListener("click", nextImage);
-
-  // Close on background click
-  if (lightbox) {
-    lightbox.addEventListener("click", (e) => {
-      if (e.target === lightbox) {
-        closeLightbox();
+      currentImages = images;
+      // Fallback if somehow empty, though data ensures at least 1 (and we duped to 2)
+      if (currentImages.length < 2) {
+        // Ensure at least 2 for demo if source was just 1 and we passed the array
+        if (currentImages.length === 1) currentImages.push(currentImages[0]);
       }
-    });
-  }
 
-  // Keyboard nav
-  document.addEventListener("keydown", (e) => {
-    if (!lightbox || lightbox.classList.contains("invisible")) return;
+      currentIndex = 0;
 
-    if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowRight") nextImage();
-    if (e.key === "ArrowLeft") prevImage();
-  });
+      if (totalCounter)
+        totalCounter.textContent = currentImages.length.toString();
+      updateLightboxImage();
 
-  // Subscription Modal Logic
-  const subModal = document.getElementById("subscription-modal");
-  const openSubBtn = document.getElementById("open-subscription-modal");
-  const closeSubBtn = document.getElementById("close-subscription-modal");
-
-  if (openSubBtn && subModal) {
-    openSubBtn.addEventListener("click", () => {
-      subModal.classList.remove("hidden");
-      subModal.classList.add("flex");
+      lightbox.classList.remove("invisible", "opacity-0");
       document.body.style.overflow = "hidden";
-    });
-  }
+    }
 
-  if (closeSubBtn && subModal) {
-    closeSubBtn.addEventListener("click", () => {
-      subModal.classList.add("hidden");
-      subModal.classList.remove("flex");
+    function closeLightbox() {
+      if (!lightbox) return;
+      lightbox.classList.add("invisible", "opacity-0");
       document.body.style.overflow = "";
-    });
-  }
+    }
 
-  if (subModal) {
-    subModal.addEventListener("click", (e) => {
-      if (e.target === subModal) {
+    function nextImage(e?: Event) {
+      e?.stopPropagation();
+      currentIndex = (currentIndex + 1) % currentImages.length;
+      updateLightboxImage();
+    }
+
+    function prevImage(e?: Event) {
+      e?.stopPropagation();
+      currentIndex =
+        (currentIndex - 1 + currentImages.length) % currentImages.length;
+      updateLightboxImage();
+    }
+
+    // Event Listeners
+    if (closeBtn) closeBtn.addEventListener("click", closeLightbox);
+    if (nextBtn) nextBtn.addEventListener("click", nextImage);
+    if (prevBtn) prevBtn.addEventListener("click", prevImage);
+
+    // Click on image to advance
+    if (imgElement) imgElement.addEventListener("click", nextImage);
+
+    // Close on background click
+    if (lightbox) {
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) {
+          closeLightbox();
+        }
+      });
+    }
+
+    // Keyboard nav
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox || lightbox.classList.contains("invisible")) return;
+
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") prevImage();
+    });
+
+    // Subscription Modal Logic
+    const subModal = document.getElementById("subscription-modal");
+    const openSubBtn = document.getElementById("open-subscription-modal");
+    const closeSubBtn = document.getElementById("close-subscription-modal");
+
+    if (openSubBtn && subModal) {
+      openSubBtn.addEventListener("click", () => {
+        subModal.classList.remove("hidden");
+        subModal.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      });
+    }
+
+    if (closeSubBtn && subModal) {
+      closeSubBtn.addEventListener("click", () => {
         subModal.classList.add("hidden");
         subModal.classList.remove("flex");
         document.body.style.overflow = "";
-      }
-    });
-  }
-  // Tab Filtering Logic
-  const tabs = document.querySelectorAll(".tab-btn");
-  const items = document.querySelectorAll(".catalog-item");
-
-  tabs.forEach((tab) => {
-    tab.addEventListener("click", () => {
-      // 1. Remove active state from all tabs
-      tabs.forEach((t) => {
-        t.classList.remove("bg-honey-bronze-500/10", "active-tab");
       });
+    }
 
-      // 2. Add active state to clicked tab
-      tab.classList.add("bg-honey-bronze-500/10", "active-tab");
-
-      // 3. Filter items
-      const category = tab.getAttribute("data-category");
-
-      items.forEach((item) => {
-        const itemCategory = item.getAttribute("data-category");
-
-        if (category === "all" || itemCategory === category) {
-          item.classList.remove("hidden");
-        } else {
-          item.classList.add("hidden");
+    if (subModal) {
+      subModal.addEventListener("click", (e) => {
+        if (e.target === subModal) {
+          subModal.classList.add("hidden");
+          subModal.classList.remove("flex");
+          document.body.style.overflow = "";
         }
+      });
+    }
+    // Tab Filtering Logic
+    const tabs = document.querySelectorAll(".tab-btn");
+    const items = document.querySelectorAll(".catalog-item");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        // 1. Remove active state from all tabs
+        tabs.forEach((t) => {
+          t.classList.remove("bg-honey-bronze-500/10", "active-tab");
+        });
+
+        // 2. Add active state to clicked tab
+        tab.classList.add("bg-honey-bronze-500/10", "active-tab");
+
+        // 3. Filter items
+        const category = tab.getAttribute("data-category");
+
+        items.forEach((item) => {
+          const itemCategory = item.getAttribute("data-category");
+
+          if (category === "all" || itemCategory === category) {
+            item.classList.remove("hidden");
+          } else {
+            item.classList.add("hidden");
+          }
+        });
       });
     });
   });

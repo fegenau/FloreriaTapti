@@ -1,8 +1,8 @@
 /* empty css                                   */
-import { c as createComponent, d as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_BMt-k9YQ.mjs';
-import 'kleur/colors';
-import { $ as $$Layout } from '../chunks/Layout_CBWgi9Oy.mjs';
-import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B1XAydSN.mjs';
+import { e as createComponent, l as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_JR3jxAAG.mjs';
+import 'piccolore';
+import { $ as $$Layout } from '../chunks/Layout_CGBRDME9.mjs';
+import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B3zIEEWi.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Contacto = createComponent(($$result, $$props, $$slots) => {
