@@ -1,0 +1,63 @@
+
+---
+import Layout from "../../components/Layout.astro";
+const { slug } = Astro.params;
+const products = (await import('../../data/products.json')).default;
+const product = products.find(p => p.slug === slug);
+if (!product) throw new Error('Producto no encontrado');
+---
+<Layout title={`${product.name} — Tapti`}>
+  <section class="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8">
+    <img src={product.image} alt={product.name} class="rounded-xl border border-white/10 w-full object-cover" />
+    <div>
+      <h1 class="font-serif text-3xl text-tapti-gold">{product.name}</h1>
+      <p class="mt-2 text-white/80">{product.description}</p>
+      <form id="addToCart" class="mt-6 space-y-4">
+        <div>
+          <label class="block text-sm mb-1">Tamaño</label>
+          <select name="size" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full">
+            {product.sizes.map(s => <option value={s.k}>{s.k} — ${s.price.toLocaleString('es-CL')}</option>)}
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm mb-1">Dedicatoria (opcional)</label>
+          <input name="note" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full" placeholder="Con cariño..." />
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm mb-1">Fecha de entrega</label>
+            <input type="date" name="date" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full" />
+          </div>
+          <div>
+            <label class="block text-sm mb-1">Comuna</label>
+            <input name="comuna" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full" placeholder="Providencia" />
+          </div>
+        </div>
+        <button type="submit" class="px-5 py-3 rounded-full bg-tapti-gold text-tapti-deep font-medium">Agregar al carrito</button>
+      </form>
+      <script>
+        const productData = JSON.parse('{JSON.stringify(product)}');
+        const form = document.getElementById('addToCart') as HTMLFormElement | null;
+        form?.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const targetForm = e.currentTarget as HTMLFormElement;
+          const data = Object.fromEntries(new FormData(targetForm));
+          const item = {
+            slug: productData.slug,
+            name: productData.name,
+            image: productData.image,
+            size: data.size,
+            note: data.note || '',
+            date: data.date || '',
+            comuna: data.comuna || '',
+            price: (productData.sizes.find(s => s.k === data.size)?.price) || productData.price
+    };
+          const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+          cart.push(item);
+          localStorage.setItem('cart', JSON.stringify(cart));
+          window.location.href = '/carrito';
+        });
+      </script>
+    </div>
+  </section>
+</Layout>

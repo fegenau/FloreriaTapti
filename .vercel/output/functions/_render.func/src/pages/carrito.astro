@@ -1,0 +1,393 @@
+---
+import Layout from "../components/Layout.astro";
+import BoutiqueCard from "../components/BoutiqueCard.astro";
+import AccessoriesModal from "../components/AccessoriesModal.astro";
+---
+
+<Layout title="Tu Carrito | Tapti">
+  <div class="min-h-screen pt-24 pb-12 px-4">
+    <BoutiqueCard
+      variant="services"
+      size="large"
+      className="!h-auto min-h-[60vh] p-8 max-w-4xl mx-auto"
+    >
+      <h1 class="font-serif text-4xl text-honey-bronze-400 mb-8 text-center">
+        Tu Carrito de Compras
+      </h1>
+
+      <div id="cart-empty" class="hidden text-center py-12">
+        <p class="text-xl text-cherry-blossom-100 mb-6">
+          Tu carrito está vacío.
+        </p>
+        <a
+          href="/catalogo"
+          class="inline-block px-6 py-2 bg-honey-bronze-500 text-midnight-violet-950 rounded-full hover:bg-honey-bronze-400 transition-colors font-medium"
+        >
+          Ir al Catálogo
+        </a>
+      </div>
+
+      <div id="cart-content" class="hidden">
+        <div class="space-y-4 mb-8" id="cart-items-container">
+          <!-- Items will be injected here -->
+        </div>
+
+        <div class="border-t border-white/10 pt-6 mt-8">
+          <div
+            class="flex justify-between items-center text-2xl font-serif text-honey-bronze-100 mb-8"
+          >
+            <span>Total</span>
+            <span id="cart-total">$0</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <form
+              id="form-checkout"
+              class="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-white/5 p-6 rounded-lg border border-white/10"
+            >
+              <h3
+                class="col-span-1 md:col-span-2 text-xl font-serif text-honey-bronze-100 mb-2"
+              >
+                Datos de Despacho
+              </h3>
+              <div class="col-span-1 md:col-span-2 space-y-4">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Nombre completo"
+                  required
+                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                />
+                <p
+                  class="text-red-400 text-sm mt-1 hidden error-msg"
+                  id="error-name"
+                >
+                </p>
+                <input
+                  type="text"
+                  name="rut"
+                  id="input-rut"
+                  placeholder="RUT (12.345.678-9)"
+                  required
+                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                />
+                <p
+                  class="text-red-400 text-sm mt-1 hidden error-msg"
+                  id="error-rut"
+                >
+                </p>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email"
+                  required
+                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                />
+                <p
+                  class="text-red-400 text-sm mt-1 hidden error-msg"
+                  id="error-email"
+                >
+                </p>
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Teléfono (+569...)"
+                  required
+                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                />
+                <p
+                  class="text-red-400 text-sm mt-1 hidden error-msg"
+                  id="error-phone"
+                >
+                </p>
+                <input
+                  type="text"
+                  name="commune"
+                  placeholder="Comuna"
+                  required
+                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                />
+                <p
+                  class="text-red-400 text-sm mt-1 hidden error-msg"
+                  id="error-commune"
+                >
+                </p>
+                <input
+                  type="text"
+                  name="address"
+                  placeholder="Dirección calle/número"
+                  required
+                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                />
+                <p
+                  class="text-red-400 text-sm mt-1 hidden error-msg"
+                  id="error-address"
+                >
+                </p>
+
+                <div
+                  class="col-span-1 md:col-span-2 flex justify-end gap-4 mt-4"
+                >
+                  <button
+                    type="button"
+                    id="btn-cancel"
+                    class="px-6 py-3 border border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/10 transition-colors"
+                  >
+                    Cancelar Compra
+                  </button>
+                  <a
+                    href="/catalogo"
+                    class="px-6 py-3 border border-honey-bronze-500/50 text-honey-bronze-300 rounded-lg hover:bg-honey-bronze-500/10 transition-colors text-center"
+                  >
+                    Seguir comprando
+                  </a>
+                  <button
+                    type="submit"
+                    class="px-6 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-lg hover:bg-honey-bronze-400 transition-colors font-bold shadow-lg shadow-honey-bronze-500/20"
+                  >
+                    Ir a Pagar
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </BoutiqueCard>
+  </div>
+
+  <AccessoriesModal isOpen={false} />
+
+  <script>
+    import { cartItems, clearCart, removeCartItem } from "../store/cartStore";
+
+    document.addEventListener("astro:page-load", () => {
+      const cartEmpty = document.getElementById("cart-empty");
+      const cartContent = document.getElementById("cart-content");
+      const itemsContainer = document.getElementById("cart-items-container");
+      const cartTotal = document.getElementById("cart-total");
+      const btnCancel = document.getElementById("btn-cancel");
+      const formCheckout = document.getElementById(
+        "form-checkout",
+      ) as HTMLFormElement;
+
+      let currentItems: any[] = [];
+
+      function renderCart(items: any) {
+        const itemsList = Object.values(items);
+        currentItems = itemsList;
+
+        if (itemsList.length === 0) {
+          cartEmpty?.classList.remove("hidden");
+          cartContent?.classList.add("hidden");
+          return;
+        }
+
+        cartEmpty?.classList.add("hidden");
+        cartContent?.classList.remove("hidden");
+
+        if (itemsContainer) {
+          itemsContainer.innerHTML = "";
+          let total = 0;
+
+          itemsList.forEach((item: any) => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
+            const itemEl = document.createElement("div");
+            itemEl.className =
+              "flex items-center gap-4 bg-white/5 p-4 rounded-lg border border-white/5";
+            itemEl.innerHTML = `
+              <div class="w-20 h-20 bg-black/20 rounded overflow-hidden flex-shrink-0">
+                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-2xl">🌸</div>'}
+              </div>
+              <div class="flex-grow">
+                <h3 class="font-serif text-lg text-honey-bronze-100">${item.name}</h3>
+                <p class="text-sm text-gray-400">Tamaño: ${item.size}</p>
+                <p class="text-sm text-cherry-blossom-100">Cantidad: ${item.quantity}</p>
+              </div>
+              <div class="text-right">
+                <p class="font-bold text-honey-bronze-400">$${itemTotal.toLocaleString("es-CL")}</p>
+                <button class="text-xs text-red-400 hover:text-red-300 mt-1 underline btn-remove" data-id="${item.id}">
+                  Eliminar
+                </button>
+              </div>
+            `;
+            itemsContainer.appendChild(itemEl);
+          });
+
+          if (cartTotal) {
+            cartTotal.innerText = `$${total.toLocaleString("es-CL")}`;
+          }
+
+          // Re-attach event listeners
+          document.querySelectorAll(".btn-remove").forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const id = (e.target as HTMLElement).getAttribute("data-id");
+              if (id) removeCartItem(id);
+            });
+          });
+        }
+      }
+
+      // Subscribe to store updates
+      cartItems.subscribe(renderCart);
+
+      btnCancel?.addEventListener("click", () => {
+        if (confirm("¿Estás seguro de que quieres vaciar tu carrito?")) {
+          clearCart();
+        }
+      });
+
+      // Initialize Google Places Autocomplete
+      if (formCheckout) {
+        const addressInput = formCheckout.querySelector(
+          'input[name="address"]',
+        ) as HTMLInputElement;
+        // @ts-ignore
+        if (addressInput && typeof google !== "undefined") {
+          // @ts-ignore
+          const autocomplete = new google.maps.places.Autocomplete(
+            addressInput,
+            {
+              componentRestrictions: { country: "cl" },
+              fields: ["address_components", "geometry", "name"],
+              types: ["address"],
+            },
+          );
+
+          // Prevent form submission on enter key in address field (common issue with autocomplete)
+          addressInput.addEventListener("keydown", (e) => {
+            if (e.key === "Enter") e.preventDefault();
+          });
+        }
+      }
+
+      let accessoriesShown = false;
+      const accessoriesModal = document.getElementById("accessories-modal");
+
+      // Listen for completion of accessories selection
+      document.addEventListener("accessories-complete", () => {
+        accessoriesShown = true;
+        formCheckout?.requestSubmit();
+      });
+
+      const inputRut = document.getElementById("input-rut");
+      if (inputRut) {
+        inputRut.addEventListener("input", (e) => {
+          const target = e.target as HTMLInputElement;
+          let value = target.value.replace(/[^0-9kK]/g, "");
+
+          if (value.length > 1) {
+            const body = value.slice(0, -1);
+            const dv = value.slice(-1);
+
+            // Format body with dots
+            let formattedBody = "";
+            for (let i = body.length - 1, j = 0; i >= 0; i--, j++) {
+              formattedBody =
+                body.charAt(i) +
+                (j > 0 && j % 3 === 0 ? "." : "") +
+                formattedBody;
+            }
+
+            target.value = `${formattedBody}-${dv}`;
+          } else {
+            target.value = value;
+          }
+        });
+      }
+
+      formCheckout?.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Clear previous errors
+        document.querySelectorAll(".error-msg").forEach((el) => {
+          el.classList.add("hidden");
+          el.textContent = "";
+        });
+
+        if (currentItems.length === 0) return alert("El carrito está vacío");
+
+        // Show modal first if not shown yet
+        if (!accessoriesShown) {
+          if (accessoriesModal) {
+            accessoriesModal.classList.remove(
+              "opacity-0",
+              "pointer-events-none",
+            );
+            accessoriesModal.querySelector("div")?.classList.remove("scale-95");
+            accessoriesModal.querySelector("div")?.classList.add("scale-100");
+          }
+          return;
+        }
+
+        const formData = new FormData(formCheckout);
+        const customerData = {
+          name: formData.get("name"),
+          rut: formData.get("rut"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          commune: formData.get("commune"),
+          address: formData.get("address"),
+          items: currentItems,
+        };
+
+        const submitBtn = formCheckout.querySelector(
+          'button[type="submit"]',
+        ) as HTMLButtonElement;
+        const oldText = submitBtn.innerText;
+        submitBtn.innerText = "Procesando...";
+        submitBtn.disabled = true;
+
+        try {
+          const res = await fetch("/api/orders/checkout", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(customerData),
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            if (data.fieldErrors) {
+              Object.entries(data.fieldErrors).forEach(([field, msg]) => {
+                const errorEl = document.getElementById(`error-${field}`);
+                if (errorEl) {
+                  errorEl.textContent = msg as string;
+                  errorEl.classList.remove("hidden");
+                }
+              });
+              throw new Error(
+                "Por favor corrige los errores en el formulario.",
+              );
+            }
+            throw new Error(data.error || "Error desconocido");
+          }
+
+          if (data.url && data.token) {
+            // Redirect to Webpay
+            const form = document.createElement("form");
+            form.action = data.url;
+            form.method = "POST";
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = "token_ws";
+            input.value = data.token;
+            form.appendChild(input);
+            document.body.appendChild(form);
+            form.submit();
+          }
+        } catch (err: any) {
+          if (!err.message.includes("corrige los errores")) {
+            alert("Error: " + err.message);
+          }
+          submitBtn.innerText = oldText;
+          submitBtn.disabled = false;
+          // Reset accessories flag on error so they can try again or change mind?
+          // accessoriesShown = false;
+        }
+      });
+    });
+  </script>
+</Layout>

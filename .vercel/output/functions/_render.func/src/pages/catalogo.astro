@@ -1,0 +1,587 @@
+---
+import Layout from "../components/Layout.astro";
+import BoutiqueCard from "../components/BoutiqueCard.astro";
+import SubscriptionForm from "../components/SubscriptionForm.astro";
+import catalogData from "../data/catalog.json";
+
+// Agrupar por categoría si es necesario, por ahora plano
+const products = catalogData.flowers;
+---
+
+<Layout title="Catálogo Completo | Tapti">
+  <div class="min-h-screen pt-24 pb-12 px-4">
+    <BoutiqueCard
+      variant="services"
+      size="large"
+      className="!h-auto min-h-[70vh] p-8 max-w-7xl mx-auto"
+      disableAnimation={true}
+    >
+      <div class="mb-16 text-center">
+        <h2 class="font-serif text-3xl text-honey-bronze-100 mb-6">
+          Suscripciones Florales
+        </h2>
+        <p class="text-white/80 mb-8 max-w-2xl mx-auto">
+          Recibe flores frescas en tu casa cada 15 o 30 días. Olvídate de
+          comprar, nosotros nos encargamos de mantener tu hogar siempre florido.
+        </p>
+        <button
+          id="open-subscription-modal"
+          class="bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition-all duration-300"
+        >
+          Suscribirme Ahora
+        </button>
+      </div>
+
+      <h1
+        class="font-serif text-4xl text-honey-bronze-400 mb-8 text-center border-t border-white/10 pt-12"
+      >
+        Catálogo de Flores
+      </h1>
+
+      {/* Tabs Navigation */}
+      <div class="flex flex-wrap justify-center gap-4 mb-12">
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300 bg-honey-bronze-500/10 active-tab"
+          data-category="all"
+        >
+          Todos
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Matrimonio"
+        >
+          Matrimonio
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Graduaciones"
+        >
+          Graduaciones
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Canastos"
+        >
+          Canastos
+        </button>
+      </div>
+
+      {/* Catalog Grid */}
+      <div
+        id="catalog-grid"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 transition-all duration-500 min-h-[50vh]"
+      >
+        {
+          products.map((product) => (
+            <div
+              class="catalog-item bg-white/5 p-6 rounded-lg border border-white/10 hover:border-honey-bronze-400/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:bg-white/10 group relative"
+              data-category={product.category || "Canastos"}
+            >
+              <h2 class="font-serif text-2xl text-honey-bronze-100 mb-4">
+                {product.name}
+              </h2>
+
+              {/* Image Carousel Container */}
+              <div
+                class="relative h-64 overflow-hidden rounded-lg cursor-pointer group/carousel"
+                data-images={JSON.stringify(
+                  product.image.length > 1
+                    ? product.image
+                    : [product.image[0], product.image[0]],
+                )}
+                data-name={product.name}
+              >
+                {/* Carousel Track */}
+                <div class="carousel-track flex h-full transition-transform duration-700 ease-in-out">
+                  {/* Original Image */}
+                  <img
+                    src={product.image[0]}
+                    alt={product.name}
+                    class="w-full h-full object-cover flex-shrink-0"
+                  />
+                  {/* Duplicate Image (Demo) or Second Image */}
+                  <img
+                    src={product.image[1] || product.image[0]}
+                    alt={`${product.name} alt`}
+                    class="w-full h-full object-cover flex-shrink-0"
+                  />
+                </div>
+
+                {/* Indicator Dots - visible on hover */}
+                <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-1 opacity-0 group-hover/carousel:opacity-100 transition-opacity">
+                  <div class="w-1.5 h-1.5 rounded-full bg-white shadow-sm" />
+                  <div class="w-1.5 h-1.5 rounded-full bg-white/50 shadow-sm" />
+                </div>
+              </div>
+
+              <div class="space-y-4 mt-6">
+                <div class="flex justify-between text-sm text-cherry-blossom-100 border-b border-white/10 pb-2">
+                  <span>Tamaño</span>
+                  <span>Varas</span>
+                  <span>Precio</span>
+                </div>
+                {Object.entries(product.sizes).map(([size, details]) => {
+                  if (!details) return null;
+                  return (
+                    <div class="flex justify-between items-center text-gray-300">
+                      <span class="font-medium text-honey-bronze-400">
+                        {size}
+                      </span>
+                      <span>{details.qty}</span>
+                      <div class="flex items-center gap-3">
+                        <span class="font-bold">
+                          ${details.total.toLocaleString("es-CL")}
+                        </span>
+                        <button
+                          class="decrease-cart-btn hidden bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 rounded-full p-1 transition-colors"
+                          data-product={JSON.stringify(product)}
+                          data-size={size}
+                          title="Quitar del carrito"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                        <button
+                          class="add-to-cart-btn bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 rounded-full p-1 transition-colors"
+                          data-product={JSON.stringify(product)}
+                          data-size={size}
+                          data-price={details.total}
+                          title="Agregar al carrito"
+                        >
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="16"
+                            height="16"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div class="mt-6 pt-4 border-t border-white/10">
+                <p class="text-xs text-gray-400 mb-2">Composición:</p>
+                <div class="min-h-20 h-auto bg-black/20 rounded p-2 text-sm text-white italic">
+                  {/* Espacio para las flores como pidió el usuario */}
+                  {product.Description}
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </BoutiqueCard>
+
+    {/* Subscription Modal */}
+    <div
+      id="subscription-modal"
+      class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4"
+    >
+      <div class="relative w-full max-w-lg">
+        <button
+          id="close-subscription-modal"
+          class="absolute -top-4 -right-4 z-50 bg-white text-black rounded-full p-2 shadow-lg hover:bg-gray-200 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><line x1="18" y1="6" x2="6" y2="18"></line><line
+              x1="6"
+              y1="6"
+              x2="18"
+              y2="18"></line></svg
+          >
+        </button>
+        <SubscriptionForm />
+      </div>
+    </div>
+
+    {/* Lightbox Modal */}
+    <div
+      id="lightbox"
+      class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
+    >
+      {/* Close Button */}
+      <button
+        id="lightbox-close"
+        class="absolute top-4 right-4 z-[210] text-white/70 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="32"
+          height="32"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><line x1="18" y1="6" x2="6" y2="18"></line><line
+            x1="6"
+            y1="6"
+            x2="18"
+            y2="18"></line></svg
+        >
+      </button>
+
+      {/* Main Container */}
+      <div
+        class="relative w-full max-w-5xl h-[85vh] flex items-center justify-center"
+      >
+        {/* Previous Button */}
+        <button
+          id="lightbox-prev"
+          class="absolute left-0 md:-left-12 p-2 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-all hidden md:block"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><polyline points="15 18 9 12 15 6"></polyline></svg
+          >
+        </button>
+
+        {/* Image Display */}
+        <div
+          class="relative h-full w-full flex items-center justify-center overflow-hidden"
+        >
+          <img
+            id="lightbox-img"
+            src=""
+            class="max-h-full max-w-full object-contain rounded-lg shadow-2xl transition-opacity duration-300 cursor-pointer"
+            alt="Lightbox view"
+            title="Click para ver siguiente imagen"
+          />
+
+          {/* Image Counter */}
+          <div
+            class="absolute bottom-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm"
+          >
+            <span id="lightbox-current">1</span> / <span id="lightbox-total"
+              >2</span
+            >
+          </div>
+        </div>
+
+        {/* Next Button */}
+        <button
+          id="lightbox-next"
+          class="absolute right-0 md:-right-12 p-2 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-all hidden md:block"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            ><polyline points="9 18 15 12 9 6"></polyline></svg
+          >
+        </button>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<script>
+  import { cartItems, addCartItem, decreaseCartItem } from "../store/cartStore";
+
+  // Re-render logic to show/hide decrease buttons
+  function updateButtons(items) {
+    document.querySelectorAll(".decrease-cart-btn").forEach((btn) => {
+      const productStr = btn.getAttribute("data-product");
+      const size = btn.getAttribute("data-size");
+      if (!productStr || !size) return;
+
+      const product = JSON.parse(productStr);
+      const itemId = `${product.name}-${size}`
+        .replace(/\s+/g, "-")
+        .toLowerCase();
+
+      if (items[itemId]) {
+        btn.classList.remove("hidden");
+      } else {
+        btn.classList.add("hidden");
+      }
+    });
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    // Subscribe
+    const unsubscribe = cartItems.subscribe(updateButtons);
+    // Clean up subscription on page unload (optional but good practice, though with ViewTransitions page-load fires on every nav)
+    // In Astro ViewTransitions, scripts run once, but we are wrapping in page-load.
+    // Ideally we should cleanup previous listeners if this were a SPA framework, but Astro replaces body content.
+    // However, store subscriptions might persist if not handled.
+    // For simplicity in this context, we'll let nanostores handle it or just re-subscribe.
+    // A better approach for nanostores in Astro ViewTransitions is to clean up on `astro:before-swap` if needed,
+    // but here we just want to ensure UI updates.
+
+    // Add Item Logic
+    const buttons = document.querySelectorAll(".add-to-cart-btn");
+    buttons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productStr = btn.getAttribute("data-product");
+        const size = btn.getAttribute("data-size");
+        const priceStr = btn.getAttribute("data-price");
+
+        if (productStr && size && priceStr) {
+          const product = JSON.parse(productStr);
+          const price = parseInt(priceStr);
+          addCartItem(product, size, price);
+        }
+
+        // Visual feedback
+        const originalContent = btn.innerHTML;
+        btn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+        btn.classList.add("bg-green-500", "text-white");
+        btn.classList.remove("bg-honey-bronze-500", "text-midnight-violet-950");
+
+        setTimeout(() => {
+          btn.innerHTML = originalContent;
+          btn.classList.remove("bg-green-500", "text-white");
+          btn.classList.add("bg-honey-bronze-500", "text-midnight-violet-950");
+        }, 1000);
+      });
+    });
+
+    // Decrease Item Logic
+    const decButtons = document.querySelectorAll(".decrease-cart-btn");
+    decButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productStr = btn.getAttribute("data-product");
+        const size = btn.getAttribute("data-size");
+
+        if (productStr && size) {
+          const product = JSON.parse(productStr);
+          const itemId = `${product.name}-${size}`
+            .replace(/\s+/g, "-")
+            .toLowerCase();
+          decreaseCartItem(itemId);
+        }
+      });
+    });
+
+    // Carousel Logic on Hover
+    const carousels = document.querySelectorAll(".group\\/carousel");
+
+    carousels.forEach((carousel) => {
+      const track = carousel.querySelector(".carousel-track") as HTMLElement;
+      let interval: any;
+
+      carousel.addEventListener("mouseenter", () => {
+        // Start sliding
+        let index = 0;
+        interval = setInterval(() => {
+          index = index === 0 ? 1 : 0;
+          track.style.transform = `translateX(-${index * 100}%)`;
+        }, 2000); // Switch every 2 seconds
+      });
+
+      carousel.addEventListener("mouseleave", () => {
+        clearInterval(interval);
+        track.style.transform = "translateX(0)"; // Reset
+      });
+
+      // Lightbox Logic
+      carousel.addEventListener("click", () => {
+        const imagesStr = carousel.getAttribute("data-images");
+        if (imagesStr) {
+          const images = JSON.parse(imagesStr);
+          openLightbox(images);
+        }
+      });
+    });
+
+    // Lightbox Implementation
+    const lightbox = document.getElementById("lightbox");
+    const closeBtn = document.getElementById("lightbox-close");
+    const prevBtn = document.getElementById("lightbox-prev");
+    const nextBtn = document.getElementById("lightbox-next");
+    const imgElement = document.getElementById(
+      "lightbox-img",
+    ) as HTMLImageElement;
+    const currentCounter = document.getElementById("lightbox-current");
+    const totalCounter = document.getElementById("lightbox-total");
+
+    let currentImages: string[] = [];
+    let currentIndex = 0;
+
+    function updateLightboxImage() {
+      if (!imgElement) return;
+
+      // Quick fade effect
+      imgElement.style.opacity = "0.5";
+
+      setTimeout(() => {
+        imgElement.src = currentImages[currentIndex];
+        imgElement.style.opacity = "1";
+      }, 150);
+
+      if (currentCounter)
+        currentCounter.textContent = (currentIndex + 1).toString();
+    }
+
+    function openLightbox(images: string[]) {
+      if (!lightbox || !imgElement) return;
+
+      currentImages = images;
+      // Fallback if somehow empty, though data ensures at least 1 (and we duped to 2)
+      if (currentImages.length < 2) {
+        // Ensure at least 2 for demo if source was just 1 and we passed the array
+        if (currentImages.length === 1) currentImages.push(currentImages[0]);
+      }
+
+      currentIndex = 0;
+
+      if (totalCounter)
+        totalCounter.textContent = currentImages.length.toString();
+      updateLightboxImage();
+
+      lightbox.classList.remove("invisible", "opacity-0");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeLightbox() {
+      if (!lightbox) return;
+      lightbox.classList.add("invisible", "opacity-0");
+      document.body.style.overflow = "";
+    }
+
+    function nextImage(e?: Event) {
+      e?.stopPropagation();
+      currentIndex = (currentIndex + 1) % currentImages.length;
+      updateLightboxImage();
+    }
+
+    function prevImage(e?: Event) {
+      e?.stopPropagation();
+      currentIndex =
+        (currentIndex - 1 + currentImages.length) % currentImages.length;
+      updateLightboxImage();
+    }
+
+    // Event Listeners
+    if (closeBtn) closeBtn.addEventListener("click", closeLightbox);
+    if (nextBtn) nextBtn.addEventListener("click", nextImage);
+    if (prevBtn) prevBtn.addEventListener("click", prevImage);
+
+    // Click on image to advance
+    if (imgElement) imgElement.addEventListener("click", nextImage);
+
+    // Close on background click
+    if (lightbox) {
+      lightbox.addEventListener("click", (e) => {
+        if (e.target === lightbox) {
+          closeLightbox();
+        }
+      });
+    }
+
+    // Keyboard nav
+    document.addEventListener("keydown", (e) => {
+      if (!lightbox || lightbox.classList.contains("invisible")) return;
+
+      if (e.key === "Escape") closeLightbox();
+      if (e.key === "ArrowRight") nextImage();
+      if (e.key === "ArrowLeft") prevImage();
+    });
+
+    // Subscription Modal Logic
+    const subModal = document.getElementById("subscription-modal");
+    const openSubBtn = document.getElementById("open-subscription-modal");
+    const closeSubBtn = document.getElementById("close-subscription-modal");
+
+    if (openSubBtn && subModal) {
+      openSubBtn.addEventListener("click", () => {
+        subModal.classList.remove("hidden");
+        subModal.classList.add("flex");
+        document.body.style.overflow = "hidden";
+      });
+    }
+
+    if (closeSubBtn && subModal) {
+      closeSubBtn.addEventListener("click", () => {
+        subModal.classList.add("hidden");
+        subModal.classList.remove("flex");
+        document.body.style.overflow = "";
+      });
+    }
+
+    if (subModal) {
+      subModal.addEventListener("click", (e) => {
+        if (e.target === subModal) {
+          subModal.classList.add("hidden");
+          subModal.classList.remove("flex");
+          document.body.style.overflow = "";
+        }
+      });
+    }
+    // Tab Filtering Logic
+    const tabs = document.querySelectorAll(".tab-btn");
+    const items = document.querySelectorAll(".catalog-item");
+
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        // 1. Remove active state from all tabs
+        tabs.forEach((t) => {
+          t.classList.remove("bg-honey-bronze-500/10", "active-tab");
+        });
+
+        // 2. Add active state to clicked tab
+        tab.classList.add("bg-honey-bronze-500/10", "active-tab");
+
+        // 3. Filter items
+        const category = tab.getAttribute("data-category");
+
+        items.forEach((item) => {
+          const itemCategory = item.getAttribute("data-category");
+
+          if (category === "all" || itemCategory === category) {
+            item.classList.remove("hidden");
+          } else {
+            item.classList.add("hidden");
+          }
+        });
+      });
+    });
+  });
+</script>
+```
