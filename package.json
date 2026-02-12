@@ -9,8 +9,8 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@astrojs/node": "^9.5.1",
     "@astrojs/tailwind": "^5.1.0",
+    "@astrojs/vercel": "^9.0.4",
     "@nanostores/persistent": "^1.2.0",
     "@supabase/supabase-js": "^2.89.0",
     "astro": "^5.16.6",
