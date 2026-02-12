@@ -1,8 +1,8 @@
 /* empty css                                   */
-import { e as createComponent, l as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_JR3jxAAG.mjs';
+import { e as createComponent, l as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_CZQ_ue84.mjs';
 import 'piccolore';
-import { $ as $$Layout } from '../chunks/Layout_CGBRDME9.mjs';
-import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B3zIEEWi.mjs';
+import { $ as $$Layout } from '../chunks/Layout_D9WWbt9a.mjs';
+import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_CmaMCsFM.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Sobre = createComponent(($$result, $$props, $$slots) => {

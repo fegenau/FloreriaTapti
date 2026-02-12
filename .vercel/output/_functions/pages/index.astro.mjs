@@ -1,8 +1,8 @@
 /* empty css                                   */
-import { e as createComponent, m as maybeRenderHead, r as renderTemplate, f as createAstro, h as addAttribute, l as renderComponent } from '../chunks/astro/server_JR3jxAAG.mjs';
+import { e as createComponent, m as maybeRenderHead, r as renderTemplate, f as createAstro, h as addAttribute, l as renderComponent } from '../chunks/astro/server_CZQ_ue84.mjs';
 import 'piccolore';
-import { $ as $$Layout } from '../chunks/Layout_CGBRDME9.mjs';
-import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_B3zIEEWi.mjs';
+import { $ as $$Layout } from '../chunks/Layout_D9WWbt9a.mjs';
+import { $ as $$BoutiqueCard } from '../chunks/BoutiqueCard_CmaMCsFM.mjs';
 import 'clsx';
 /* empty css                                 */
 import { c as catalogData } from '../chunks/catalog_Emdk47vd.mjs';

@@ -1,15 +1,15 @@
-import { R as ROUTE_TYPE_HEADER, q as REROUTE_DIRECTIVE_HEADER, D as DEFAULT_404_COMPONENT, A as AstroError, v as ActionNotFoundError, w as clientAddressSymbol, x as LocalsNotAnObject, y as REROUTABLE_STATUS_CODES, z as responseSentSymbol, B as nodeRequestAbortControllerCleanupSymbol } from './astro/server_JR3jxAAG.mjs';
+import { R as ROUTE_TYPE_HEADER, q as REROUTE_DIRECTIVE_HEADER, D as DEFAULT_404_COMPONENT, A as AstroError, v as ActionNotFoundError, w as clientAddressSymbol, x as LocalsNotAnObject, y as FailedToFindPageMapSSR, z as REROUTABLE_STATUS_CODES, B as responseSentSymbol, C as nodeRequestAbortControllerCleanupSymbol } from './astro/server_CZQ_ue84.mjs';
 import colors from 'piccolore';
 import 'clsx';
-import { D as DEFAULT_404_ROUTE, d as default404Instance, e as ensure404Route } from './astro-designed-error-pages_JH6cQa6h.mjs';
+import { D as DEFAULT_404_ROUTE, d as default404Instance, e as ensure404Route } from './astro-designed-error-pages_DXkAAw5Y.mjs';
 import 'es-module-lexer';
 import buffer from 'node:buffer';
 import crypto$1 from 'node:crypto';
 import { Http2ServerResponse } from 'node:http2';
 import { f as fileExtension, j as joinPaths, s as slash, p as prependForwardSlash, r as removeTrailingForwardSlash, a as appendForwardSlash, b as isInternalPath, c as collapseDuplicateTrailingSlashes, h as hasFileExtension } from './path_De6Se6hL.mjs';
-import { m as matchPattern } from './index_CZWCDbwp.mjs';
-import { r as requestIs404Or500, i as isRequestServerIsland, n as notFound, a as redirectToFallback, b as redirectToDefaultLocale, c as requestHasLocale, e as normalizeTheLocale, d as defineMiddleware, S as SERVER_ISLAND_COMPONENT, f as SERVER_ISLAND_ROUTE, g as createEndpoint, R as RouteCache, s as sequence, h as findRouteToRewrite, v as validateAndDecodePathname, m as matchRoute, j as RenderContext, P as PERSIST_SYMBOL, k as getSetCookiesFromResponse } from './index_BwcR4kwO.mjs';
-import { N as NOOP_MIDDLEWARE_FN } from './noop-middleware_BNB6Oirg.mjs';
+import { m as matchPattern } from './index_BL6Pqka4.mjs';
+import { r as requestIs404Or500, i as isRequestServerIsland, n as notFound, a as redirectToFallback, b as redirectToDefaultLocale, c as requestHasLocale, e as normalizeTheLocale, d as defineMiddleware, S as SERVER_ISLAND_COMPONENT, f as SERVER_ISLAND_ROUTE, g as createEndpoint, R as RouteCache, s as sequence, h as findRouteToRewrite, v as validateAndDecodePathname, m as matchRoute, j as RenderContext, P as PERSIST_SYMBOL, k as getSetCookiesFromResponse } from './index_cAt2i2n9.mjs';
+import { N as NOOP_MIDDLEWARE_FN } from './noop-middleware_D2Ir9VKt.mjs';
 import '@vercel/routing-utils';
 import 'deterministic-object-hash';
 import nodePath from 'node:path';
@@ -957,6 +957,12 @@ class App {
     let session;
     try {
       const mod = await this.#pipeline.getModuleForRoute(routeData);
+      if (!mod || typeof mod.page !== "function") {
+        throw new AstroError({
+          ...FailedToFindPageMapSSR,
+          message: `The module for route "${routeData.route}" does not have a valid page function. This may occur when using static output mode with an SSR adapter.`
+        });
+      }
       const renderContext = await RenderContext.create({
         pipeline: this.#pipeline,
         locals,
@@ -969,6 +975,7 @@ class App {
       session = renderContext.session;
       response = await renderContext.render(await mod.page());
     } catch (err) {
+      this.#logger.error("router", "Error while trying to render the route " + routeData.route);
       this.#logger.error(null, err.stack || err.message || String(err));
       return this.#renderError(request, {
         locals,
@@ -1050,6 +1057,11 @@ class App {
         }
       }
       const mod = await this.#pipeline.getModuleForRoute(errorRouteData);
+      if (!mod || typeof mod.page !== "function") {
+        const response2 = this.#mergeResponses(new Response(null, { status }), originalResponse);
+        Reflect.set(response2, responseSentSymbol, true);
+        return response2;
+      }
       let session;
       try {
         const renderContext = await RenderContext.create({
@@ -1158,6 +1170,82 @@ const createOutgoingHttpHeaders = (headers) => {
   return nodeHeaders;
 };
 
+function sanitizeHost(hostname) {
+  if (!hostname) return void 0;
+  if (/[/\\]/.test(hostname)) return void 0;
+  return hostname;
+}
+function parseHost(host) {
+  const parts = host.split(":");
+  return {
+    hostname: parts[0],
+    port: parts[1]
+  };
+}
+function matchesAllowedDomains(hostname, protocol, port, allowedDomains) {
+  const hostWithPort = port ? `${hostname}:${port}` : hostname;
+  const urlString = `${protocol}://${hostWithPort}`;
+  if (!URL.canParse(urlString)) {
+    return false;
+  }
+  const testUrl = new URL(urlString);
+  return allowedDomains.some((pattern) => matchPattern(testUrl, pattern));
+}
+function validateHost(host, protocol, allowedDomains) {
+  if (!host || host.length === 0) return void 0;
+  if (!allowedDomains || allowedDomains.length === 0) return void 0;
+  const sanitized = sanitizeHost(host);
+  if (!sanitized) return void 0;
+  const { hostname, port } = parseHost(sanitized);
+  if (matchesAllowedDomains(hostname, protocol, port, allowedDomains)) {
+    return sanitized;
+  }
+  return void 0;
+}
+function validateForwardedHeaders(forwardedProtocol, forwardedHost, forwardedPort, allowedDomains) {
+  const result = {};
+  if (forwardedProtocol) {
+    if (allowedDomains && allowedDomains.length > 0) {
+      const hasProtocolPatterns = allowedDomains.some((pattern) => pattern.protocol !== void 0);
+      if (hasProtocolPatterns) {
+        try {
+          const testUrl = new URL(`${forwardedProtocol}://example.com`);
+          const isAllowed = allowedDomains.some((pattern) => matchPattern(testUrl, pattern));
+          if (isAllowed) {
+            result.protocol = forwardedProtocol;
+          }
+        } catch {
+        }
+      } else if (/^https?$/.test(forwardedProtocol)) {
+        result.protocol = forwardedProtocol;
+      }
+    } else if (/^https?$/.test(forwardedProtocol)) {
+      result.protocol = forwardedProtocol;
+    }
+  }
+  if (forwardedPort && allowedDomains && allowedDomains.length > 0) {
+    const hasPortPatterns = allowedDomains.some((pattern) => pattern.port !== void 0);
+    if (hasPortPatterns) {
+      const isAllowed = allowedDomains.some((pattern) => pattern.port === forwardedPort);
+      if (isAllowed) {
+        result.port = forwardedPort;
+      }
+    }
+  }
+  if (forwardedHost && forwardedHost.length > 0 && allowedDomains && allowedDomains.length > 0) {
+    const protoForValidation = result.protocol || "https";
+    const sanitized = sanitizeHost(forwardedHost);
+    if (sanitized) {
+      const { hostname, port: portFromHost } = parseHost(sanitized);
+      const portForValidation = result.port || portFromHost;
+      if (matchesAllowedDomains(hostname, protoForValidation, portForValidation, allowedDomains)) {
+        result.host = sanitized;
+      }
+    }
+  }
+  return result;
+}
+
 function apply() {
   if (!globalThis.crypto) {
     Object.defineProperty(globalThis, "crypto", {
@@ -1216,26 +1304,28 @@ class NodeApp extends App {
       return multiValueHeader?.toString()?.split(",").map((e) => e.trim())?.[0];
     };
     const providedProtocol = isEncrypted ? "https" : "http";
-    const providedHostname = req.headers.host ?? req.headers[":authority"];
-    const validated = App.validateForwardedHeaders(
+    const untrustedHostname = req.headers.host ?? req.headers[":authority"];
+    const validated = validateForwardedHeaders(
       getFirstForwardedValue(req.headers["x-forwarded-proto"]),
       getFirstForwardedValue(req.headers["x-forwarded-host"]),
       getFirstForwardedValue(req.headers["x-forwarded-port"]),
       allowedDomains
     );
     const protocol = validated.protocol ?? providedProtocol;
-    const sanitizedProvidedHostname = App.sanitizeHost(
-      typeof providedHostname === "string" ? providedHostname : void 0
+    const validatedHostname = validateHost(
+      typeof untrustedHostname === "string" ? untrustedHostname : void 0,
+      protocol,
+      allowedDomains
     );
-    const hostname = validated.host ?? sanitizedProvidedHostname;
+    const hostname = validated.host ?? validatedHostname ?? "localhost";
     const port = validated.port;
     let url;
     try {
       const hostnamePort = getHostnamePort(hostname, port);
       url = new URL(`${protocol}://${hostnamePort}${req.url}`);
     } catch {
-      const hostnamePort = getHostnamePort(providedHostname, port);
-      url = new URL(`${providedProtocol}://${hostnamePort}`);
+      const hostnamePort = getHostnamePort(hostname, port);
+      url = new URL(`${protocol}://${hostnamePort}`);
     }
     const options = {
       method: req.method || "GET",
