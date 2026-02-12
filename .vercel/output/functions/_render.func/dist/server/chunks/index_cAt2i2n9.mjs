@@ -1,8 +1,8 @@
-import { C as decryptString, G as createSlotValueFromString, H as isAstroComponentFactory, l as renderComponent, r as renderTemplate, q as REROUTE_DIRECTIVE_HEADER, A as AstroError, J as i18nNoLocaleFoundInPath, K as ResponseSentError, O as originPathnameSymbol, P as RewriteWithBodyUsed, Q as GetStaticPathsRequired, S as InvalidGetStaticPathsReturn, T as InvalidGetStaticPathsEntry, V as GetStaticPathsExpectedParams, W as GetStaticPathsInvalidRouteParam, X as PageNumberParamNotFound, D as DEFAULT_404_COMPONENT, Y as NoMatchingStaticPathFound, Z as PrerenderDynamicEndpointPathCollide, _ as ReservedSlotName, $ as renderSlotToString, a0 as renderJSX, a1 as chunkToString, a2 as isRenderInstruction, v as ActionNotFoundError, a3 as MiddlewareNoDataOrNextCalled, a4 as MiddlewareNotAResponse, a5 as SessionStorageInitError, a6 as SessionStorageSaveError, R as ROUTE_TYPE_HEADER, a7 as ForbiddenRewrite, a8 as ASTRO_VERSION, a9 as CspNotEnabled, aa as LocalsReassigned, ab as generateCspDigest, ac as PrerenderClientAddressNotAvailable, w as clientAddressSymbol, ad as ClientAddressNotAvailable, ae as StaticClientAddressNotAvailable, af as AstroResponseHeadersReassigned, z as responseSentSymbol$1, ag as renderPage, ah as REWRITE_DIRECTIVE_HEADER_KEY, ai as REWRITE_DIRECTIVE_HEADER_VALUE, aj as renderEndpoint } from './astro/server_JR3jxAAG.mjs';
+import { G as decryptString, H as createSlotValueFromString, J as isAstroComponentFactory, l as renderComponent, r as renderTemplate, q as REROUTE_DIRECTIVE_HEADER, A as AstroError, K as i18nNoLocaleFoundInPath, O as ResponseSentError, P as originPathnameSymbol, Q as RewriteWithBodyUsed, S as GetStaticPathsRequired, T as InvalidGetStaticPathsReturn, V as InvalidGetStaticPathsEntry, W as GetStaticPathsExpectedParams, X as GetStaticPathsInvalidRouteParam, Y as PageNumberParamNotFound, D as DEFAULT_404_COMPONENT, Z as NoMatchingStaticPathFound, _ as PrerenderDynamicEndpointPathCollide, $ as ReservedSlotName, a0 as renderSlotToString, a1 as renderJSX, a2 as chunkToString, a3 as isRenderInstruction, v as ActionNotFoundError, a4 as MiddlewareNoDataOrNextCalled, a5 as MiddlewareNotAResponse, a6 as SessionStorageInitError, a7 as SessionStorageSaveError, R as ROUTE_TYPE_HEADER, a8 as ForbiddenRewrite, a9 as ASTRO_VERSION, aa as CspNotEnabled, ab as LocalsReassigned, ac as generateCspDigest, ad as PrerenderClientAddressNotAvailable, w as clientAddressSymbol, ae as ClientAddressNotAvailable, af as StaticClientAddressNotAvailable, ag as AstroResponseHeadersReassigned, B as responseSentSymbol$1, ah as renderPage, ai as REWRITE_DIRECTIVE_HEADER_KEY, aj as REWRITE_DIRECTIVE_HEADER_VALUE, ak as renderEndpoint } from './astro/server_CZQ_ue84.mjs';
 import colors from 'piccolore';
 import 'clsx';
 import 'es-module-lexer';
-import { g as getActionQueryString, a as deserializeActionResult, D as DEFAULT_404_ROUTE, A as ActionError, s as serializeActionResult, b as ACTION_RPC_ROUTE_PATTERN, c as ACTION_QUERY_PARAMS } from './astro-designed-error-pages_JH6cQa6h.mjs';
+import { g as getActionQueryString, a as deserializeActionResult, D as DEFAULT_404_ROUTE, A as ActionError, s as serializeActionResult, b as ACTION_RPC_ROUTE_PATTERN, c as ACTION_QUERY_PARAMS } from './astro-designed-error-pages_DXkAAw5Y.mjs';
 import { a as appendForwardSlash, j as joinPaths, r as removeTrailingForwardSlash, p as prependForwardSlash, t as trimSlashes } from './path_De6Se6hL.mjs';
 import { serialize, parse } from 'cookie';
 import { unflatten as unflatten$1, stringify as stringify$1 } from 'devalue';
@@ -119,7 +119,7 @@ async function getRequestData(request) {
       }
       const encryptedSlots = params.get("s");
       return {
-        componentExport: params.get("e"),
+        encryptedComponentExport: params.get("e"),
         encryptedProps: params.get("p"),
         encryptedSlots
       };
@@ -130,6 +130,11 @@ async function getRequestData(request) {
         const data = JSON.parse(raw);
         if ("slots" in data && typeof data.slots === "object") {
           return badRequest("Plaintext slots are not allowed. Slots must be encrypted.");
+        }
+        if ("componentExport" in data && typeof data.componentExport === "string") {
+          return badRequest(
+            "Plaintext componentExport is not allowed. componentExport must be encrypted."
+          );
         }
         return data;
       } catch (e) {
@@ -166,6 +171,12 @@ function createEndpoint(manifest) {
       });
     }
     const key = await manifest.key;
+    let componentExport;
+    try {
+      componentExport = await decryptString(key, data.encryptedComponentExport);
+    } catch (_e) {
+      return badRequest("Encrypted componentExport value is invalid.");
+    }
     const encryptedProps = data.encryptedProps;
     let props = {};
     if (encryptedProps !== "") {
@@ -187,7 +198,7 @@ function createEndpoint(manifest) {
       }
     }
     const componentModule = await imp();
-    let Component = componentModule[data.componentExport];
+    let Component = componentModule[componentExport];
     const slots = {};
     for (const prop in decryptedSlots) {
       slots[prop] = createSlotValueFromString(decryptedSlots[prop]);
