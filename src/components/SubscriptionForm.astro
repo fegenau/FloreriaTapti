@@ -112,6 +112,38 @@
       />
     </div>
 
+    <!-- Fechas Importantes -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label
+          for="important_date"
+          class="block text-sm font-medium text-purple-100 mb-1"
+          >Fecha Importante</label
+        >
+        <input
+          type="date"
+          id="important_date"
+          name="important_date"
+          required
+          class="w-full bg-white/5 border border-purple-300/30 rounded-lg px-4 py-3 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
+        />
+      </div>
+      <div>
+        <label
+          for="reason"
+          class="block text-sm font-medium text-purple-100 mb-1">Motivo</label
+        >
+        <input
+          type="text"
+          id="reason"
+          name="reason"
+          required
+          class="w-full bg-white/5 border border-purple-300/30 rounded-lg px-4 py-3 text-white placeholder-purple-200/50 focus:outline-none focus:ring-2 focus:ring-purple-400 transition-all"
+          placeholder="Ej: Aniversario"
+        />
+      </div>
+    </div>
+
     <!-- Suscripción -->
     <div>
       <label
@@ -175,7 +207,7 @@
       e.preventDefault();
 
       const submitBtn = form.querySelector(
-        'button[type="submit"]'
+        'button[type="submit"]',
       ) as HTMLButtonElement;
 
       const formData = new FormData(e.target as HTMLFormElement);

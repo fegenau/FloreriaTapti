@@ -1,5 +1,7 @@
 ---
-interface Props {
+import type { HTMLAttributes } from "astro/types";
+
+interface Props extends HTMLAttributes<"div"> {
   variant?: "hero" | "gallery" | "info" | "contact" | "services";
   size?: "small" | "medium" | "large" | "hero";
   background?: string;
@@ -13,6 +15,7 @@ const {
   background,
   className = "",
   disableAnimation = false,
+  ...rest
 } = Astro.props;
 
 const sizeClasses = {
@@ -41,6 +44,7 @@ const animationClasses = disableAnimation
   style={background
     ? `background-image: url(${background}); background-size: cover; background-position: center;`
     : ""}
+  {...rest}
 >
   <!-- Overlay gradient si hay background image -->
   {

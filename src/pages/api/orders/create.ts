@@ -12,13 +12,15 @@ const bodySchema = z.object({
   email: z.string().email(),
   phone: z.string().min(8),
   commune: z.string().min(3),
+  important_date: z.string().min(1),
+  reason: z.string().min(1),
   duration: z.string().refine((val) => ["15", "30"].includes(val)),
 });
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, duration } = bodySchema.parse(body);
+    const { name, rut, address, email, phone, commune, important_date, reason, duration } = bodySchema.parse(body);
     
     // ... price calculation ...
     const price = duration === "15" ? 20000 : 15000;
@@ -60,6 +62,21 @@ export const POST: APIRoute = async ({ request }) => {
       }]);
 
     if (subError) throw new Error(`Error creating subscription: ${subError.message}`);
+
+    // 2.5 Save Customer Event
+    const { error: eventError } = await supabase
+      .from('customer_events')
+      .insert([{
+          customer_name: name,
+          customer_rut: rut,
+          customer_email: email,
+          important_date: important_date,
+          reason: reason
+      }]);
+
+    if (eventError) {
+        console.error('Supabase Customer Event Error:', eventError);
+    }
 
     // 3. Start Oneclick Enrollment
     // We pass orderId in the URL to identify the order on return, as Oneclick finish only returns the token
