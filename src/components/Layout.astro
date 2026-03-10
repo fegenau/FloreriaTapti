@@ -1,6 +1,7 @@
 ---
 import EntranceAnimation from "./EntranceAnimation.astro";
 import FloatingNav from "./FloatingNav.astro";
+import FloatingWhatsApp from "./FloatingWhatsApp.astro";
 import { ViewTransitions } from "astro:transitions";
 
 interface Props {
@@ -24,13 +25,25 @@ const {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <ViewTransitions />
+    <script is:inline>
+      // Run before first paint to prevent flash
+      if (sessionStorage.getItem("tapti_intro_shown")) {
+        document.documentElement.style.overflow = "visible";
+        // Inject a style that makes main-content immediately visible
+        var s = document.createElement("style");
+        s.textContent =
+          "#main-content { opacity: 1 !important; transition: none !important; animation: none !important; }";
+        document.head.appendChild(s);
+      }
+    </script>
     <script
       is:inline
       src={`https://maps.googleapis.com/maps/api/js?key=${import.meta.env.GOOGLE_MAPS_API_KEY}&libraries=places`}
     ></script>
   </head>
   <body
-    class={`min-h-screen bg-white text-gray-900 ${showEntrance ? "overflow-hidden" : "overflow-visible"}`}
+    class="min-h-screen text-white overflow-visible"
+    style="background-color: #0B1220;"
   >
     {showEntrance && <EntranceAnimation />}
 
@@ -40,15 +53,15 @@ const {
         ? "opacity-0 transition-opacity duration-1000"
         : "opacity-100"}
     >
-      <script>
-        // Handle View Transitions
-        document.addEventListener("astro:page-load", () => {
+      <script is:inline>
+        // Fallback for astro:page-load (View Transitions)
+        document.addEventListener("astro:page-load", function () {
           if (sessionStorage.getItem("tapti_intro_shown")) {
-            const main = document.getElementById("main-content");
+            var main = document.getElementById("main-content");
             if (main) {
-              main.classList.remove("opacity-0");
-              main.classList.add("opacity-100");
+              main.style.opacity = "1";
               main.style.transition = "none";
+              main.style.animation = "none";
             }
             document.body.style.overflow = "visible";
           }
@@ -73,6 +86,11 @@ const {
     </div>
 
     <style>
+      body {
+        background-color: #0b1220;
+        color: #f8fafc;
+      }
+
       @keyframes gentle-fade {
         from {
           opacity: 0;
@@ -86,5 +104,6 @@ const {
         animation: gentle-fade 1s ease-out forwards;
       }
     </style>
+    <FloatingWhatsApp />
   </body>
 </html>

@@ -2,7 +2,6 @@
 import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
 import FloatingNav from "../components/FloatingNav.astro";
-import FloatingWhatsApp from "../components/FloatingWhatsApp.astro";
 import OccasionCard from "../components/OccasionCard.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 
@@ -90,12 +89,12 @@ const specialOccasions = [
     >
       <div class="max-w-4xl pl-8 md:pl-16">
         <h1
-          class="font-serif text-5xl md:text-7xl lg:text-8xl text-sky-blue-400 mb-6 leading-tight"
+          class="font-serif text-5xl md:text-7xl lg:text-8xl text-honey-bronze-400 mb-6 leading-tight"
         >
           Tengo algo para ti
         </h1>
         <p
-          class="text-lg md:text-xl lg:text-2xl text-cerulean-100 mb-8 leading-relaxed max-w-2xl"
+          class="text-lg md:text-xl lg:text-2xl text-cherry-blossom-100 mb-8 leading-relaxed max-w-2xl"
         >
           Ramos elegantes y regalos personalizados, diseñados con la esencia
           única de Tapti
@@ -103,13 +102,13 @@ const specialOccasions = [
         <div class="flex flex-wrap gap-4">
           <a
             href="/catalogo"
-            class="px-10 py-5 bg-sky-blue-500 text-ocean-blue-950 font-semibold rounded-full hover:bg-sky-blue-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg relative z-10"
+            class="px-10 py-5 bg-honey-bronze-500 text-midnight-violet-950 font-semibold rounded-full hover:bg-honey-bronze-400 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg relative z-10"
           >
             Explorar Catálogo
           </a>
           <a
             href="/sobre"
-            class="px-10 py-5 border-2 border-sky-blue-500 text-sky-blue-400 rounded-full hover:bg-sky-blue-500 hover:text-ocean-blue-950 transition-all duration-300 text-lg relative z-10"
+            class="px-10 py-5 border-2 border-honey-bronze-500 text-honey-bronze-400 rounded-full hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300 text-lg relative z-10"
           >
             Nuestra Historia
           </a>
@@ -121,7 +120,7 @@ const specialOccasions = [
     <div class="px-4 md:px-6">
       <div class="max-w-7xl mx-auto">
         <h2
-          class="font-serif text-3xl md:text-4xl text-sky-blue-400 mb-8 text-center"
+          class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
         >
           Te acompañamos en momentos especiales
         </h2>
@@ -144,7 +143,7 @@ const specialOccasions = [
     <div class="px-4 md:px-6">
       <div class="max-w-7xl mx-auto">
         <h2
-          class="font-serif text-3xl md:text-4xl text-sky-blue-400 mb-8 text-center"
+          class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
         >
           Nuestros Favoritos
         </h2>
@@ -160,15 +159,15 @@ const specialOccasions = [
                 onclick="window.location.href='/catalogo'"
               >
                 <div class="space-y-4 relative z-10">
-                  <h3 class="font-serif text-2xl md:text-3xl text-sky-blue-400 mb-3 group-hover:text-sky-blue-300 transition-colors">
+                  <h3 class="font-serif text-2xl md:text-3xl text-honey-bronze-400 mb-3 group-hover:text-honey-bronze-300 transition-colors">
                     {product.name}
                   </h3>
-                  <p class="text-cerulean-100 mb-4 text-sm md:text-base line-clamp-3 group-hover:text-cerulean-50 transition-colors">
+                  <p class="text-cherry-blossom-100 mb-4 text-sm md:text-base line-clamp-3 group-hover:text-cherry-blossom-50 transition-colors">
                     {product.Description}
                   </p>
                   <a
                     href="/catalogo"
-                    class="inline-flex items-center text-sky-blue-400 hover:text-sky-blue-300 font-medium transition-colors group/link text-lg relative z-10"
+                    class="inline-flex items-center text-honey-bronze-400 hover:text-honey-bronze-300 font-medium transition-colors group/link text-lg relative z-10"
                   >
                     Ver Detalles
                     <svg
@@ -197,7 +196,7 @@ const specialOccasions = [
     <div class="px-4 md:px-6">
       <div class="max-w-7xl mx-auto">
         <h2
-          class="font-serif text-3xl md:text-4xl text-sky-blue-400 mb-8 text-center"
+          class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
         >
           Nuestros Servicios
         </h2>
@@ -210,15 +209,15 @@ const specialOccasions = [
                 background={service.image}
               >
                 <div class="p-6 text-center relative z-10">
-                  <h3 class="font-serif text-xl text-sky-blue-400 mb-3">
+                  <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">
                     {service.title}
                   </h3>
-                  <p class="text-cerulean-100 text-sm mb-4">
+                  <p class="text-cherry-blossom-100 text-sm mb-4">
                     {service.description}
                   </p>
                   <a
                     href={service.url}
-                    class="inline-block px-6 py-2 bg-sky-blue-500 text-ocean-blue-950 rounded-full text-sm font-medium hover:bg-sky-blue-400 transition-colors relative z-10"
+                    class="inline-block px-6 py-2 bg-honey-bronze-500 text-midnight-violet-950 rounded-full text-sm font-medium hover:bg-honey-bronze-400 transition-colors relative z-10"
                   >
                     {service.url.includes("catalogo")
                       ? "Ver Catálogo"
@@ -246,19 +245,19 @@ const specialOccasions = [
           className="text-center py-16"
         >
           <h2
-            class="font-serif text-3xl md:text-4xl lg:text-5xl text-sky-blue-400 mb-6"
+            class="font-serif text-3xl md:text-4xl lg:text-5xl text-honey-bronze-400 mb-6"
           >
             Únete a Tapti Club
           </h2>
           <p
-            class="text-cerulean-100 mb-8 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed"
+            class="text-cherry-blossom-100 mb-8 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed"
           >
             Descubre beneficios exclusivos, descuentos especiales y acceso
             prioritario a nuestras nuevas colecciones
           </p>
           <a
             href="/membresias"
-            class="inline-flex items-center px-10 py-5 bg-gradient-to-r from-sky-blue-500 to-sky-blue-400 text-ocean-blue-950 font-semibold rounded-full hover:from-sky-blue-400 hover:to-sky-blue-300 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg relative z-10"
+            class="inline-flex items-center px-10 py-5 bg-gradient-to-r from-honey-bronze-500 to-honey-bronze-400 text-midnight-violet-950 font-semibold rounded-full hover:from-honey-bronze-400 hover:to-honey-bronze-300 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg relative z-10"
           >
             Conocer Membresías
             <svg
@@ -278,9 +277,6 @@ const specialOccasions = [
       </div>
     </div>
   </div>
-
-  <!-- Componente flotante de WhatsApp -->
-  <FloatingWhatsApp />
 
   <!-- Navegación flotante -->
 </Layout>
