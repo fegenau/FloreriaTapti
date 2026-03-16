@@ -10,12 +10,14 @@ const bodySchema = z.object({
   email: z.string().email(),
   phone: z.string().min(8),
   commune: z.string().min(3),
+  important_date: z.string().min(1),
+  reason: z.string().min(1),
   duration: z.string().refine((val) => ["15", "30"].includes(val))
 });
 const POST = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, duration } = bodySchema.parse(body);
+    const { name, rut, address, email, phone, commune, important_date, reason, duration } = bodySchema.parse(body);
     const price = duration === "15" ? 2e4 : 15e3;
     const buyOrder = `SUB-${Date.now()}`;
     const sessionId = `s-${Math.random().toString(36).substring(7)}`;
@@ -42,6 +44,16 @@ const POST = async ({ request }) => {
       is_active: false
     }]);
     if (subError) throw new Error(`Error creating subscription: ${subError.message}`);
+    const { error: eventError } = await supabase.from("customer_events").insert([{
+      customer_name: name,
+      customer_rut: rut,
+      customer_email: email,
+      important_date,
+      reason
+    }]);
+    if (eventError) {
+      console.error("Supabase Customer Event Error:", eventError);
+    }
     const returnUrl = `http://${request.headers.get("host")}/api/webpay/return?orderId=${order.id}`;
     const username = `user-${order.id}`;
     const { token, url_webpay } = await startOneclick(username, email, returnUrl);

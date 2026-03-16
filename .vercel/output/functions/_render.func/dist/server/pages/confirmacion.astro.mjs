@@ -1,7 +1,7 @@
 /* empty css                                   */
 import { e as createComponent, l as renderComponent, r as renderTemplate, m as maybeRenderHead } from '../chunks/astro/server_CZQ_ue84.mjs';
 import 'piccolore';
-import { $ as $$Layout } from '../chunks/Layout_D9WWbt9a.mjs';
+import { $ as $$Layout } from '../chunks/Layout_B3-FjVFm.mjs';
 export { renderers } from '../renderers.mjs';
 
 const $$Confirmacion = createComponent(($$result, $$props, $$slots) => {

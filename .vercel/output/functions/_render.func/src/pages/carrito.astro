@@ -79,7 +79,7 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
                 <input
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder="Tu email"
                   required
                   class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
                 />
@@ -103,7 +103,7 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
                 <input
                   type="text"
                   name="commune"
-                  placeholder="Comuna"
+                  placeholder="Tu comuna"
                   required
                   class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
                 />
@@ -115,7 +115,7 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
                 <input
                   type="text"
                   name="address"
-                  placeholder="Dirección calle/número"
+                  placeholder="A cual dirección deseas que llegue tu pedido?"
                   required
                   class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
                 />
@@ -124,6 +124,50 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
                   id="error-address"
                 >
                 </p>
+
+                <div
+                  class="col-span-1 md:col-span-2 mt-6 pt-6 border-t border-white/20"
+                >
+                  <h3 class="text-xl font-serif text-honey-bronze-100 mb-4">
+                    Registra una fecha importante para ti, para acceder a
+                    descuentos
+                  </h3>
+                  <h5 class="text-sm font-serif text-honey-bronze-100 mb-2">
+                    Por ejemplo: Cumpleaños, Aniversario, etc.
+                  </h5>
+                  <div
+                    class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 p-4 rounded-lg border border-white/10"
+                  >
+                    <div>
+                      <input
+                        type="date"
+                        name="important_date"
+                        placeholder="Fecha importante"
+                        required
+                        class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                      />
+                      <p
+                        class="text-red-400 text-sm mt-1 hidden error-msg"
+                        id="error-important_date"
+                      >
+                      </p>
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        name="reason"
+                        placeholder="Motivo (ej: Cumpleaños)"
+                        required
+                        class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                      />
+                      <p
+                        class="text-red-400 text-sm mt-1 hidden error-msg"
+                        id="error-reason"
+                      >
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
                 <div
                   class="col-span-1 md:col-span-2 flex justify-end gap-4 mt-4"
@@ -330,6 +374,8 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
           phone: formData.get("phone"),
           commune: formData.get("commune"),
           address: formData.get("address"),
+          important_date: formData.get("important_date"),
+          reason: formData.get("reason"),
           items: currentItems,
         };
 

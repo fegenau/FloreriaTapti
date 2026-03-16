@@ -2,6 +2,7 @@
 import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
 import SubscriptionForm from "../components/SubscriptionForm.astro";
+import ExperienceModal from "../components/ExperienceModal.astro";
 import catalogData from "../data/catalog.json";
 
 // Agrupar por categoría si es necesario, por ahora plano
@@ -16,7 +17,7 @@ const products = catalogData.flowers;
       className="!h-auto min-h-[70vh] p-8 max-w-7xl mx-auto"
       disableAnimation={true}
     >
-      <div class="mb-16 text-center">
+      <div class="mb-16 text-center hidden">
         <h2 class="font-serif text-3xl text-honey-bronze-100 mb-6">
           Suscripciones Florales
         </h2>
@@ -63,6 +64,18 @@ const products = catalogData.flowers;
           data-category="Canastos"
         >
           Canastos
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Experiencias"
+        >
+          Experiencias
+        </button>
+        <button
+          class="tab-btn px-6 py-2 rounded-full border border-honey-bronze-500 text-honey-bronze-400 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 transition-all duration-300"
+          data-category="Decoración"
+        >
+          Decoración
         </button>
       </div>
 
@@ -192,52 +205,24 @@ const products = catalogData.flowers;
         }
       </div>
     </BoutiqueCard>
+  </div>
 
-    {/* Subscription Modal */}
-    <div
-      id="subscription-modal"
-      class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4"
-    >
-      <div class="relative w-full max-w-lg">
-        <button
-          id="close-subscription-modal"
-          class="absolute -top-4 -right-4 z-50 bg-white text-black rounded-full p-2 shadow-lg hover:bg-gray-200 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            ><line x1="18" y1="6" x2="6" y2="18"></line><line
-              x1="6"
-              y1="6"
-              x2="18"
-              y2="18"></line></svg
-          >
-        </button>
-        <SubscriptionForm />
-      </div>
-    </div>
+  <ExperienceModal />
 
-    {/* Lightbox Modal */}
-    <div
-      id="lightbox"
-      class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
-    >
-      {/* Close Button */}
+  {/* Subscription Modal */}
+  <div
+    id="subscription-modal"
+    class="fixed inset-0 z-[200] bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4"
+  >
+    <div class="relative w-full max-w-lg">
       <button
-        id="lightbox-close"
-        class="absolute top-4 right-4 z-[210] text-white/70 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all"
+        id="close-subscription-modal"
+        class="absolute -top-4 -right-4 z-50 bg-white text-black rounded-full p-2 shadow-lg hover:bg-gray-200 transition-colors"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          width="32"
-          height="32"
+          width="20"
+          height="20"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -251,71 +236,101 @@ const products = catalogData.flowers;
             y2="18"></line></svg
         >
       </button>
+      <SubscriptionForm />
+    </div>
+  </div>
 
-      {/* Main Container */}
-      <div
-        class="relative w-full max-w-5xl h-[85vh] flex items-center justify-center"
+  {/* Lightbox Modal */}
+  <div
+    id="lightbox"
+    class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-md opacity-0 invisible transition-all duration-300 flex items-center justify-center p-4"
+  >
+    {/* Close Button */}
+    <button
+      id="lightbox-close"
+      class="absolute top-4 right-4 z-[210] text-white/70 hover:text-white hover:bg-white/10 rounded-full p-2 transition-all"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        ><line x1="18" y1="6" x2="6" y2="18"></line><line
+          x1="6"
+          y1="6"
+          x2="18"
+          y2="18"></line></svg
       >
-        {/* Previous Button */}
-        <button
-          id="lightbox-prev"
-          class="absolute left-0 md:-left-12 p-2 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-all hidden md:block"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            ><polyline points="15 18 9 12 15 6"></polyline></svg
-          >
-        </button>
+    </button>
 
-        {/* Image Display */}
+    {/* Main Container */}
+    <div
+      class="relative w-full max-w-5xl h-[85vh] flex items-center justify-center"
+    >
+      {/* Previous Button */}
+      <button
+        id="lightbox-prev"
+        class="absolute left-0 md:-left-12 p-2 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-all hidden md:block"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="40"
+          height="40"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><polyline points="15 18 9 12 15 6"></polyline></svg
+        >
+      </button>
+
+      {/* Image Display */}
+      <div
+        class="relative h-full w-full flex items-center justify-center overflow-hidden"
+      >
+        <img
+          id="lightbox-img"
+          src=""
+          class="max-h-full max-w-full object-contain rounded-lg shadow-2xl transition-opacity duration-300 cursor-pointer"
+          alt="Lightbox view"
+          title="Click para ver siguiente imagen"
+        />
+
+        {/* Image Counter */}
         <div
-          class="relative h-full w-full flex items-center justify-center overflow-hidden"
+          class="absolute bottom-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm"
         >
-          <img
-            id="lightbox-img"
-            src=""
-            class="max-h-full max-w-full object-contain rounded-lg shadow-2xl transition-opacity duration-300 cursor-pointer"
-            alt="Lightbox view"
-            title="Click para ver siguiente imagen"
-          />
-
-          {/* Image Counter */}
-          <div
-            class="absolute bottom-4 bg-black/50 text-white text-sm px-3 py-1 rounded-full backdrop-blur-sm"
+          <span id="lightbox-current">1</span> / <span id="lightbox-total"
+            >2</span
           >
-            <span id="lightbox-current">1</span> / <span id="lightbox-total"
-              >2</span
-            >
-          </div>
         </div>
-
-        {/* Next Button */}
-        <button
-          id="lightbox-next"
-          class="absolute right-0 md:-right-12 p-2 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-all hidden md:block"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="40"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            ><polyline points="9 18 15 12 9 6"></polyline></svg
-          >
-        </button>
       </div>
+
+      {/* Next Button */}
+      <button
+        id="lightbox-next"
+        class="absolute right-0 md:-right-12 p-2 hover:bg-white/10 rounded-full text-white/50 hover:text-white transition-all hidden md:block"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="40"
+          height="40"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><polyline points="9 18 15 12 9 6"></polyline></svg
+        >
+      </button>
     </div>
   </div>
 </Layout>
@@ -324,7 +339,7 @@ const products = catalogData.flowers;
   import { cartItems, addCartItem, decreaseCartItem } from "../store/cartStore";
 
   // Re-render logic to show/hide decrease buttons
-  function updateButtons(items) {
+  function updateButtons(items: any) {
     document.querySelectorAll(".decrease-cart-btn").forEach((btn) => {
       const productStr = btn.getAttribute("data-product");
       const size = btn.getAttribute("data-size");
@@ -365,6 +380,17 @@ const products = catalogData.flowers;
         if (productStr && size && priceStr) {
           const product = JSON.parse(productStr);
           const price = parseInt(priceStr);
+
+          if (product.hasForm) {
+            // Trigger custom event to open ExperienceModal
+            window.dispatchEvent(
+              new CustomEvent("open-experience-form", {
+                detail: { product, size, price },
+              }),
+            );
+            return;
+          }
+
           addCartItem(product, size, price);
         }
 

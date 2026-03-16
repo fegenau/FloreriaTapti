@@ -10,6 +10,8 @@ const CheckoutSchema = z.object({
   phone: z.string().min(8, "Teléfono inválido"),
   address: z.string().min(5, "Dirección inválida"),
   commune: z.string().min(3, "Comuna inválida"),
+  important_date: z.string().min(1, "La fecha importante es obligatoria"),
+  reason: z.string().min(1, "El motivo es obligatorio"),
   items: z.array(z.object({
     id: z.string(),
     quantity: z.number().min(1),
@@ -19,7 +21,7 @@ const CheckoutSchema = z.object({
 const POST = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, items } = CheckoutSchema.parse(body);
+    const { name, rut, address, email, phone, commune, important_date, reason, items } = CheckoutSchema.parse(body);
     const totalAmount = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const buyOrder = `CART-${Date.now()}`;
     const { data: order, error: orderError } = await supabase.from("orders").insert([{
@@ -35,6 +37,16 @@ const POST = async ({ request }) => {
     if (orderError) {
       console.error("Supabase Order Error:", orderError);
       throw new Error(`DB Error: ${orderError.message}`);
+    }
+    const { error: eventError } = await supabase.from("customer_events").insert([{
+      customer_name: name,
+      customer_rut: rut,
+      customer_email: email,
+      important_date,
+      reason
+    }]);
+    if (eventError) {
+      console.error("Supabase Customer Event Error:", eventError);
     }
     const returnUrl = `http://${request.headers.get("host")}/api/webpay/return`;
     const { url, token } = await initTransaction(totalAmount, buyOrder, order.id, returnUrl);

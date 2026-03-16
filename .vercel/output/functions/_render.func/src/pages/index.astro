@@ -2,7 +2,6 @@
 import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
 import FloatingNav from "../components/FloatingNav.astro";
-import FloatingWhatsApp from "../components/FloatingWhatsApp.astro";
 import OccasionCard from "../components/OccasionCard.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 
@@ -30,14 +29,14 @@ const mainServices = [
       "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=500&fit=crop&crop=center",
     url: "/contacto",
   },
-  {
-    title: "Suscripciones",
-    description:
-      "Recibe flores frescas semanalmente. Perfecto para oficinas y hogares",
-    image:
-      "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=500&fit=crop&crop=center",
-    url: "/membresias",
-  },
+  // {
+  //   title: "Suscripciones",
+  //   description:
+  //     "Recibe flores frescas semanalmente. Perfecto para oficinas y hogares",
+  //   image:
+  //     "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=500&fit=crop&crop=center",
+  //   url: "/membresias",
+  // },
 ];
 
 import catalogData from "../data/catalog.json";
@@ -237,8 +236,8 @@ const specialOccasions = [
     <!-- Feed de Instagram con scraping -->
     <InstagramFeed username="tapti_regalo" />
 
-    <!-- Card de Membresías - Ancho ajustado y centrado -->
-    <div class="flex justify-center px-4 md:px-6">
+    <!-- Card de Membresías - Ancho ajustado y centrado (Oculto temporalmente) -->
+    <div class="flex justify-center px-4 md:px-6 hidden">
       <div class="w-full max-w-5xl">
         <BoutiqueCard
           variant="services"
@@ -256,7 +255,7 @@ const specialOccasions = [
             Descubre beneficios exclusivos, descuentos especiales y acceso
             prioritario a nuestras nuevas colecciones
           </p>
-          <!-- <a
+          <a
             href="/membresias"
             class="inline-flex items-center px-10 py-5 bg-gradient-to-r from-honey-bronze-500 to-honey-bronze-400 text-midnight-violet-950 font-semibold rounded-full hover:from-honey-bronze-400 hover:to-honey-bronze-300 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg relative z-10"
           >
@@ -273,14 +272,11 @@ const specialOccasions = [
                 stroke-width="2"
                 d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
             </svg>
-          </a> -->
+          </a>
         </BoutiqueCard>
       </div>
     </div>
   </div>
-
-  <!-- Componente flotante de WhatsApp -->
-  <FloatingWhatsApp />
 
   <!-- Navegación flotante -->
 </Layout>
