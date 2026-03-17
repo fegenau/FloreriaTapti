@@ -35,7 +35,7 @@ const $$Index = createComponent(($$result, $$props, $$slots) => {
     {
       title: "Ramos Personalizados",
       description: "Dise\xF1os \xFAnicos adaptados a tus gustos y ocasi\xF3n especial",
-      image: "../images/Flores/Armando.png",
+      image: "/images/Flores/Armando.png",
       url: "/contacto"
     },
     {
@@ -74,7 +74,7 @@ const $$Index = createComponent(($$result, $$props, $$slots) => {
     },
     {
       title: "Condolencias",
-      image: "../public/images/Flores/Condolencias.jpeg",
+      image: "/images/Flores/Condolencias.jpeg",
       url: "/catalogo?ocasion=condolencias"
     },
     {
@@ -83,7 +83,7 @@ const $$Index = createComponent(($$result, $$props, $$slots) => {
       url: "/catalogo?ocasion=san-valentin"
     }
   ];
-  return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "Tapti \u2014 Florer\xEDa Moderna, elegante y aut\xE9ntica", "hideHeader": true, "hideFooter": true, "showEntrance": true }, { "default": ($$result2) => renderTemplate`  ${maybeRenderHead()}<div class="min-h-screen pt-20 pb-24 space-y-6"> <!-- Hero Card Principal --> ${renderComponent($$result2, "BoutiqueCard", $$BoutiqueCard, { "variant": "hero", "size": "hero", "background": "../../public/images/Banner.jpg", "className": "mx-4 md:mx-6" }, { "default": ($$result3) => renderTemplate` <div class="max-w-4xl pl-8 md:pl-16"> <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl text-honey-bronze-400 mb-6 leading-tight">
+  return renderTemplate`${renderComponent($$result, "Layout", $$Layout, { "title": "Tapti \u2014 Florer\xEDa Moderna, elegante y aut\xE9ntica", "hideHeader": true, "hideFooter": true, "showEntrance": true }, { "default": ($$result2) => renderTemplate`  ${maybeRenderHead()}<div class="min-h-screen pt-20 pb-24 space-y-6"> <!-- Hero Card Principal --> ${renderComponent($$result2, "BoutiqueCard", $$BoutiqueCard, { "variant": "hero", "size": "hero", "background": "/images/Banner.jpg", "className": "mx-4 md:mx-6" }, { "default": ($$result3) => renderTemplate` <div class="max-w-4xl pl-8 md:pl-16"> <h1 class="font-serif text-5xl md:text-7xl lg:text-8xl text-honey-bronze-400 mb-6 leading-tight">
 Tengo algo para ti
 </h1> <p class="text-lg md:text-xl lg:text-2xl text-cherry-blossom-100 mb-8 leading-relaxed max-w-2xl">
 Ramos elegantes y regalos personalizados, diseñados con la esencia
