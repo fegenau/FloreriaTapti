@@ -86,22 +86,17 @@ const accessories = catalog.accessories || [];
         const { id, name, price, image } = target.dataset;
 
         if (id && name && price) {
-          addCartItem({
-            id: id,
-            name: name,
-            price: parseInt(price),
-            image: image || "", // Handle missing image if needed
-            quantity: 1,
-            size: "Único",
-          });
+          addCartItem(
+            {
+              id: id,
+              name: name,
+              image: image ? [image] : null,
+            },
+            "Único",
+            parseInt(price),
+          );
 
           target.textContent = "¡Agregado!";
-          target.classList.add(
-            "bg-green-500/20",
-            "text-green-300",
-            "border-green-500/50",
-          ); // Fixed classList syntax
-
           target.classList.add(
             "bg-green-500/20",
             "text-green-300",

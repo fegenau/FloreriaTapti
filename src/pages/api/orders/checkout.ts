@@ -11,6 +11,8 @@ const CheckoutSchema = z.object({
   phone: z.string().min(8, "Teléfono inválido"),
   address: z.string().min(5, "Dirección inválida"),
   commune: z.string().min(3, "Comuna inválida"),
+  important_date: z.string().min(1, "La fecha importante es obligatoria"),
+  reason: z.string().min(1, "El motivo es obligatorio"),
   items: z.array(z.object({
     id: z.string(),
     quantity: z.number().min(1),
@@ -21,7 +23,7 @@ const CheckoutSchema = z.object({
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, items } = CheckoutSchema.parse(body);
+    const { name, rut, address, email, phone, commune, important_date, reason, items } = CheckoutSchema.parse(body);
 
     // Calculate total
     const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -46,6 +48,22 @@ export const POST: APIRoute = async ({ request }) => {
     if (orderError) {
         console.error('Supabase Order Error:', orderError);
         throw new Error(`DB Error: ${orderError.message}`);
+    }
+
+    // 1.5 Save Customer Event
+    const { error: eventError } = await supabase
+      .from('customer_events')
+      .insert([{
+          customer_name: name,
+          customer_rut: rut,
+          customer_email: email,
+          important_date: important_date,
+          reason: reason
+      }]);
+
+    if (eventError) {
+        console.error('Supabase Customer Event Error:', eventError);
+        // We won't throw error to stop the whole flow, just log it.
     }
 
     // 2. Initiate Webpay

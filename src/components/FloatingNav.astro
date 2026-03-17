@@ -3,7 +3,8 @@
 ---
 
 <nav
-  class="fixed top-6 left-1/2 -translate-x-1/2 z-40 bg-midnight-violet-950/80 backdrop-blur-md border border-honey-bronze-500/20 rounded-full px-6 py-3 shadow-2xl hidden md:block"
+  class="fixed top-6 left-1/2 -translate-x-1/2 z-40 backdrop-blur-md rounded-full px-6 py-3 shadow-2xl hidden md:block border border-brand-400/20"
+  style="background-color: #111827;"
 >
   <div class="flex items-center space-x-6">
     <!-- Logo -->
@@ -25,12 +26,14 @@
       >
         Catálogo
       </a>
-      <a
+      {
+        /* <a
         href="/membresias"
         class="text-sm text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors px-3 py-1 rounded-full hover:bg-honey-bronze-500/10"
       >
         Membresías
-      </a>
+      </a> */
+      }
       <a
         href="/sobre"
         class="text-sm text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors px-3 py-1 rounded-full hover:bg-honey-bronze-500/10"
@@ -110,7 +113,7 @@
 <div
   class="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-midnight-violet-950/90 backdrop-blur-md border border-honey-bronze-500/20 rounded-2xl p-4 shadow-2xl"
 >
-  <div class="grid grid-cols-5 gap-2">
+  <div class="grid grid-cols-4 gap-2">
     <a
       href="/catalogo"
       class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
@@ -118,13 +121,15 @@
       <div class="text-lg mb-1">🌸</div>
       <span class="text-xs">Catálogo</span>
     </a>
-    <a
+    {
+      /* <a
       href="/membresias"
       class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
     >
       <div class="text-lg mb-1">💎</div>
       <span class="text-xs">Membresías</span>
-    </a>
+    </a> */
+    }
     <a
       href="/sobre"
       class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"

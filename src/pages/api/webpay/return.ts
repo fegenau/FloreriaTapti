@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 import { finishOneclick, authorizeOneclick, confirmTransaction } from '../../../lib/webpay'; // keep confirmTransaction just in case, but usually we'd remove it if unused here.
+import { sendOrderNotification } from '../../../lib/email';
 // Actually, checkout.ts uses initTransaction which defaults to Webpay Plus, and that needs a return handler too?
 // Wait. checkout.ts sets returnUrl to /api/webpay/return as well!
 // This file needs to handle BOTH Webpay Plus (for cart) AND Oneclick (for subscription).
@@ -77,9 +78,21 @@ const processRequest = async (request: Request, redirect: any) => {
 
         if (detail.response_code === 0 && detail.status === 'AUTHORIZED') {
              await supabase.from('orders').update({ status: 'paid' }).eq('id', orderIdParam);
+             await sendOrderNotification({
+                email: order.customer_email,
+                orderId: orderIdParam,
+                address: order.shipping_address,
+                type: 'success'
+             });
              return redirect(`/webpay/return?status=success&orderId=${orderIdParam}`);
         } else {
              await supabase.from('orders').update({ status: 'rejected' }).eq('id', orderIdParam);
+             await sendOrderNotification({
+                 email: order.customer_email,
+                 orderId: orderIdParam,
+                 type: 'payment_error',
+                 errorReason: 'Pago rechazado por el banco (Suscripción)'
+             });
              return redirect(`/webpay/return?status=failed&message=Pago+rechazado`);
         }
     }
@@ -89,11 +102,21 @@ const processRequest = async (request: Request, redirect: any) => {
 
     // Case 1: Timeout (No token_ws, No TBK_TOKEN, but has TBK_ID_SESION)
     if (!tokenWs && !tbkToken && tbkIdSesion) {
+        const { data: order } = await supabase.from('orders').select('*').eq('id', tbkIdSesion).single();
+        if (order) {
+             await sendOrderNotification({ email: order.customer_email, orderId: tbkIdSesion, type: 'payment_error', errorReason: 'El tiempo de pago ha expirado' });
+        }
         return redirect(`/webpay/return?status=timeout&orderId=${tbkIdSesion}&message=El+tiempo+de+pago+ha+expirado`);
     }
 
     // Case 2: User aborted (TBK_TOKEN present)
     if (tbkToken && !tokenWs) {
+       if (tbkIdSesion) {
+           const { data: order } = await supabase.from('orders').select('*').eq('id', tbkIdSesion).single();
+           if (order) {
+                await sendOrderNotification({ email: order.customer_email, orderId: tbkIdSesion, type: 'payment_error', errorReason: 'Compra anulada por usuario' });
+           }
+       }
        return redirect(`/webpay/return?status=aborted&orderId=${tbkIdSesion || ''}&message=Compra+anulada+por+usuario`);
     }
 
@@ -106,6 +129,9 @@ const processRequest = async (request: Request, redirect: any) => {
     const response = await confirmTransaction(tokenWs);
     const orderId = response.session_id; // For Plus, session_id is orderId
     
+    // Fetch order to have email/address available
+    const { data: order } = await supabase.from('orders').select('*').eq('id', orderId).single();
+
     if (response.response_code === 0 && response.status === 'AUTHORIZED') {
         const { error: updateError } = await supabase
             .from('orders')
@@ -117,9 +143,26 @@ const processRequest = async (request: Request, redirect: any) => {
             return redirect(`/webpay/return?status=warning&message=Pago+exitoso+pero+error+actualizando+orden`);
         }
         
+        if (order) {
+            await sendOrderNotification({
+                email: order.customer_email,
+                orderId: orderId,
+                address: order.shipping_address,
+                type: 'success'
+            });
+        }
+
         return redirect(`/webpay/return?status=success&orderId=${orderId}`); // No subscription update here, that is only for Oneclick branch
     } else {
         await supabase.from('orders').update({ status: 'rejected' }).eq('id', orderId);
+        if (order) {
+            await sendOrderNotification({
+                email: order.customer_email,
+                orderId: orderId,
+                type: 'payment_error',
+                errorReason: 'Pago rechazado por el banco'
+            });
+        }
         return redirect(`/webpay/return?status=failed&message=${encodeURIComponent('Pago rechazado por el banco')}`);
     }
 

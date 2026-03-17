@@ -6,12 +6,15 @@ export const cartItems = persistentAtom('cartItems', {}, {
     decode: JSON.parse
 });
 
-export function addCartItem(product, size, price) {
+export function addCartItem(product, size, price, metadata = null) {
     const currentItems = cartItems.get();
-    const itemId = `${product.name}-${size}`.replace(/\s+/g, '-').toLowerCase();
+    // For items with metadata, we create a unique ID to avoid merging different personalizations
+    const baseId = `${product.name}-${size}`.replace(/\s+/g, '-').toLowerCase();
+    const itemId = metadata ? `${baseId}-${Date.now()}` : baseId;
+    
     const existingItem = currentItems[itemId];
 
-    if (existingItem) {
+    if (existingItem && !metadata) {
         cartItems.set({
             ...currentItems,
             [itemId]: {
@@ -29,6 +32,7 @@ export function addCartItem(product, size, price) {
                 price: price,
                 quantity: 1,
                 image: product.image ? product.image[0] : null,
+                metadata: metadata
             }
         });
     }

@@ -1,6 +1,7 @@
 node_modules
+dist
+.vercel
+.netlify
 
 .env
-.env
-.env
-.env
+.env.*
