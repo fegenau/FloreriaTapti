@@ -21,8 +21,19 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
 
     if (info.type === 'success') {
       subject = 'Tu pedido ha sido generado con éxito';
-      const itemsListHtml = info.items && info.items.length > 0 
-        ? '<ul>' + info.items.map(item => `<li>${item.quantity}x ${item.name || 'Producto'} - $${item.price}</li>`).join('') + '</ul>'
+      let parsedItems: any[] = [];
+      if (Array.isArray(info.items)) {
+        parsedItems = info.items;
+      } else if (typeof info.items === 'string') {
+        try {
+          parsedItems = JSON.parse(info.items);
+        } catch (e) {
+          console.error("Failed to parse info.items", e);
+        }
+      }
+
+      const itemsListHtml = parsedItems.length > 0 
+        ? '<ul>' + parsedItems.map(item => `<li>${item.quantity}x ${item.name || 'Producto'} - $${item.price}</li>`).join('') + '</ul>'
         : '<p>Ver detalles en la plataforma.</p>';
 
       htmlContent = `

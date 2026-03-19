@@ -15,9 +15,12 @@ const CheckoutSchema = z.object({
   reason: z.string().min(1, "El motivo es obligatorio"),
   items: z.array(z.object({
     id: z.string(),
+    name: z.string().optional(),
+    size: z.string().optional(),
+    image: z.string().optional(),
     quantity: z.number().min(1).max(100, "Cantidad sospechosa"),
     price: z.number()
-  })).min(1, "El carrito está vacío").max(50, "Límite de ítems excedido")
+  }).passthrough()).min(1, "El carrito está vacío").max(50, "Límite de ítems excedido")
 });
 
 export const POST: APIRoute = async ({ request }) => {
