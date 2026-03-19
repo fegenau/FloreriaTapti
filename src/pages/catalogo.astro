@@ -130,7 +130,6 @@ const products = catalogData.flowers;
               <div class="space-y-4 mt-6">
                 <div class="flex justify-between text-sm text-cherry-blossom-100 border-b border-white/10 pb-2">
                   <span>Tamaño</span>
-                  <span>Varas</span>
                   <span>Precio</span>
                 </div>
                 {Object.entries(product.sizes).map(([size, details]) => {
@@ -140,7 +139,6 @@ const products = catalogData.flowers;
                       <span class="font-medium text-honey-bronze-400">
                         {size}
                       </span>
-                      <span>{details.qty}</span>
                       <div class="flex items-center gap-3">
                         <span class="font-bold">
                           ${details.total.toLocaleString("es-CL")}

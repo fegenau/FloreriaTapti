@@ -9,6 +9,7 @@ interface Props {
   hideHeader?: boolean;
   hideFooter?: boolean;
   showEntrance?: boolean;
+  hideWhatsApp?: boolean;
 }
 
 const {
@@ -16,6 +17,7 @@ const {
   hideHeader = false,
   hideFooter = false,
   showEntrance = false,
+  hideWhatsApp = false,
 } = Astro.props;
 ---
 
@@ -23,6 +25,7 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
     <title>{title}</title>
     <ViewTransitions />
     <script is:inline>
@@ -104,6 +107,6 @@ const {
         animation: gentle-fade 1s ease-out forwards;
       }
     </style>
-    <FloatingWhatsApp />
+    {!hideWhatsApp && <FloatingWhatsApp />}
   </body>
 </html>
