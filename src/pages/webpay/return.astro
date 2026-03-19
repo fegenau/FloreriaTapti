@@ -19,7 +19,7 @@ if (messageFromUrl) {
   message = decodeURIComponent(messageFromUrl);
 } else {
   if (status === "success")
-    message = "Pago exitoso! Tu suscripción ha sido activada.";
+    message = "Tu pedido se ha generado con éxito.";
   else if (status === "aborted") message = "Anulaste la compra.";
   else if (status === "timeout") message = "El tiempo para pagar expiró.";
   else if (status === "failed") message = "El pago fue rechazado.";

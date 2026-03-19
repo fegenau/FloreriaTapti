@@ -8,6 +8,9 @@ interface OrderEmailInfo {
   orderId: string;
   address?: string;
   errorReason?: string;
+  customerName?: string;
+  customerPhone?: string;
+  items?: any[];
   type: 'success' | 'payment_error';
 }
 
@@ -18,12 +21,27 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
 
     if (info.type === 'success') {
       subject = 'Tu pedido ha sido generado con éxito';
+      let parsedItems: any[] = [];
+      if (Array.isArray(info.items)) {
+        parsedItems = info.items;
+      } else if (typeof info.items === 'string') {
+        try {
+          parsedItems = JSON.parse(info.items);
+        } catch (e) {
+          console.error("Failed to parse info.items", e);
+        }
+      }
+
+      const itemsListHtml = parsedItems.length > 0 
+        ? '<ul>' + parsedItems.map(item => `<li>${item.quantity}x ${item.name || 'Producto'} - $${item.price}</li>`).join('') + '</ul>'
+        : '<p>Ver detalles en la plataforma.</p>';
+
       htmlContent = `
         <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
           <h2 style="color: #4CAF50;">¡Gracias por tu compra!</h2>
           <p>Tu pedido ha sido generado con éxito.</p>
           <p><strong>N° de orden:</strong> ${info.orderId}</p>
-          <p><strong>Dirección de destino:</strong> ${info.address ? info.address : 'No especificada (Retiro o similar)'}</p>
+          <p><strong>Dirección de entrega:</strong> ${info.address ? info.address : 'No especificada'}</p>
           <br/>
           <p>Pronto nos pondremos en contacto contigo para más detalles. ¡Que tengas un excelente día!</p>
           
@@ -31,6 +49,35 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
           <p style="font-size: 12px; color: #888;">Este es un correo automático. Por favor, no respondas a este mensaje.</p>
         </div>
       `;
+
+      // Email to the Owner
+      const ownerSubject = `Nuevo pedido recibido - Orden ${info.orderId}`;
+      const ownerHtmlContent = `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+          <h2 style="color: #4CAF50;">¡Nuevo pedido web!</h2>
+          <p>Se ha recibido una nueva compra exitosa.</p>
+          <p><strong>N° de orden:</strong> ${info.orderId}</p>
+          <h3>Detalles del Cliente</h3>
+          <p><strong>Nombre:</strong> ${info.customerName || 'No especificado'}</p>
+          <p><strong>Teléfono:</strong> ${info.customerPhone || 'No especificado'}</p>
+          <p><strong>Email:</strong> ${info.email}</p>
+          <p><strong>Dirección de entrega:</strong> ${info.address || 'No especificada'}</p>
+          <h3>Productos:</h3>
+          ${itemsListHtml}
+        </div>
+      `;
+
+      try {
+        const ownerEmail = process.env.OWNER_EMAIL || 'fr.egenau@duocuc.cl'; // Change to actual owner email
+        await resend.emails.send({
+          from: 'Florería Tapti <onboarding@resend.dev>',
+          to: [ownerEmail],
+          subject: ownerSubject,
+          html: ownerHtmlContent,
+        });
+      } catch (ownerErr) {
+        console.error('Error enviando email a dueña:', ownerErr);
+      }
     } else {
       subject = 'Aviso sobre tu intento de compra';
       htmlContent = `

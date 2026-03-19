@@ -5,29 +5,22 @@ import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
 
 const CheckoutSchema = z.object({
-  name: z.string()
-    .min(3, "El nombre es muy corto")
-    .regex(/^[A-Za-zÁ-Úá-úñÑ\s]+$/, "El nombre solo puede contener letras"),
+  name: z.string().min(3, "El nombre es muy corto"),
   rut: z.string().refine(validateRut, "RUT inválido (Formato 12.345.678-9)"),
   email: z.string().email("Email inválido"),
-  phone: z.string()
-    .min(8, "Teléfono inválido")
-    .regex(/^\+?[0-9\s]+$/, "Teléfono solo permite números y '+'"),
-  address: z.string()
-    .min(5, "Dirección inválida")
-    .regex(/^[A-Za-zÁ-Úá-úñÑ0-9\s.,#-]+$/, "Dirección contiene símbolos no permitidos (ej: <>%;')"),
-  commune: z.string()
-    .min(3, "Comuna inválida")
-    .regex(/^[A-Za-zÁ-Úá-úñÑ\s-]+$/, "Comuna solo permite letras y guiones"),
+  phone: z.string().min(8, "Teléfono inválido"),
+  address: z.string().min(5, "Dirección inválida"),
+  commune: z.string().min(3, "Comuna inválida"),
   important_date: z.string().min(1, "La fecha importante es obligatoria"),
-  reason: z.string()
-    .min(1, "El motivo es obligatorio")
-    .regex(/^[A-Za-zÁ-Úá-úñÑ0-9\s.,-]+$/, "El motivo contiene símbolos no permitidos (ej: <>%;')"),
+  reason: z.string().min(1, "El motivo es obligatorio"),
   items: z.array(z.object({
     id: z.string(),
+    name: z.string().optional(),
+    size: z.string().optional(),
+    image: z.string().optional(),
     quantity: z.number().min(1).max(100, "Cantidad sospechosa"),
     price: z.number()
-  })).min(1, "El carrito está vacío").max(50, "Límite de ítems excedido")
+  }).passthrough()).min(1, "El carrito está vacío").max(50, "Límite de ítems excedido")
 });
 
 export const POST: APIRoute = async ({ request }) => {
@@ -50,6 +43,7 @@ export const POST: APIRoute = async ({ request }) => {
           shipping_address: address,
           shipping_commune: commune,
           total_amount: totalAmount,
+          items: items,
           status: 'draft'
       }])
       .select()
