@@ -138,11 +138,11 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
                   <div
                     class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 p-4 rounded-lg border border-white/10"
                   >
-                    <div>
+                    <div class="flex flex-col">
+                      <label class="text-sm text-cherry-blossom-100 mb-1">¿Qué fecha es?</label>
                       <input
                         type="date"
                         name="important_date"
-                        placeholder="Fecha importante"
                         required
                         class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
                       />
@@ -152,11 +152,12 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
                       >
                       </p>
                     </div>
-                    <div>
+                    <div class="flex flex-col">
+                      <label class="text-sm text-cherry-blossom-100 mb-1">¿Qué se celebra?</label>
                       <input
                         type="text"
                         name="reason"
-                        placeholder="Motivo (ej: Cumpleaños)"
+                        placeholder="Ej: Cumpleaños de mamá"
                         required
                         class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
                       />
