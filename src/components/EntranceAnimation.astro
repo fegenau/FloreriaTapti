@@ -13,18 +13,24 @@ import EntranceLogo from "./EntranceLogo.astro";
 </div>
 
 <script is:inline>
-  if (sessionStorage.getItem("tapti_intro_shown")) {
-    const el = document.getElementById("entrance-animation");
-    if (el) el.style.display = "none";
-  }
+  const hideEntranceIfNeeded = () => {
+    if (sessionStorage.getItem("tapti_intro_shown")) {
+      const el = document.getElementById("entrance-animation");
+      if (el) el.style.display = "none";
+    }
+  };
+  hideEntranceIfNeeded();
+  document.addEventListener("astro:page-load", hideEntranceIfNeeded);
 </script>
 
 <script>
   import { EntranceAnimationController } from "../utils/entranceAnimation.js";
 
-  window.addEventListener("DOMContentLoaded", () => {
-    const controller = new EntranceAnimationController();
-    controller.init();
+  document.addEventListener("astro:page-load", () => {
+    if (!sessionStorage.getItem("tapti_intro_shown")) {
+      const controller = new EntranceAnimationController();
+      controller.init();
+    }
   });
 </script>
 

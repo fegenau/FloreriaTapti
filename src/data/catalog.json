@@ -25,9 +25,7 @@
       "category": "Colección General"
     },
     {
-      "image": [
-        "images/Flores/Astromelia Lilium/Astromelia Lilium.png"
-      ],
+      "image": ["images/Flores/Astromelia Lilium/Astromelia Lilium.png"],
       "Description": "Ramo de Astromelia de colores y Lilium color blanco. Es un ramo clásico, para toda ocasión.",
       "name": "Astromelias  lilium",
       "unit_price": 1000,
@@ -145,9 +143,7 @@
       "category": "Colección General"
     },
     {
-      "image": [
-        "images/Flores/Pastel nude/Pastel nude.png"
-      ],
+      "image": ["images/Flores/Pastel nude/Pastel nude.png"],
       "Description": "Este es un ramo para destacar por sobre lo tradicional, definitivamente si quieres impresionar con un ramo único, esta es tu mejor opción. Ramo tiene Cremones, hypericum, mini rosas, limonium, alelí o perritos, cardo azul (arañitas) y follaje.",
       "name": "Pastel nude",
       "unit_price": 1000,
@@ -168,9 +164,7 @@
       "category": "Colección General"
     },
     {
-      "image": [
-        "images/Flores/Gerberas pastel/Gerberas pastel.png"
-      ],
+      "image": ["images/Flores/Gerberas pastel/Gerberas pastel.png"],
       "Description": "Este es un ramo muy romántico, las gerberas pueden ser amarillas o rosadas. Ramo contiene mini rosas, gerberas, hypericum, daisy, claveles, gypsophilia y follaje.",
       "name": "Gerberas pastel",
       "unit_price": 3000,
@@ -264,9 +258,7 @@
       "category": "Colección General"
     },
     {
-      "image": [
-        "images/Flores/Rosas rojas/Rosas rojas.jpeg"
-      ],
+      "image": ["images/Flores/Rosas rojas/Rosas rojas.jpeg"],
       "Description": "Este es un ramo clásico pero muy elegante. Ramo de rosas rojas, eucalipto y gypsophilia.",
       "name": "Rosas rojas",
       "unit_price": 800,
@@ -319,9 +311,7 @@
       "category": "Colección General"
     },
     {
-      "image": [
-        "images/Flores/Canastos/canasto niño.png"
-      ],
+      "image": ["images/Flores/Canastos/canasto niño.png"],
       "Description": "Un canasto de Bienvenida al mundo en tonos celestes. Canasto de hortensias, claveles, cremones, lisianthus, cardo azul (arañitas), craspedia y follaje. Este canasto puede ir con un peluche de recién nacido, gorro y/o calcetines.",
       "name": "Canasto nacimientos niño",
       "unit_price": 800,
@@ -334,9 +324,7 @@
       "category": "Canastos"
     },
     {
-      "image": [
-        "images/Flores/Canastos/canasto niñas.png"
-      ],
+      "image": ["images/Flores/Canastos/canasto niñas.png"],
       "Description": "Un canasto de Bienvenida al mundo en tonos rosados. Canasto de hortensias, claveles, astromelia, mable, hypericum y follaje. Este canasto puede ir con un peluche de recién nacida, gorro y/o calcetines.",
       "name": "Canasto nacimientos niña",
       "unit_price": 800,
@@ -349,9 +337,7 @@
       "category": "Canastos"
     },
     {
-      "image": [
-        "images/Flores/Ramo novia/Ramo Novia rosa-damasco.jpg"
-      ],
+      "image": ["images/Flores/Ramo novia/Ramo Novia rosa-damasco.jpg"],
       "Description": "Un ramo de rosas rosadas, para el dia mas maravilloso de su vida.",
       "name": "Ramo de novia rosas rosadas",
       "unit_price": 800,
@@ -364,9 +350,7 @@
       "category": "Matrimonio"
     },
     {
-      "image": [
-        "images/Flores/Ramo novia/Ramo novia rosas-Peonías 2.jpg"
-      ],
+      "image": ["images/Flores/Ramo novia/Ramo novia rosas-Peonías 2.jpg"],
       "Description": "Un ramo de peonías, para el dia mas maravilloso de su vida.",
       "name": "Ramo de novia peonías",
       "unit_price": 800,
@@ -428,9 +412,7 @@
       "category": "Graduaciones"
     },
     {
-      "image": [
-        "images/Flores/Graduaciones/girasoles y clavel.PNG"
-      ],
+      "image": ["images/Flores/Graduaciones/girasoles y clavel.PNG"],
       "Description": "Birrete con flores.",
       "name": "Girasoles y claveles",
       "unit_price": 800,

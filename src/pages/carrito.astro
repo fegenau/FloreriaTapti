@@ -4,7 +4,7 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
 import AccessoriesModal from "../components/AccessoriesModal.astro";
 ---
 
-<Layout title="Tu Carrito | Tapti">
+<Layout title="Tu Carrito | Tapti" hideWhatsApp={true}>
   <div class="min-h-screen pt-24 pb-12 px-4">
     <BoutiqueCard
       variant="services"
@@ -170,24 +170,24 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
                 </div>
 
                 <div
-                  class="col-span-1 md:col-span-2 flex justify-end gap-4 mt-4"
+                  class="col-span-1 md:col-span-2 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-6"
                 >
                   <button
                     type="button"
                     id="btn-cancel"
-                    class="px-6 py-3 border border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/10 transition-colors"
+                    class="w-full sm:w-auto px-4 sm:px-6 py-3 border border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/10 transition-colors order-3 sm:order-1 text-center"
                   >
                     Cancelar Compra
                   </button>
                   <a
                     href="/catalogo"
-                    class="px-6 py-3 border border-honey-bronze-500/50 text-honey-bronze-300 rounded-lg hover:bg-honey-bronze-500/10 transition-colors text-center"
+                    class="w-full sm:w-auto px-4 sm:px-6 py-3 border border-honey-bronze-500/50 text-honey-bronze-300 rounded-lg hover:bg-honey-bronze-500/10 transition-colors text-center order-2 sm:order-2"
                   >
                     Seguir comprando
                   </a>
                   <button
                     type="submit"
-                    class="px-6 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-lg hover:bg-honey-bronze-400 transition-colors font-bold shadow-lg shadow-honey-bronze-500/20"
+                    class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-lg hover:bg-honey-bronze-400 transition-colors font-bold shadow-lg shadow-honey-bronze-500/20 order-1 sm:order-3 text-center"
                   >
                     Ir a Pagar
                   </button>
@@ -240,19 +240,21 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
 
             const itemEl = document.createElement("div");
             itemEl.className =
-              "flex items-center gap-4 bg-white/5 p-4 rounded-lg border border-white/5";
+              "flex flex-col sm:flex-row sm:items-center gap-4 bg-white/5 p-4 rounded-lg border border-white/5";
             itemEl.innerHTML = `
-              <div class="w-20 h-20 bg-black/20 rounded overflow-hidden flex-shrink-0">
-                ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-2xl">🌸</div>'}
+              <div class="flex flex-row items-center gap-4 w-full sm:w-auto">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-black/20 rounded overflow-hidden flex-shrink-0">
+                  ${item.image ? `<img src="${item.image}" alt="${item.name}" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-2xl">🌸</div>'}
+                </div>
+                <div class="flex-grow">
+                  <h3 class="font-serif text-base sm:text-lg text-honey-bronze-100 leading-tight mb-1">${item.name}</h3>
+                  <p class="text-xs sm:text-sm text-gray-400">Tamaño: ${item.size}</p>
+                  <p class="text-xs sm:text-sm text-cherry-blossom-100">Cantidad: ${item.quantity}</p>
+                </div>
               </div>
-              <div class="flex-grow">
-                <h3 class="font-serif text-lg text-honey-bronze-100">${item.name}</h3>
-                <p class="text-sm text-gray-400">Tamaño: ${item.size}</p>
-                <p class="text-sm text-cherry-blossom-100">Cantidad: ${item.quantity}</p>
-              </div>
-              <div class="text-right">
-                <p class="font-bold text-honey-bronze-400">$${itemTotal.toLocaleString("es-CL")}</p>
-                <button class="text-xs text-red-400 hover:text-red-300 mt-1 underline btn-remove" data-id="${item.id}">
+              <div class="flex flex-row sm:flex-col justify-between items-center sm:items-end w-full sm:w-auto mt-2 sm:mt-0 pt-2 sm:pt-0 border-t sm:border-0 border-white/10 sm:ml-auto">
+                <p class="font-bold text-honey-bronze-400 text-lg sm:text-base">$${itemTotal.toLocaleString("es-CL")}</p>
+                <button class="text-sm sm:text-xs text-red-400 hover:text-red-300 underline btn-remove" data-id="${item.id}">
                   Eliminar
                 </button>
               </div>
