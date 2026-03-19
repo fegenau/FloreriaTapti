@@ -40,6 +40,7 @@ export const POST: APIRoute = async ({ request }) => {
           shipping_address: address,
           shipping_commune: commune,
           total_amount: totalAmount,
+          items: items,
           status: 'draft'
       }])
       .select()
