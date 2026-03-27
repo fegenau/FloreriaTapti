@@ -13,8 +13,8 @@ export const initTransaction = async (
 ) => {
   const commerceCode = import.meta.env.WEBPAY_CC || IntegrationCommerceCodes.WEBPAY_PLUS;
   const apiKey = import.meta.env.WEBPAY_KEY || IntegrationApiKeys.WEBPAY;
-  const environment = import.meta.env.PROD ? Environment.Production : Environment.Integration;
-
+  const environment = import.meta.env.WEBPAY_ENV === 'production' ? Environment.Production : Environment.Integration;
+  
   const tx = new WebpayPlus.Transaction(new Options(commerceCode, apiKey, environment));
   return await tx.create(buyOrder, sessionId, amount, returnUrl);
 };
@@ -22,7 +22,7 @@ export const initTransaction = async (
 export const confirmTransaction = async (token: string) => {
   const commerceCode = import.meta.env.WEBPAY_CC || IntegrationCommerceCodes.WEBPAY_PLUS;
   const apiKey = import.meta.env.WEBPAY_KEY || IntegrationApiKeys.WEBPAY;
-  const environment = import.meta.env.PROD ? Environment.Production : Environment.Integration;
+  const environment = import.meta.env.WEBPAY_ENV === 'production' ? Environment.Production : Environment.Integration;
 
   const tx = new WebpayPlus.Transaction(new Options(commerceCode, apiKey, environment));
   return await tx.commit(token);
@@ -33,7 +33,7 @@ export const confirmTransaction = async (token: string) => {
 const getOneclickConfig = () => {
     const commerceCode = import.meta.env.ONECLICK_MALL_CC || IntegrationCommerceCodes.ONECLICK_MALL;
     const apiKey = import.meta.env.ONECLICK_KEY || IntegrationApiKeys.WEBPAY; // Usually same key for integration
-    const environment = import.meta.env.PROD ? Environment.Production : Environment.Integration;
+    const environment = import.meta.env.WEBPAY_ENV === 'production' ? Environment.Production : Environment.Integration;
     const childCommerceCode = import.meta.env.ONECLICK_CHILD_CC;
     
     return { commerceCode, apiKey, environment, childCommerceCode };
