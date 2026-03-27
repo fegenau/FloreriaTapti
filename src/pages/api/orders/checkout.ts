@@ -9,8 +9,8 @@ const CheckoutSchema = z.object({
   rut: z.string().refine(validateRut, "RUT inválido (Formato 12.345.678-9)"),
   email: z.string().email("Email inválido"),
   phone: z.string().min(8, "Teléfono inválido"),
-  address: z.string().min(5, "Dirección inválida"),
-  commune: z.string().min(3, "Comuna inválida"),
+  address: z.string().trim().min(4, "Dirección inválida o muy corta (mínimo 4 caracteres)"),
+  commune: z.string().trim().min(3, "Comuna inválida"),
   important_date: z.string().min(1, "La fecha importante es obligatoria"),
   reason: z.string().min(1, "El motivo es obligatorio"),
   items: z.array(z.object({
