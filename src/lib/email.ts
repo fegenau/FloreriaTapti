@@ -68,9 +68,9 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
       `;
 
       try {
-        const ownerEmail = process.env.OWNER_EMAIL || 'fr.egenau@duocuc.cl'; // Change to actual owner email
+        const ownerEmail = process.env.OWNER_EMAIL || 'tapti.contacto@gmail.com'; // Change to actual owner email
         await resend.emails.send({
-          from: 'Florería Tapti <onboarding@resend.dev>',
+          from: 'Florería Tapti <tapti.contacto@gmail.com>',
           to: [ownerEmail],
           subject: ownerSubject,
           html: ownerHtmlContent,
