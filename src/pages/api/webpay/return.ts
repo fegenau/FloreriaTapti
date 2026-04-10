@@ -85,6 +85,9 @@ const processRequest = async (request: Request, redirect: any) => {
                 customerName: order.customer_name,
                 customerPhone: order.customer_phone,
                 items: order.items,
+                shippingCost: order.shipping_cost,
+                deliveryType: order.delivery_type,
+                deliveryDate: order.delivery_date,
                 type: 'success'
              });
              return redirect(`/webpay/return?status=success&orderId=${orderIdParam}`);
@@ -154,6 +157,9 @@ const processRequest = async (request: Request, redirect: any) => {
                 customerName: order.customer_name,
                 customerPhone: order.customer_phone,
                 items: order.items,
+                shippingCost: order.shipping_cost,
+                deliveryType: order.delivery_type,
+                deliveryDate: order.delivery_date,
                 type: 'success'
             });
         }

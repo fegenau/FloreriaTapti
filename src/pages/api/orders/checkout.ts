@@ -3,6 +3,7 @@ import { supabase } from '../../../lib/supabase';
 import { initTransaction } from '../../../lib/webpay';
 import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
+import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
 
 const CheckoutSchema = z.object({
   name: z.string().min(3, "El nombre es muy corto"),
@@ -11,6 +12,8 @@ const CheckoutSchema = z.object({
   phone: z.string().min(8, "Teléfono inválido"),
   address: z.string().trim().min(4, "Dirección inválida o muy corta (mínimo 4 caracteres)"),
   commune: z.string().trim().min(3, "Comuna inválida"),
+  delivery_type: z.enum(['normal', 'express']).optional(),
+  delivery_date: z.string().optional(),
   important_date: z.string().min(1, "La fecha importante es obligatoria"),
   reason: z.string().min(1, "El motivo es obligatorio"),
   items: z.array(z.object({
@@ -26,10 +29,28 @@ const CheckoutSchema = z.object({
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, important_date, reason, items } = CheckoutSchema.parse(body);
+    const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items } = CheckoutSchema.parse(body);
 
-    // Calculate total
-    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    let shippingCost = 0;
+    if (delivery_type === 'express') {
+      // Validate hour in Santiago
+      const santiagoTime = new Date().toLocaleString("en-US", { timeZone: "America/Santiago" });
+      const currentHour = new Date(santiagoTime).getHours();
+      
+      if (currentHour >= 13) {
+        throw new Error("El Delivery Express no está disponible después de las 13:00 hrs");
+      }
+      shippingCost = EXPRESS_DELIVERY_PRICE;
+    } else {
+      try {
+        shippingCost = getCommunePrice(commune);
+      } catch (err) {
+        shippingCost = 0; // fallback in case of missing commune
+      }
+    }
+
+    // Calculate total incl. shipping
+    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0) + shippingCost;
     const buyOrder = `CART-${Date.now()}`;
 
     // 1. Save Order (Draft)
@@ -42,6 +63,9 @@ export const POST: APIRoute = async ({ request }) => {
           customer_phone: phone,
           shipping_address: address,
           shipping_commune: commune,
+          shipping_cost: shippingCost,
+          delivery_type: delivery_type || 'normal',
+          delivery_date: delivery_type === 'express' ? 'HOY' : (delivery_date || null),
           total_amount: totalAmount,
           items: items,
           status: 'draft'

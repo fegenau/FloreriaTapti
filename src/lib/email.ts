@@ -11,6 +11,9 @@ interface OrderEmailInfo {
   customerName?: string;
   customerPhone?: string;
   items?: any[];
+  shippingCost?: number;
+  deliveryType?: string;
+  deliveryDate?: string;
   type: 'success' | 'payment_error';
 }
 
@@ -41,7 +44,7 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
           <h2 style="color: #4CAF50;">¡Gracias por tu compra!</h2>
           <p>Tu pedido ha sido generado con éxito.</p>
           <p><strong>N° de orden:</strong> ${info.orderId}</p>
-          <p><strong>Dirección de entrega:</strong> ${info.address ? info.address : 'No especificada'}</p>
+          <p><strong>Dirección de entrega:</strong> ${info.address ? info.address : 'No especificada'} ${info.deliveryDate ? `<br/><small>Fecha Programada: ${info.deliveryDate}</small>` : ''} ${info.deliveryType === 'express' ? `<br/><small><b>(DELIVERY EXPRESS PARA HOY)</b></small>` : ''}</p>
           <br/>
           <p>Pronto nos pondremos en contacto contigo para más detalles. ¡Que tengas un excelente día!</p>
           
@@ -61,16 +64,20 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
           <p><strong>Nombre:</strong> ${info.customerName || 'No especificado'}</p>
           <p><strong>Teléfono:</strong> ${info.customerPhone || 'No especificado'}</p>
           <p><strong>Email:</strong> ${info.email}</p>
-          <p><strong>Dirección de entrega:</strong> ${info.address || 'No especificada'}</p>
+          <p><strong>Dirección de entrega:</strong> ${info.address || 'No especificada'} 
+             ${info.deliveryDate ? `<br/><b>Fecha Programada:</b> ${info.deliveryDate}` : ''}
+             ${info.deliveryType === 'express' ? `<br/><b>¡ATENCIÓN! DELIVERY EXPRESS SOLICITADO PARA HOY</b>` : ''}
+          </p>
           <h3>Productos:</h3>
           ${itemsListHtml}
+          ${info.shippingCost !== undefined ? `<p><strong>Despacho cobrado:</strong> $${info.shippingCost}</p>` : ''}
         </div>
       `;
 
       try {
         const ownerEmail = process.env.OWNER_EMAIL || 'tapti.contacto@gmail.com'; // Change to actual owner email
         await resend.emails.send({
-          from: 'Florería Tapti <tapti.contacto@gmail.com>',
+          from: 'Florería Tapti <noreply@tapti.cl>',
           to: [ownerEmail],
           subject: ownerSubject,
           html: ownerHtmlContent,
@@ -96,7 +103,7 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
     // al correo del propietario de la cuenta, o desde 'onboarding@resend.dev'.
     // Si configuras un dominio, cámbialo en el "from".
     const response = await resend.emails.send({
-      from: 'Florería Tapti <onboarding@resend.dev>', 
+      from: 'Florería Tapti <noreply@tapti.cl>', 
       to: [info.email],
       subject: subject,
       html: htmlContent,
@@ -104,10 +111,7 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
 
     if (response.error) {
       console.error('Error enviando email con Resend:', response.error);
-    } else {
-      console.log('Email enviado exitosamente. ID:', response.data?.id);
     }
-
   } catch (error) {
     console.error('Excepción al intentar enviar correo con Resend:', error);
   }
