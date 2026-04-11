@@ -500,25 +500,25 @@
   ],
   "accessories": [
     {
-      "id": "acc-chocolates",
-      "name": "Caja de Chocolates",
-      "price": 5000,
-      "image": "/images/accessories/chocolates.png",
-      "description": "Exquisita selección de chocolates para endulzar el momento."
+      "id": "acc-vino",
+      "name": "Botella de Vino",
+      "price": 9990,
+      "image": "images/Flores/Accesorios/Vino.avif",
+      "description": "Una excelente botella de vino para acompañar este hermoso momento."
     },
     {
-      "id": "acc-peluche",
-      "name": "Peluche Pequeño",
-      "price": 8000,
-      "image": "/images/accessories/peluche.png",
-      "description": "Un tierno compañero para acompañar tus flores."
+      "id": "acc-chocolate",
+      "name": "Chocolate",
+      "price": 4990,
+      "image": "images/Flores/Accesorios/Chocolate.avif",
+      "description": "Exquisita selección de chocolates para endulzar tu regalo."
     },
     {
-      "id": "acc-globo",
-      "name": "Globo Metálico",
-      "price": 3000,
-      "image": "/images/accessories/globo.png",
-      "description": "Globo decorativo para toda ocasión (Feliz Cumpleaños, Amor, etc)."
+      "id": "acc-foto",
+      "name": "Foto Instantánea",
+      "price": 2990,
+      "image": "images/Flores/Accesorios/Foto.avif",
+      "description": "Inmortaliza el momento. Esta opción tiene que ser coordinada vía WhatsApp."
     }
   ]
 }

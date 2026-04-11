@@ -1,8 +1,10 @@
 ---
 import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
-import AccessoriesModal from "../components/AccessoriesModal.astro";
 import { COMMUNES } from "../utils/communes";
+import catalog from "../data/catalog.json";
+
+const accessories = catalog.accessories || [];
 ---
 
 <Layout title="Tu Carrito | Tapti" hideWhatsApp={true}>
@@ -31,6 +33,46 @@ import { COMMUNES } from "../utils/communes";
       <div id="cart-content" class="hidden">
         <div class="space-y-4 mb-8" id="cart-items-container">
           <!-- Items will be injected here -->
+        </div>
+
+        <!-- Extras Section -->
+        <div class="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
+          <h3 class="text-xl font-serif text-honey-bronze-100 mb-2">
+            ¿Deseas agregar algo más?
+          </h3>
+          <p class="text-sm text-cherry-blossom-100 mb-6">
+            Complementa tu regalo con estos detalles especiales.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {
+              accessories.map((item) => (
+                <div class="bg-black/20 rounded-lg p-4 border border-white/5 flex flex-col items-center text-center">
+                  <div class="w-16 h-16 bg-black/30 rounded-full mb-3 flex items-center justify-center overflow-hidden">
+                    {item.image ? (
+                      <img src={item.image.startsWith("/") || item.image.startsWith("http") ? item.image : "/" + item.image} alt={item.name} class="w-full h-full object-cover" />
+                    ) : (
+                      <span class="text-3xl">🎁</span>
+                    )}
+                  </div>
+                  <h4 class="font-medium text-honey-bronze-200 mb-1">{item.name}</h4>
+                  <p class="text-xs text-gray-400 mb-3 flex-grow">{item.description}</p>
+                  <p class="font-bold text-white mb-3">
+                    ${item.price.toLocaleString("es-CL")}
+                  </p>
+                  <button
+                    type="button"
+                    class="btn-add-accessory px-4 py-2 bg-white/10 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 rounded-full text-xs transition-all border border-white/20"
+                    data-id={item.id}
+                    data-name={item.name}
+                    data-price={item.price}
+                    data-image={item.image}
+                  >
+                    Mío
+                  </button>
+                </div>
+              ))
+            }
+          </div>
         </div>
 
         <div class="border-t border-white/10 pt-6 mt-8">
@@ -318,15 +360,13 @@ import { COMMUNES } from "../utils/communes";
     </BoutiqueCard>
   </div>
 
-  <AccessoriesModal isOpen={false} />
-
   <script>
     import {
       COMMUNES,
       EXPRESS_DELIVERY_PRICE,
       getCommunePrice,
     } from "../utils/communes";
-    import { cartItems, clearCart, removeCartItem } from "../store/cartStore";
+    import { cartItems, clearCart, removeCartItem, addCartItem } from "../store/cartStore";
 
     document.addEventListener("astro:page-load", () => {
       const cartEmpty = document.getElementById("cart-empty");
@@ -525,13 +565,40 @@ import { COMMUNES } from "../utils/communes";
         }
       }
 
-      let accessoriesShown = false;
-      const accessoriesModal = document.getElementById("accessories-modal");
+      // Add Accessory Logic
+      document.querySelectorAll(".btn-add-accessory").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const target = e.currentTarget as HTMLButtonElement;
+          const { id, name, price, image } = target.dataset;
 
-      // Listen for completion of accessories selection
-      document.addEventListener("accessories-complete", () => {
-        accessoriesShown = true;
-        formCheckout?.requestSubmit();
+          if (id && name && price) {
+            addCartItem(
+              {
+                id: id,
+                name: name,
+                image: image ? [image] : null,
+              },
+              "Único",
+              parseInt(price),
+            );
+
+            target.textContent = "¡Agregado!";
+            target.classList.add(
+              "bg-green-500/20",
+              "text-green-300",
+              "border-green-500/50",
+            );
+
+            setTimeout(() => {
+              target.textContent = "Mío";
+              target.classList.remove(
+                "bg-green-500/20",
+                "text-green-300",
+                "border-green-500/50",
+              );
+            }, 2000);
+          }
+        });
       });
 
       const inputRut = document.getElementById("input-rut");
@@ -570,19 +637,6 @@ import { COMMUNES } from "../utils/communes";
         });
 
         if (currentItems.length === 0) return alert("El carrito está vacío");
-
-        // Show modal first if not shown yet
-        if (!accessoriesShown) {
-          if (accessoriesModal) {
-            accessoriesModal.classList.remove(
-              "opacity-0",
-              "pointer-events-none",
-            );
-            accessoriesModal.querySelector("div")?.classList.remove("scale-95");
-            accessoriesModal.querySelector("div")?.classList.add("scale-100");
-          }
-          return;
-        }
 
         const formData = new FormData(formCheckout);
         const customerData = {
@@ -650,8 +704,6 @@ import { COMMUNES } from "../utils/communes";
           }
           submitBtn.innerText = oldText;
           submitBtn.disabled = false;
-          // Reset accessories flag on error so they can try again or change mind?
-          // accessoriesShown = false;
         }
       });
     });

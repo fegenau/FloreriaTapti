@@ -29,8 +29,15 @@ const accessories = catalog.accessories || [];
         accessories.map((item) => (
           <div class="bg-white/5 rounded-lg p-4 border border-white/10 flex flex-col items-center text-center hover:bg-white/10 transition-colors">
             <div class="w-20 h-20 bg-black/20 rounded-full mb-3 flex items-center justify-center overflow-hidden">
-              {/* Placeholder or actual image if available */}
-              <span class="text-3xl">🎁</span>
+              {item.image ? (
+                item.image.startsWith("/") || item.image.startsWith("http") ? (
+                  <img src={item.image} alt={item.name} class="w-full h-full object-cover" />
+                ) : (
+                  <span class="text-5xl">{item.image}</span>
+                )
+              ) : (
+                <span class="text-5xl">🎁</span>
+              )}
             </div>
             <h3 class="font-medium text-honey-bronze-200 mb-1">{item.name}</h3>
             <p class="text-sm text-gray-400 mb-3">{item.description}</p>
