@@ -87,25 +87,43 @@
   document.addEventListener("astro:page-load", () => {
     const desktopCount = document.getElementById("cart-count-desktop");
     const mobileCount = document.getElementById("cart-count-mobile");
+    const cartBtnDesktop = document.getElementById("cart-btn-desktop");
+    const cartBtnMobile = document.getElementById("cart-btn-mobile");
+
+    let currentItemCount = 0;
 
     cartItems.subscribe((items) => {
       const count = Object.values(items).reduce(
         (acc: any, item: any) => acc + item.quantity,
         0,
       );
+      
+      currentItemCount = count as number;
 
       if (desktopCount) {
-        desktopCount.innerText = (count as number).toString();
-        if ((count as number) > 0) desktopCount.classList.remove("hidden");
+        desktopCount.innerText = currentItemCount.toString();
+        if (currentItemCount > 0) desktopCount.classList.remove("hidden");
         else desktopCount.classList.add("hidden");
       }
 
       if (mobileCount) {
-        mobileCount.innerText = (count as number).toString();
-        if ((count as number) > 0) mobileCount.classList.remove("hidden");
+        mobileCount.innerText = currentItemCount.toString();
+        if (currentItemCount > 0) mobileCount.classList.remove("hidden");
         else mobileCount.classList.add("hidden");
       }
     });
+
+    function handleCartClick(e: Event) {
+      // Only show modal if we are NOT already on the cart page 
+      // and we have items in the cart
+      if (currentItemCount > 0 && window.location.pathname !== "/carrito") {
+        e.preventDefault();
+        window.dispatchEvent(new Event("open-accessories-modal"));
+      }
+    }
+
+    cartBtnDesktop?.addEventListener("click", handleCartClick);
+    cartBtnMobile?.addEventListener("click", handleCartClick);
   });
 </script>
 

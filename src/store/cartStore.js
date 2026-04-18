@@ -31,7 +31,7 @@ export function addCartItem(product, size, price, metadata = null) {
                 size: size,
                 price: price,
                 quantity: 1,
-                image: product.image ? product.image[0] : null,
+                image: product.image ? (Array.isArray(product.image) ? product.image[0] : product.image) : null,
                 metadata: metadata
             }
         });

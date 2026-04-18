@@ -11,11 +11,11 @@ const CheckoutSchema = z.object({
   email: z.string().email("Email inválido"),
   phone: z.string().min(8, "Teléfono inválido"),
   address: z.string().trim().min(4, "Dirección inválida o muy corta (mínimo 4 caracteres)"),
-  commune: z.string().trim().min(3, "Comuna inválida"),
-  delivery_type: z.enum(['normal', 'express']).optional(),
-  delivery_date: z.string().optional(),
-  important_date: z.string().min(1, "La fecha importante es obligatoria"),
-  reason: z.string().min(1, "El motivo es obligatorio"),
+  important_date: z.string().optional(),
+  reason: z.string().optional(),
+  receiver_name: z.string().optional(),
+  receiver_phone: z.string().optional(),
+  dedication: z.string().optional(),
   items: z.array(z.object({
     id: z.string(),
     name: z.string().optional(),
@@ -29,7 +29,7 @@ const CheckoutSchema = z.object({
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items } = CheckoutSchema.parse(body);
+    const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items, receiver_name, receiver_phone, dedication } = CheckoutSchema.parse(body);
 
     let shippingCost = 0;
     if (delivery_type === 'express') {
@@ -53,6 +53,15 @@ export const POST: APIRoute = async ({ request }) => {
     const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0) + shippingCost;
     const buyOrder = `CART-${Date.now()}`;
 
+    // Format the final shipping address including receiver details
+    let finalAddress = address;
+    if (receiver_name || receiver_phone || dedication) {
+      finalAddress += `\n\n>> DETALLES DESTINATARIO:`;
+      if (receiver_name) finalAddress += `\n- Recibe: ${receiver_name}`;
+      if (receiver_phone) finalAddress += `\n- Teléfono: ${receiver_phone}`;
+      if (dedication) finalAddress += `\n- Mensaje: "${dedication}"`;
+    }
+
     // 1. Save Order (Draft)
     const { data: order, error: orderError } = await supabase
       .from('orders')
@@ -61,7 +70,7 @@ export const POST: APIRoute = async ({ request }) => {
           customer_rut: rut,
           customer_email: email,
           customer_phone: phone,
-          shipping_address: address,
+          shipping_address: finalAddress,
           shipping_commune: commune,
           shipping_cost: shippingCost,
           delivery_type: delivery_type || 'normal',
@@ -78,20 +87,21 @@ export const POST: APIRoute = async ({ request }) => {
         throw new Error(`DB Error: ${orderError.message}`);
     }
 
-    // 1.5 Save Customer Event
-    const { error: eventError } = await supabase
-      .from('customer_events')
-      .insert([{
-          customer_name: name,
-          customer_rut: rut,
-          customer_email: email,
-          important_date: important_date,
-          reason: reason
-      }]);
+    // 1.5 Save Customer Event (Optional)
+    if (important_date && reason) {
+      const { error: eventError } = await supabase
+        .from('customer_events')
+        .insert([{
+            customer_name: name,
+            customer_rut: rut,
+            customer_email: email,
+            important_date: important_date,
+            reason: reason
+        }]);
 
-    if (eventError) {
-        console.error('Supabase Customer Event Error:', eventError);
-        // We won't throw error to stop the whole flow, just log it.
+      if (eventError) {
+          console.error('Supabase Customer Event Error:', eventError);
+      }
     }
 
     // 2. Initiate Webpay
