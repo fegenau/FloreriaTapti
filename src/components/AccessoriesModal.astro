@@ -25,11 +25,11 @@ const accessories = catalog.accessories || [];
           <div class="bg-white/5 rounded-lg p-4 border border-white/10 flex flex-col items-center text-center hover:bg-white/10 transition-colors">
             <div class="w-20 h-20 bg-black/20 rounded-full mb-3 flex items-center justify-center overflow-hidden">
               {item.image ? (
-                item.image.startsWith("/") || item.image.startsWith("http") ? (
-                  <img src={item.image} alt={item.name} class="w-full h-full object-cover" />
-                ) : (
-                  <span class="text-5xl">{item.image}</span>
-                )
+                <img
+                  src={item.image.startsWith("http") ? item.image : `/${item.image.replace(/^\//, "")}`}
+                  alt={item.name}
+                  class="w-full h-full object-cover"
+                />
               ) : (
                 <span class="text-5xl">🎁</span>
               )}

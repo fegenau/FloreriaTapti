@@ -196,7 +196,7 @@ const specialOccasions = [
               <BoutiqueCard
                 variant="gallery"
                 size="medium"
-                background={service.image}
+                background={service.image.replace(/ /g, "%20")}
               >
                 <div class="p-6 text-center relative z-10">
                   <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">

@@ -49,13 +49,26 @@ const accessories = catalog.accessories || [];
                 <div class="bg-black/20 rounded-lg p-4 border border-white/5 flex flex-col items-center text-center">
                   <div class="w-16 h-16 bg-black/30 rounded-full mb-3 flex items-center justify-center overflow-hidden">
                     {item.image ? (
-                      <img src={item.image.startsWith("/") || item.image.startsWith("http") ? item.image : "/" + item.image} alt={item.name} class="w-full h-full object-cover" />
+                      <img
+                        src={
+                          item.image.startsWith("/") ||
+                          item.image.startsWith("http")
+                            ? item.image
+                            : "/" + item.image
+                        }
+                        alt={item.name}
+                        class="w-full h-full object-cover"
+                      />
                     ) : (
                       <span class="text-3xl">🎁</span>
                     )}
                   </div>
-                  <h4 class="font-medium text-honey-bronze-200 mb-1">{item.name}</h4>
-                  <p class="text-xs text-gray-400 mb-3 flex-grow">{item.description}</p>
+                  <h4 class="font-medium text-honey-bronze-200 mb-1">
+                    {item.name}
+                  </h4>
+                  <p class="text-xs text-gray-400 mb-3 flex-grow">
+                    {item.description}
+                  </p>
                   <p class="font-bold text-white mb-3">
                     ${item.price.toLocaleString("es-CL")}
                   </p>
@@ -100,90 +113,232 @@ const accessories = catalog.accessories || [];
 
           <div class="mt-8">
             <form id="form-checkout" class="space-y-6">
-              
               <!-- 1. Datos Personales -->
               <div class="bg-white/5 p-6 rounded-xl border border-white/10">
-                <h3 class="text-xl font-serif text-honey-bronze-200 mb-4 flex items-center gap-2">
-                  <span class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm">1</span>
+                <h3
+                  class="text-xl font-serif text-honey-bronze-200 mb-4 flex items-center gap-2"
+                >
+                  <span
+                    class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm"
+                    >1</span
+                  >
                   Datos Personales
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">Nombre Completo *</label>
-                    <input type="text" name="name" placeholder="Tu nombre" required class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
-                    <p class="text-red-400 text-sm mt-1 hidden error-msg" id="error-name"></p>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Nombre Completo *</label
+                    >
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Tu nombre"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-name"
+                    >
+                    </p>
                   </div>
                   <div>
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">RUT *</label>
-                    <input type="text" name="rut" id="input-rut" placeholder="12.345.678-9" required class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
-                    <p class="text-red-400 text-sm mt-1 hidden error-msg" id="error-rut"></p>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >RUT *</label
+                    >
+                    <input
+                      type="text"
+                      name="rut"
+                      id="input-rut"
+                      placeholder="12.345.678-9"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-rut"
+                    >
+                    </p>
                   </div>
                   <div>
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">Email *</label>
-                    <input type="email" name="email" placeholder="correo@ejemplo.com" required class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
-                    <p class="text-red-400 text-sm mt-1 hidden error-msg" id="error-email"></p>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Email *</label
+                    >
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="correo@ejemplo.com"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-email"
+                    >
+                    </p>
                   </div>
                   <div>
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">Teléfono *</label>
-                    <input type="tel" name="phone" placeholder="+56 9 1234 5678" required class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
-                    <p class="text-red-400 text-sm mt-1 hidden error-msg" id="error-phone"></p>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Teléfono *</label
+                    >
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="+56 9 1234 5678"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-phone"
+                    >
+                    </p>
                   </div>
                 </div>
               </div>
 
               <!-- 2. Datos de Despacho -->
               <div class="bg-white/5 p-6 rounded-xl border border-white/10">
-                <h3 class="text-xl font-serif text-honey-bronze-200 mb-4 flex items-center gap-2">
-                  <span class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm">2</span>
+                <h3
+                  class="text-xl font-serif text-honey-bronze-200 mb-4 flex items-center gap-2"
+                >
+                  <span
+                    class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm"
+                    >2</span
+                  >
                   Datos de Despacho
                 </h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                   <!-- Dirección -->
                   <div class="md:col-span-2">
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">Dirección de Entrega *</label>
-                    <input type="text" name="address" placeholder="Calle, Número, Depto..." required class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
-                    <p class="text-red-400 text-sm mt-1 hidden error-msg" id="error-address"></p>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Dirección de Entrega *</label
+                    >
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Calle, Número, Depto..."
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-address"
+                    >
+                    </p>
                   </div>
                   <!-- Comuna -->
                   <div class="md:col-span-2">
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">Comuna *</label>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Comuna *</label
+                    >
                     <div class="relative">
-                      <select name="commune" id="select-commune" required class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none appearance-none transition-colors">
-                        <option value="" disabled selected>Selecciona la comuna</option>
-                        {COMMUNES.map((c) => (<option value={c.name}>{c.name}</option>))}
+                      <select
+                        name="commune"
+                        id="select-commune"
+                        required
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none appearance-none transition-colors"
+                      >
+                        <option value="" disabled selected
+                          >Selecciona la comuna</option
+                        >
+                        {
+                          COMMUNES.map((c) => (
+                            <option value={c.name}>{c.name}</option>
+                          ))
+                        }
                       </select>
-                      <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                      <div
+                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white"
+                      >
+                        <svg
+                          class="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          ><path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"></path></svg
+                        >
                       </div>
                     </div>
-                    <p class="text-red-400 text-sm mt-1 hidden error-msg" id="error-commune"></p>
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-commune"
+                    >
+                    </p>
                   </div>
                 </div>
 
                 <!-- Opciones de Entrega -->
-                <div class="bg-black/20 p-4 rounded-lg border border-white/5 mb-6">
-                  <h4 class="text-honey-bronze-100 font-medium mb-3">Opciones de Entrega</h4>
-                  
+                <div
+                  class="bg-black/20 p-4 rounded-lg border border-white/5 mb-6"
+                >
+                  <h4 class="text-honey-bronze-100 font-medium mb-3">
+                    Opciones de Entrega
+                  </h4>
+
                   <div class="space-y-4">
-                    <label class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-white/5 transition-colors">
-                      <input type="radio" name="delivery_type" value="normal" checked class="mt-1 accent-honey-bronze-500" />
+                    <label
+                      class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-white/5 transition-colors"
+                    >
+                      <input
+                        type="radio"
+                        name="delivery_type"
+                        value="normal"
+                        checked
+                        class="mt-1 accent-honey-bronze-500"
+                      />
                       <div>
-                        <span class="block text-white font-medium">Despacho Normal (Día programado)</span>
-                        <span class="text-xs text-honey-bronze-300 block mt-1">Costo calculado según comuna. Entregas post 13:00hrs y hora coordinada por WhatsApp.</span>
+                        <span class="block text-white font-medium"
+                          >Despacho Normal (Día programado)</span
+                        >
+                        <span class="text-xs text-honey-bronze-300 block mt-1"
+                          >Costo calculado según comuna. Entregas post 13:00hrs
+                          y hora coordinada por WhatsApp.</span
+                        >
                       </div>
                     </label>
 
                     <div id="date-picker-container" class="ml-8 mb-4">
-                      <label class="text-sm text-cherry-blossom-100 mb-1 block">¿Qué día deseas recibirlo? *</label>
-                      <input type="date" name="delivery_date" id="input-delivery-date" required class="w-full sm:w-1/2 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none" />
-                      <p class="text-red-400 text-sm mt-1 hidden error-msg" id="error-delivery_date"></p>
+                      <label class="text-sm text-cherry-blossom-100 mb-1 block"
+                        >¿Qué día deseas recibirlo? *</label
+                      >
+                      <input
+                        type="date"
+                        name="delivery_date"
+                        id="input-delivery-date"
+                        required
+                        class="w-full sm:w-1/2 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                      />
+                      <p
+                        class="text-red-400 text-sm mt-1 hidden error-msg"
+                        id="error-delivery_date"
+                      >
+                      </p>
                     </div>
 
-                    <label id="label-express-delivery" class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-white/5 transition-colors" style="display: none;">
-                      <input type="radio" name="delivery_type" value="express" class="mt-1 accent-honey-bronze-500" />
+                    <label
+                      id="label-express-delivery"
+                      class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-white/5 transition-colors"
+                      style="display: none;"
+                    >
+                      <input
+                        type="radio"
+                        name="delivery_type"
+                        value="express"
+                        class="mt-1 accent-honey-bronze-500"
+                      />
                       <div>
-                        <span class="block text-white font-medium">Delivery Express Mismo Día ($5.990)</span>
-                        <span class="text-xs text-honey-bronze-300 block mt-1">Recíbelo hoy mismo (solo compras antes de las 13:00hrs).</span>
+                        <span class="block text-white font-medium"
+                          >Delivery Express Mismo Día ($5.990)</span
+                        >
+                        <span class="text-xs text-honey-bronze-300 block mt-1"
+                          >Recíbelo hoy mismo (solo compras antes de las
+                          13:00hrs).</span
+                        >
                       </div>
                     </label>
                   </div>
@@ -191,20 +346,46 @@ const accessories = catalog.accessories || [];
 
                 <!-- Datos del Destinatario Integrado -->
                 <div class="pt-6 border-t border-white/10">
-                  <h4 class="text-honey-bronze-100 font-medium mb-2">Datos del Destinatario (Opcional)</h4>
-                  <p class="text-sm text-cherry-blossom-100 mb-4">Si este pedido es para otra persona, por favor bríndanos su información.</p>
+                  <h4 class="text-honey-bronze-100 font-medium mb-2">
+                    Datos del Destinatario (Opcional)
+                  </h4>
+                  <p class="text-sm text-cherry-blossom-100 mb-4">
+                    Si este pedido es para otra persona, por favor bríndanos su
+                    información.
+                  </p>
                   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="md:col-span-1">
-                      <label class="block text-sm text-cherry-blossom-100 mb-1">Nombre de quien recibe</label>
-                      <input type="text" name="receiver_name" placeholder="Nombre completo" class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
+                      <label class="block text-sm text-cherry-blossom-100 mb-1"
+                        >Nombre de quien recibe</label
+                      >
+                      <input
+                        type="text"
+                        name="receiver_name"
+                        placeholder="Nombre completo"
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                      />
                     </div>
                     <div class="md:col-span-1">
-                      <label class="block text-sm text-cherry-blossom-100 mb-1">Teléfono de quien recibe</label>
-                      <input type="tel" name="receiver_phone" placeholder="Opcional para despacho" class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
+                      <label class="block text-sm text-cherry-blossom-100 mb-1"
+                        >Teléfono de quien recibe</label
+                      >
+                      <input
+                        type="tel"
+                        name="receiver_phone"
+                        placeholder="Opcional para despacho"
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                      />
                     </div>
                     <div class="md:col-span-2">
-                      <label class="block text-sm text-cherry-blossom-100 mb-1">Mensaje o Dedicatoria</label>
-                      <textarea name="dedication" rows="2" placeholder="Escribe un lindo mensaje para enviar con las flores..." class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors resize-none"></textarea>
+                      <label class="block text-sm text-cherry-blossom-100 mb-1"
+                        >Mensaje o Dedicatoria</label
+                      >
+                      <textarea
+                        name="dedication"
+                        rows="2"
+                        placeholder="Escribe un lindo mensaje para enviar con las flores..."
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors resize-none"
+                      ></textarea>
                     </div>
                   </div>
                 </div>
@@ -213,37 +394,66 @@ const accessories = catalog.accessories || [];
               <!-- 3. Fechas Importantes (Opcional) -->
               <div class="bg-white/5 p-6 rounded-xl border border-white/10">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="text-xl font-serif text-honey-bronze-200 flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm">3</span>
+                  <h3
+                    class="text-xl font-serif text-honey-bronze-200 flex items-center gap-2"
+                  >
+                    <span
+                      class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm"
+                      >3</span
+                    >
                     Club Tapti (Opcional)
                   </h3>
-                  <span class="text-xs px-2 py-1 bg-white/10 text-gray-300 rounded-full">Descuentos exclusivos</span>
+                  <span
+                    class="text-xs px-2 py-1 bg-white/10 text-gray-300 rounded-full"
+                    >Descuentos exclusivos</span
+                  >
                 </div>
                 <p class="text-sm text-cherry-blossom-100 mb-4">
                   Registra una fecha importante.
                 </p>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">¿Qué fecha es?</label>
-                    <input type="date" name="important_date" class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >¿Qué fecha es?</label
+                    >
+                    <input
+                      type="date"
+                      name="important_date"
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
                   </div>
                   <div>
-                    <label class="block text-sm text-cherry-blossom-100 mb-1">¿Qué se celebra?</label>
-                    <input type="text" name="reason" placeholder="Ej: Aniversario" class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors" />
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >¿Qué se celebra?</label
+                    >
+                    <input
+                      type="text"
+                      name="reason"
+                      placeholder="Ej: Aniversario"
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
                   </div>
                 </div>
               </div>
 
               <!-- Botones de Acción -->
-              <div class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-8 pt-4">
-                <button type="button" id="btn-cancel" class="w-full sm:w-auto px-6 py-3 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-500/10 transition-colors order-2 sm:order-1 font-medium">
+              <div
+                class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-8 pt-4"
+              >
+                <button
+                  type="button"
+                  id="btn-cancel"
+                  class="w-full sm:w-auto px-6 py-3 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-500/10 transition-colors order-2 sm:order-1 font-medium"
+                >
                   Vaciar Carrito
                 </button>
-                <button type="submit" class="w-full sm:w-auto px-8 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-xl hover:bg-honey-bronze-400 transition-colors font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] order-1 sm:order-2 transform hover:-translate-y-0.5">
+                <button
+                  type="submit"
+                  class="w-full sm:w-auto px-8 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-xl hover:bg-honey-bronze-400 transition-colors font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] order-1 sm:order-2 transform hover:-translate-y-0.5"
+                >
                   Ir a Pagar Seguro
                 </button>
               </div>
-
             </form>
           </div>
         </div>
@@ -257,7 +467,12 @@ const accessories = catalog.accessories || [];
       EXPRESS_DELIVERY_PRICE,
       getCommunePrice,
     } from "../utils/communes";
-    import { cartItems, clearCart, removeCartItem, addCartItem } from "../store/cartStore";
+    import {
+      cartItems,
+      clearCart,
+      removeCartItem,
+      addCartItem,
+    } from "../store/cartStore";
 
     document.addEventListener("astro:page-load", () => {
       const cartEmpty = document.getElementById("cart-empty");
@@ -541,6 +756,9 @@ const accessories = catalog.accessories || [];
           delivery_date: formData.get("delivery_date"),
           important_date: formData.get("important_date"),
           reason: formData.get("reason"),
+          receiver_name: formData.get("receiver_name"),
+          receiver_phone: formData.get("receiver_phone"),
+          dedication: formData.get("dedication"),
           items: currentItems,
         };
 
