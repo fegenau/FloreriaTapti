@@ -2,6 +2,7 @@
 import EntranceAnimation from "./EntranceAnimation.astro";
 import FloatingNav from "./FloatingNav.astro";
 import FloatingWhatsApp from "./FloatingWhatsApp.astro";
+import AccessoriesModal from "./AccessoriesModal.astro";
 import { ViewTransitions } from "astro:transitions";
 
 interface Props {
@@ -108,5 +109,6 @@ const {
       }
     </style>
     {!hideWhatsApp && <FloatingWhatsApp />}
+    <AccessoriesModal />
   </body>
 </html>

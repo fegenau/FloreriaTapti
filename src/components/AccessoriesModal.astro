@@ -1,9 +1,4 @@
 ---
-interface Props {
-  isOpen: boolean;
-}
-
-const { isOpen } = Astro.props;
 import catalog from "../data/catalog.json";
 
 const accessories = catalog.accessories || [];
@@ -11,7 +6,7 @@ const accessories = catalog.accessories || [];
 
 <div
   id="accessories-modal"
-  class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300"
+  class="fixed inset-0 z-[300] flex items-center justify-center bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-500"
   aria-hidden="true"
 >
   <div
@@ -29,8 +24,15 @@ const accessories = catalog.accessories || [];
         accessories.map((item) => (
           <div class="bg-white/5 rounded-lg p-4 border border-white/10 flex flex-col items-center text-center hover:bg-white/10 transition-colors">
             <div class="w-20 h-20 bg-black/20 rounded-full mb-3 flex items-center justify-center overflow-hidden">
-              {/* Placeholder or actual image if available */}
-              <span class="text-3xl">🎁</span>
+              {item.image ? (
+                <img
+                  src={item.image.startsWith("http") ? item.image : `/${item.image.replace(/^\//, "")}`}
+                  alt={item.name}
+                  class="w-full h-full object-cover"
+                />
+              ) : (
+                <span class="text-5xl">🎁</span>
+              )}
             </div>
             <h3 class="font-medium text-honey-bronze-200 mb-1">{item.name}</h3>
             <p class="text-sm text-gray-400 mb-3">{item.description}</p>
@@ -115,21 +117,30 @@ const accessories = catalog.accessories || [];
       });
     });
 
-    function closeModal() {
-      modal?.classList.add("opacity-0", "pointer-events-none");
+    function openModal() {
+      if (!modal) return;
+      modal.classList.remove("opacity-0", "pointer-events-none");
     }
+
+    function closeModal() {
+      if (!modal) return;
+      modal.classList.add("opacity-0", "pointer-events-none");
+    }
+
+    // Listen for the custom global event
+    window.addEventListener("open-accessories-modal", () => {
+      openModal();
+    });
 
     // Navigation Logic
     btnSkip?.addEventListener("click", () => {
-      // Dispatch event to continue checkout without adding more
-      document.dispatchEvent(new CustomEvent("accessories-complete"));
       closeModal();
+      window.location.href = "/carrito";
     });
 
     btnConfirm?.addEventListener("click", () => {
-      // Dispatch event to continue checkout
-      document.dispatchEvent(new CustomEvent("accessories-complete"));
       closeModal();
+      window.location.href = "/carrito";
     });
   });
 </script>

@@ -1,7 +1,10 @@
 ---
 import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
-import AccessoriesModal from "../components/AccessoriesModal.astro";
+import { COMMUNES } from "../utils/communes";
+import catalog from "../data/catalog.json";
+
+const accessories = catalog.accessories || [];
 ---
 
 <Layout title="Tu Carrito | Tapti" hideWhatsApp={true}>
@@ -32,167 +35,424 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
           <!-- Items will be injected here -->
         </div>
 
+        <!-- Extras Section -->
+        <div class="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
+          <h3 class="text-xl font-serif text-honey-bronze-100 mb-2">
+            ¿Deseas agregar algo más?
+          </h3>
+          <p class="text-sm text-cherry-blossom-100 mb-6">
+            Complementa tu regalo con estos detalles especiales.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {
+              accessories.map((item) => (
+                <div class="bg-black/20 rounded-lg p-4 border border-white/5 flex flex-col items-center text-center">
+                  <div class="w-16 h-16 bg-black/30 rounded-full mb-3 flex items-center justify-center overflow-hidden">
+                    {item.image ? (
+                      <img
+                        src={
+                          item.image.startsWith("/") ||
+                          item.image.startsWith("http")
+                            ? item.image
+                            : "/" + item.image
+                        }
+                        alt={item.name}
+                        class="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span class="text-3xl">🎁</span>
+                    )}
+                  </div>
+                  <h4 class="font-medium text-honey-bronze-200 mb-1">
+                    {item.name}
+                  </h4>
+                  <p class="text-xs text-gray-400 mb-3 flex-grow">
+                    {item.description}
+                  </p>
+                  <p class="font-bold text-white mb-3">
+                    ${item.price.toLocaleString("es-CL")}
+                  </p>
+                  <button
+                    type="button"
+                    class="btn-add-accessory px-4 py-2 bg-white/10 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 rounded-full text-xs transition-all border border-white/20"
+                    data-id={item.id}
+                    data-name={item.name}
+                    data-price={item.price}
+                    data-image={item.image}
+                  >
+                    Mío
+                  </button>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
         <div class="border-t border-white/10 pt-6 mt-8">
-          <div
-            class="flex justify-between items-center text-2xl font-serif text-honey-bronze-100 mb-8"
-          >
-            <span>Total</span>
-            <span id="cart-total">$0</span>
+          <div class="space-y-2 mb-6">
+            <div
+              class="flex justify-between items-center text-lg text-cherry-blossom-100"
+            >
+              <span>Subtotal Productos</span>
+              <span id="cart-subtotal">$0</span>
+            </div>
+            <div
+              class="flex justify-between items-center text-lg text-cherry-blossom-100"
+              id="shipping-row"
+            >
+              <span>Costo de Envío</span>
+              <span id="cart-shipping">$0</span>
+            </div>
+            <div
+              class="flex justify-between items-center text-2xl font-serif text-honey-bronze-100 pt-4 border-t border-white/10"
+            >
+              <span>Total a Pagar</span>
+              <span id="cart-total">$0</span>
+            </div>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <form
-              id="form-checkout"
-              class="col-span-1 md:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 bg-white/5 p-6 rounded-lg border border-white/10"
-            >
-              <h3
-                class="col-span-1 md:col-span-2 text-xl font-serif text-honey-bronze-100 mb-2"
-              >
-                Datos de Despacho
-              </h3>
-              <div class="col-span-1 md:col-span-2 space-y-4">
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Nombre completo"
-                  required
-                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                />
-                <p
-                  class="text-red-400 text-sm mt-1 hidden error-msg"
-                  id="error-name"
+          <div class="mt-8">
+            <form id="form-checkout" class="space-y-6">
+              <!-- 1. Datos Personales -->
+              <div class="bg-white/5 p-6 rounded-xl border border-white/10">
+                <h3
+                  class="text-xl font-serif text-honey-bronze-200 mb-4 flex items-center gap-2"
                 >
-                </p>
-                <input
-                  type="text"
-                  name="rut"
-                  id="input-rut"
-                  placeholder="RUT (12.345.678-9)"
-                  required
-                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                />
-                <p
-                  class="text-red-400 text-sm mt-1 hidden error-msg"
-                  id="error-rut"
-                >
-                </p>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Tu email"
-                  required
-                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                />
-                <p
-                  class="text-red-400 text-sm mt-1 hidden error-msg"
-                  id="error-email"
-                >
-                </p>
-                <input
-                  type="tel"
-                  name="phone"
-                  placeholder="Teléfono (+569...)"
-                  required
-                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                />
-                <p
-                  class="text-red-400 text-sm mt-1 hidden error-msg"
-                  id="error-phone"
-                >
-                </p>
-                <input
-                  type="text"
-                  name="commune"
-                  placeholder="Tu comuna"
-                  required
-                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                />
-                <p
-                  class="text-red-400 text-sm mt-1 hidden error-msg"
-                  id="error-commune"
-                >
-                </p>
-                <input
-                  type="text"
-                  name="address"
-                  placeholder="A cual dirección deseas que llegue tu pedido?"
-                  required
-                  class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                />
-                <p
-                  class="text-red-400 text-sm mt-1 hidden error-msg"
-                  id="error-address"
-                >
-                </p>
-
-                <div
-                  class="col-span-1 md:col-span-2 mt-6 pt-6 border-t border-white/20"
-                >
-                  <h3 class="text-xl font-serif text-honey-bronze-100 mb-4">
-                    Registra una fecha importante para ti, para acceder a
-                    descuentos
-                  </h3>
-                  <h5 class="text-sm font-serif text-honey-bronze-100 mb-2">
-                    Por ejemplo: Cumpleaños, Aniversario, etc.
-                  </h5>
-                  <div
-                    class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 p-4 rounded-lg border border-white/10"
+                  <span
+                    class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm"
+                    >1</span
                   >
-                    <div class="flex flex-col">
-                      <label class="text-sm text-cherry-blossom-100 mb-1">¿Qué fecha es?</label>
-                      <input
-                        type="date"
-                        name="important_date"
+                  Datos Personales
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Nombre Completo *</label
+                    >
+                    <input
+                      type="text"
+                      name="name"
+                      placeholder="Tu nombre"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-name"
+                    >
+                    </p>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >RUT *</label
+                    >
+                    <input
+                      type="text"
+                      name="rut"
+                      id="input-rut"
+                      placeholder="12.345.678-9"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-rut"
+                    >
+                    </p>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Email *</label
+                    >
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="correo@ejemplo.com"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-email"
+                    >
+                    </p>
+                  </div>
+                  <div>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Teléfono *</label
+                    >
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="+56 9 1234 5678"
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-phone"
+                    >
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 2. Datos de Despacho -->
+              <div class="bg-white/5 p-6 rounded-xl border border-white/10">
+                <h3
+                  class="text-xl font-serif text-honey-bronze-200 mb-4 flex items-center gap-2"
+                >
+                  <span
+                    class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm"
+                    >2</span
+                  >
+                  Datos de Despacho
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                  <!-- Dirección -->
+                  <div class="md:col-span-2">
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Dirección de Entrega *</label
+                    >
+                    <input
+                      type="text"
+                      name="address"
+                      placeholder="Calle, Número, Depto..."
+                      required
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-address"
+                    >
+                    </p>
+                  </div>
+                  <!-- Comuna -->
+                  <div class="md:col-span-2">
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >Comuna *</label
+                    >
+                    <div class="relative">
+                      <select
+                        name="commune"
+                        id="select-commune"
                         required
-                        class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                      />
-                      <p
-                        class="text-red-400 text-sm mt-1 hidden error-msg"
-                        id="error-important_date"
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none appearance-none transition-colors"
                       >
-                      </p>
-                    </div>
-                    <div class="flex flex-col">
-                      <label class="text-sm text-cherry-blossom-100 mb-1">¿Qué se celebra?</label>
-                      <input
-                        type="text"
-                        name="reason"
-                        placeholder="Ej: Cumpleaños de mamá"
-                        required
-                        class="w-full bg-white/5 border border-white/20 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
-                      />
-                      <p
-                        class="text-red-400 text-sm mt-1 hidden error-msg"
-                        id="error-reason"
+                        <option value="" disabled selected
+                          >Selecciona la comuna</option
+                        >
+                        {
+                          COMMUNES.map((c) => (
+                            <option value={c.name}>{c.name}</option>
+                          ))
+                        }
+                      </select>
+                      <div
+                        class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-white"
                       >
-                      </p>
+                        <svg
+                          class="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          ><path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"></path></svg
+                        >
+                      </div>
                     </div>
+                    <p
+                      class="text-red-400 text-sm mt-1 hidden error-msg"
+                      id="error-commune"
+                    >
+                    </p>
                   </div>
                 </div>
 
+                <!-- Opciones de Entrega -->
                 <div
-                  class="col-span-1 md:col-span-2 flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-6"
+                  class="bg-black/20 p-4 rounded-lg border border-white/5 mb-6"
                 >
-                  <button
-                    type="button"
-                    id="btn-cancel"
-                    class="w-full sm:w-auto px-4 sm:px-6 py-3 border border-red-500/50 text-red-300 rounded-lg hover:bg-red-500/10 transition-colors order-3 sm:order-1 text-center"
-                  >
-                    Cancelar Compra
-                  </button>
-                  <a
-                    href="/catalogo"
-                    class="w-full sm:w-auto px-4 sm:px-6 py-3 border border-honey-bronze-500/50 text-honey-bronze-300 rounded-lg hover:bg-honey-bronze-500/10 transition-colors text-center order-2 sm:order-2"
-                  >
-                    Seguir comprando
-                  </a>
-                  <button
-                    type="submit"
-                    class="w-full sm:w-auto px-4 sm:px-6 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-lg hover:bg-honey-bronze-400 transition-colors font-bold shadow-lg shadow-honey-bronze-500/20 order-1 sm:order-3 text-center"
-                  >
-                    Ir a Pagar
-                  </button>
+                  <h4 class="text-honey-bronze-100 font-medium mb-3">
+                    Opciones de Entrega
+                  </h4>
+
+                  <div class="space-y-4">
+                    <label
+                      class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-white/5 transition-colors"
+                    >
+                      <input
+                        type="radio"
+                        name="delivery_type"
+                        value="normal"
+                        checked
+                        class="mt-1 accent-honey-bronze-500"
+                      />
+                      <div>
+                        <span class="block text-white font-medium"
+                          >Despacho Normal (Día programado)</span
+                        >
+                        <span class="text-xs text-honey-bronze-300 block mt-1"
+                          >Costo calculado según comuna. Entregas post 13:00hrs
+                          y hora coordinada por WhatsApp.</span
+                        >
+                      </div>
+                    </label>
+
+                    <div id="date-picker-container" class="ml-8 mb-4">
+                      <label class="text-sm text-cherry-blossom-100 mb-1 block"
+                        >¿Qué día deseas recibirlo? *</label
+                      >
+                      <input
+                        type="date"
+                        name="delivery_date"
+                        id="input-delivery-date"
+                        required
+                        class="w-full sm:w-1/2 bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:border-honey-bronze-400 outline-none"
+                      />
+                      <p
+                        class="text-red-400 text-sm mt-1 hidden error-msg"
+                        id="error-delivery_date"
+                      >
+                      </p>
+                    </div>
+
+                    <label
+                      id="label-express-delivery"
+                      class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-white/5 transition-colors"
+                      style="display: none;"
+                    >
+                      <input
+                        type="radio"
+                        name="delivery_type"
+                        value="express"
+                        class="mt-1 accent-honey-bronze-500"
+                      />
+                      <div>
+                        <span class="block text-white font-medium"
+                          >Delivery Express Mismo Día ($5.990)</span
+                        >
+                        <span class="text-xs text-honey-bronze-300 block mt-1"
+                          >Recíbelo hoy mismo (solo compras antes de las
+                          13:00hrs).</span
+                        >
+                      </div>
+                    </label>
+                  </div>
                 </div>
+
+                <!-- Datos del Destinatario Integrado -->
+                <div class="pt-6 border-t border-white/10">
+                  <h4 class="text-honey-bronze-100 font-medium mb-2">
+                    Datos del Destinatario (Opcional)
+                  </h4>
+                  <p class="text-sm text-cherry-blossom-100 mb-4">
+                    Si este pedido es para otra persona, por favor bríndanos su
+                    información.
+                  </p>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-1">
+                      <label class="block text-sm text-cherry-blossom-100 mb-1"
+                        >Nombre de quien recibe</label
+                      >
+                      <input
+                        type="text"
+                        name="receiver_name"
+                        placeholder="Nombre completo"
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                      />
+                    </div>
+                    <div class="md:col-span-1">
+                      <label class="block text-sm text-cherry-blossom-100 mb-1"
+                        >Teléfono de quien recibe</label
+                      >
+                      <input
+                        type="tel"
+                        name="receiver_phone"
+                        placeholder="Opcional para despacho"
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                      />
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="block text-sm text-cherry-blossom-100 mb-1"
+                        >Mensaje o Dedicatoria</label
+                      >
+                      <textarea
+                        name="dedication"
+                        rows="2"
+                        placeholder="Escribe un lindo mensaje para enviar con las flores..."
+                        class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors resize-none"
+                      ></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 3. Fechas Importantes (Opcional) -->
+              <div class="bg-white/5 p-6 rounded-xl border border-white/10">
+                <div class="flex items-center justify-between mb-4">
+                  <h3
+                    class="text-xl font-serif text-honey-bronze-200 flex items-center gap-2"
+                  >
+                    <span
+                      class="w-8 h-8 rounded-full bg-honey-bronze-500/20 text-honey-bronze-400 flex items-center justify-center text-sm"
+                      >3</span
+                    >
+                    Club Tapti (Opcional)
+                  </h3>
+                  <span
+                    class="text-xs px-2 py-1 bg-white/10 text-gray-300 rounded-full"
+                    >Descuentos exclusivos</span
+                  >
+                </div>
+                <p class="text-sm text-cherry-blossom-100 mb-4">
+                  Registra una fecha importante.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >¿Qué fecha es?</label
+                    >
+                    <input
+                      type="date"
+                      name="important_date"
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label class="block text-sm text-cherry-blossom-100 mb-1"
+                      >¿Qué se celebra?</label
+                    >
+                    <input
+                      type="text"
+                      name="reason"
+                      placeholder="Ej: Aniversario"
+                      class="w-full bg-black/20 border border-white/10 rounded-lg px-4 py-3 text-white focus:border-honey-bronze-400 outline-none transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Botones de Acción -->
+              <div
+                class="flex flex-col sm:flex-row justify-end gap-3 sm:gap-4 mt-8 pt-4"
+              >
+                <button
+                  type="button"
+                  id="btn-cancel"
+                  class="w-full sm:w-auto px-6 py-3 border border-red-500/30 text-red-300 rounded-xl hover:bg-red-500/10 transition-colors order-2 sm:order-1 font-medium"
+                >
+                  Vaciar Carrito
+                </button>
+                <button
+                  type="submit"
+                  class="w-full sm:w-auto px-8 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-xl hover:bg-honey-bronze-400 transition-colors font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] order-1 sm:order-2 transform hover:-translate-y-0.5"
+                >
+                  Ir a Pagar Seguro
+                </button>
               </div>
             </form>
           </div>
@@ -201,20 +461,46 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
     </BoutiqueCard>
   </div>
 
-  <AccessoriesModal isOpen={false} />
-
   <script>
-    import { cartItems, clearCart, removeCartItem } from "../store/cartStore";
+    import {
+      COMMUNES,
+      EXPRESS_DELIVERY_PRICE,
+      getCommunePrice,
+    } from "../utils/communes";
+    import {
+      cartItems,
+      clearCart,
+      removeCartItem,
+      addCartItem,
+    } from "../store/cartStore";
 
     document.addEventListener("astro:page-load", () => {
       const cartEmpty = document.getElementById("cart-empty");
       const cartContent = document.getElementById("cart-content");
       const itemsContainer = document.getElementById("cart-items-container");
       const cartTotal = document.getElementById("cart-total");
+      const cartSubtotal = document.getElementById("cart-subtotal");
+      const cartShipping = document.getElementById("cart-shipping");
       const btnCancel = document.getElementById("btn-cancel");
       const formCheckout = document.getElementById(
         "form-checkout",
       ) as HTMLFormElement;
+      const selectCommune = document.getElementById(
+        "select-commune",
+      ) as HTMLSelectElement;
+      const radiosDeliveryType = document.querySelectorAll(
+        'input[name="delivery_type"]',
+      );
+      const labelExpress = document.getElementById("label-express-delivery");
+      const datePickerContainer = document.getElementById(
+        "date-picker-container",
+      );
+      const inputDeliveryDate = document.getElementById(
+        "input-delivery-date",
+      ) as HTMLInputElement;
+
+      let subtotalGlobal = 0;
+      let shippingGlobal = 0;
 
       let currentItems: any[] = [];
 
@@ -245,7 +531,7 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
             itemEl.innerHTML = `
               <div class="flex flex-row items-center gap-4 w-full sm:w-auto">
                 <div class="w-16 h-16 sm:w-20 sm:h-20 bg-black/20 rounded overflow-hidden flex-shrink-0">
-                  ${item.image ? `<img src="${item.image.startsWith('http') || item.image.startsWith('/') ? item.image : '/' + item.image}" alt="${item.name}" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-2xl">🌸</div>'}
+                  ${item.image ? `<img src="${item.image.startsWith("http") || item.image.startsWith("/") ? item.image : "/" + item.image}" alt="${item.name}" class="w-full h-full object-cover" />` : '<div class="w-full h-full flex items-center justify-center text-2xl">🌸</div>'}
                 </div>
                 <div class="flex-grow">
                   <h3 class="font-serif text-base sm:text-lg text-honey-bronze-100 leading-tight mb-1">${item.name}</h3>
@@ -263,9 +549,8 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
             itemsContainer.appendChild(itemEl);
           });
 
-          if (cartTotal) {
-            cartTotal.innerText = `$${total.toLocaleString("es-CL")}`;
-          }
+          subtotalGlobal = total;
+          updateTotalsDisplay();
 
           // Re-attach event listeners
           document.querySelectorAll(".btn-remove").forEach((btn) => {
@@ -279,6 +564,82 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
 
       // Subscribe to store updates
       cartItems.subscribe(renderCart);
+
+      function updateTotalsDisplay() {
+        if (cartSubtotal)
+          cartSubtotal.innerText = `$${subtotalGlobal.toLocaleString("es-CL")}`;
+
+        let type = "normal";
+        const expressChecked = document.querySelector(
+          'input[name="delivery_type"]:checked',
+        ) as HTMLInputElement;
+        if (expressChecked) type = expressChecked.value;
+
+        if (type === "express") {
+          shippingGlobal = EXPRESS_DELIVERY_PRICE;
+        } else {
+          // Normal: Get from commune or 0 if not selected
+          const communeVal = selectCommune?.value;
+          if (communeVal) {
+            try {
+              shippingGlobal = getCommunePrice(communeVal);
+            } catch (e) {
+              shippingGlobal = 0;
+            }
+          } else {
+            shippingGlobal = 0;
+          }
+        }
+
+        if (cartShipping)
+          cartShipping.innerText = `$${shippingGlobal.toLocaleString("es-CL")}`;
+        if (cartTotal)
+          cartTotal.innerText = `$${(subtotalGlobal + shippingGlobal).toLocaleString("es-CL")}`;
+      }
+
+      function applyExpressLogic() {
+        const currentHour = new Date().getHours();
+        if (currentHour < 13 && labelExpress) {
+          labelExpress.style.display = "flex";
+        } else if (labelExpress) {
+          labelExpress.style.display = "none";
+          // If express was selected and time expired or just loaded, force normal
+          const expressInput = document.querySelector(
+            'input[value="express"]',
+          ) as HTMLInputElement;
+          if (expressInput && expressInput.checked) {
+            const normalInput = document.querySelector(
+              'input[value="normal"]',
+            ) as HTMLInputElement;
+            if (normalInput) normalInput.checked = true;
+          }
+        }
+        updateDatepickerVisibility();
+      }
+
+      function updateDatepickerVisibility() {
+        const type = (
+          document.querySelector(
+            'input[name="delivery_type"]:checked',
+          ) as HTMLInputElement
+        )?.value;
+        if (type === "express") {
+          if (datePickerContainer) datePickerContainer.style.display = "none";
+          if (inputDeliveryDate) inputDeliveryDate.removeAttribute("required");
+        } else {
+          if (datePickerContainer) datePickerContainer.style.display = "block";
+          if (inputDeliveryDate)
+            inputDeliveryDate.setAttribute("required", "true");
+        }
+        updateTotalsDisplay();
+      }
+
+      selectCommune?.addEventListener("change", updateTotalsDisplay);
+      radiosDeliveryType.forEach((radio) =>
+        radio.addEventListener("change", updateDatepickerVisibility),
+      );
+
+      applyExpressLogic();
 
       btnCancel?.addEventListener("click", () => {
         if (confirm("¿Estás seguro de que quieres vaciar tu carrito?")) {
@@ -310,13 +671,40 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
         }
       }
 
-      let accessoriesShown = false;
-      const accessoriesModal = document.getElementById("accessories-modal");
+      // Add Accessory Logic
+      document.querySelectorAll(".btn-add-accessory").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const target = e.currentTarget as HTMLButtonElement;
+          const { id, name, price, image } = target.dataset;
 
-      // Listen for completion of accessories selection
-      document.addEventListener("accessories-complete", () => {
-        accessoriesShown = true;
-        formCheckout?.requestSubmit();
+          if (id && name && price) {
+            addCartItem(
+              {
+                id: id,
+                name: name,
+                image: image ? [image] : null,
+              },
+              "Único",
+              parseInt(price),
+            );
+
+            target.textContent = "¡Agregado!";
+            target.classList.add(
+              "bg-green-500/20",
+              "text-green-300",
+              "border-green-500/50",
+            );
+
+            setTimeout(() => {
+              target.textContent = "Mío";
+              target.classList.remove(
+                "bg-green-500/20",
+                "text-green-300",
+                "border-green-500/50",
+              );
+            }, 2000);
+          }
+        });
       });
 
       const inputRut = document.getElementById("input-rut");
@@ -356,19 +744,6 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
 
         if (currentItems.length === 0) return alert("El carrito está vacío");
 
-        // Show modal first if not shown yet
-        if (!accessoriesShown) {
-          if (accessoriesModal) {
-            accessoriesModal.classList.remove(
-              "opacity-0",
-              "pointer-events-none",
-            );
-            accessoriesModal.querySelector("div")?.classList.remove("scale-95");
-            accessoriesModal.querySelector("div")?.classList.add("scale-100");
-          }
-          return;
-        }
-
         const formData = new FormData(formCheckout);
         const customerData = {
           name: formData.get("name"),
@@ -377,8 +752,13 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
           phone: formData.get("phone"),
           commune: formData.get("commune"),
           address: formData.get("address"),
+          delivery_type: formData.get("delivery_type"),
+          delivery_date: formData.get("delivery_date"),
           important_date: formData.get("important_date"),
           reason: formData.get("reason"),
+          receiver_name: formData.get("receiver_name"),
+          receiver_phone: formData.get("receiver_phone"),
+          dedication: formData.get("dedication"),
           items: currentItems,
         };
 
@@ -433,8 +813,6 @@ import AccessoriesModal from "../components/AccessoriesModal.astro";
           }
           submitBtn.innerText = oldText;
           submitBtn.disabled = false;
-          // Reset accessories flag on error so they can try again or change mind?
-          // accessoriesShown = false;
         }
       });
     });

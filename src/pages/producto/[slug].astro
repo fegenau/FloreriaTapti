@@ -36,26 +36,26 @@ if (!product) throw new Error('Producto no encontrado');
         <button type="submit" class="px-5 py-3 rounded-full bg-tapti-gold text-tapti-deep font-medium">Agregar al carrito</button>
       </form>
       <script>
+        import { addCartItem } from '../../store/cartStore.js';
+        
         const productData = JSON.parse('{JSON.stringify(product)}');
         const form = document.getElementById('addToCart') as HTMLFormElement | null;
         form?.addEventListener('submit', (e) => {
           e.preventDefault();
           const targetForm = e.currentTarget as HTMLFormElement;
           const data = Object.fromEntries(new FormData(targetForm));
+          
+          const price = (productData.sizes.find((s:any) => s.k === data.size)?.price) || productData.price;
+          
           const item = {
-            slug: productData.slug,
+            id: productData.slug,
             name: productData.name,
-            image: productData.image,
-            size: data.size,
-            note: data.note || '',
-            date: data.date || '',
-            comuna: data.comuna || '',
-            price: (productData.sizes.find(s => s.k === data.size)?.price) || productData.price
-    };
-          const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-          cart.push(item);
-          localStorage.setItem('cart', JSON.stringify(cart));
-          window.location.href = '/carrito';
+            image: productData.image
+          };
+          
+          addCartItem(item, data.size as string, price, 1);
+          
+          window.dispatchEvent(new Event('open-accessories-modal'));
         });
       </script>
     </div>

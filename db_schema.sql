@@ -10,6 +10,9 @@ create table orders (
   customer_phone text,
   shipping_address text not null,
   shipping_commune text,
+  receiver_name text,
+  receiver_phone text,
+  dedication text,
   status text check (status in ('pending', 'paid', 'failed', 'shipped')) default 'pending',
   total_amount integer not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
