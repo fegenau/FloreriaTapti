@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
 import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
 
-const CHECKOUT_ENABLED = false;
+const CHECKOUT_ENABLED = import.meta.env.CHECKOUT_ENABLED === "true";
 
 const CheckoutSchema = z.object({
   name: z.string().min(3, "El nombre es muy corto"),
