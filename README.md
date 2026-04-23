@@ -62,6 +62,10 @@ Sigue estos pasos para levantar el proyecto en tu entorno local.
     # Transbank (Opcional en Dev - Usa credenciales de integración por defecto)
     WEBPAY_CC=tu_codigo_comercio
     WEBPAY_KEY=tu_llave_secreta
+
+    # Control temporal de checkout (true/false)
+    CHECKOUT_ENABLED=false
+    PUBLIC_CHECKOUT_ENABLED=false
     ```
 
 4.  **Ejecutar en desarrollo**
