@@ -338,28 +338,20 @@
     },
     {
       "image": ["images/Flores/Ramo novia/Ramo Novia rosa-damasco.jpg"],
-      "Description": "Un ramo de rosas rosadas, para el dia mas maravilloso de su vida.",
+      "Description": "Los ramos de novia son únicos y exclusivos para cada novia (o novio). Primero nos reunimos con la persona interesada para entender colores, flores, texturas, tamaño, diseño y otros, así definimos el ramo que quiere, buscamos que la novia o novio tengan su ramo soñado, que los haga lucir hermosos con las flores más frescas y hermosas de la temporada. Luego se realiza la cotización, se define fecha y horario de entrega.",
       "name": "Ramo de novia rosas rosadas",
-      "unit_price": 800,
-      "sizes": {
-        "Unico": {
-          "qty": 1,
-          "total": 0
-        }
-      },
+      "price_range": "Rango $45.000 - $90.000",
+      "isQuote": true,
+      "sizes": {},
       "category": "Matrimonio"
     },
     {
       "image": ["images/Flores/Ramo novia/Ramo novia rosas-Peonías 2.jpg"],
-      "Description": "Un ramo de peonías, para el dia mas maravilloso de su vida.",
+      "Description": "Los ramos de novia son únicos y exclusivos para cada novia (o novio). Primero nos reunimos con la persona interesada para entender colores, flores, texturas, tamaño, diseño y otros, así definimos el ramo que quiere, buscamos que la novia o novio tengan su ramo soñado, que los haga lucir hermosos con las flores más frescas y hermosas de la temporada. Luego se realiza la cotización, se define fecha y horario de entrega.",
       "name": "Ramo de novia peonías",
-      "unit_price": 800,
-      "sizes": {
-        "Unico": {
-          "qty": 1,
-          "total": 0
-        }
-      },
+      "price_range": "Rango $45.000 - $90.000",
+      "isQuote": true,
+      "sizes": {},
       "category": "Matrimonio"
     },
     {
@@ -373,7 +365,7 @@
       "sizes": {
         "Unico": {
           "qty": 1,
-          "total": 0
+          "total": 15000
         }
       },
       "category": "Graduaciones"
@@ -390,7 +382,7 @@
       "sizes": {
         "Unico": {
           "qty": 1,
-          "total": 0
+          "total": 15000
         }
       },
       "category": "Graduaciones"
@@ -406,7 +398,7 @@
       "sizes": {
         "Unico": {
           "qty": 1,
-          "total": 0
+          "total": 15000
         }
       },
       "category": "Graduaciones"
@@ -419,7 +411,7 @@
       "sizes": {
         "Unico": {
           "qty": 1,
-          "total": 0
+          "total": 15000
         }
       },
       "category": "Graduaciones"
@@ -437,7 +429,7 @@
       "sizes": {
         "Unico": {
           "qty": 1,
-          "total": 0
+          "total": 15000
         }
       },
       "category": "Graduaciones"
@@ -453,7 +445,7 @@
       "sizes": {
         "Unico": {
           "qty": 1,
-          "total": 0
+          "total": 15000
         }
       },
       "category": "Graduaciones"

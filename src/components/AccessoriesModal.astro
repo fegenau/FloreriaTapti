@@ -10,7 +10,7 @@ const accessories = catalog.accessories || [];
   aria-hidden="true"
 >
   <div
-    class="bg-midnight-violet-900 border border-white/10 rounded-xl p-6 max-w-2xl w-full mx-4 shadow-2xl transform scale-95 transition-transform duration-300"
+    class="bg-midnight-violet-900 border border-white/10 rounded-xl p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto shadow-2xl transform scale-95 transition-transform duration-300"
   >
     <h2 class="text-2xl font-serif text-honey-bronze-100 mb-2 text-center">
       ¿Deseas agregar algo más?
@@ -73,13 +73,18 @@ const accessories = catalog.accessories || [];
 <script>
   import { addCartItem } from "../store/cartStore";
 
+  let controller: AbortController | null = null;
+
   document.addEventListener("astro:page-load", () => {
+    // Limpiar listeners anteriores para evitar duplicados con View Transitions
+    if (controller) controller.abort();
+    controller = new AbortController();
+    const signal = controller.signal;
+
     const modal = document.getElementById("accessories-modal");
     const btnSkip = document.getElementById("btn-skip-accessories");
     const btnConfirm = document.getElementById("btn-confirm-accessories");
     const addButtons = document.querySelectorAll(".btn-add-accessory");
-
-    // Logic to show/hide modal is handled by parent or custom events
 
     // Add Accessory Logic
     addButtons.forEach((btn) => {
@@ -114,7 +119,7 @@ const accessories = catalog.accessories || [];
             );
           }, 2000);
         }
-      });
+      }, { signal });
     });
 
     function openModal() {
@@ -130,17 +135,17 @@ const accessories = catalog.accessories || [];
     // Listen for the custom global event
     window.addEventListener("open-accessories-modal", () => {
       openModal();
-    });
+    }, { signal });
 
     // Navigation Logic
     btnSkip?.addEventListener("click", () => {
       closeModal();
       window.location.href = "/carrito";
-    });
+    }, { signal });
 
     btnConfirm?.addEventListener("click", () => {
       closeModal();
       window.location.href = "/carrito";
-    });
+    }, { signal });
   });
 </script>

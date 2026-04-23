@@ -15,6 +15,22 @@ const messageFromUrl = Astro.url.searchParams.get("message");
 const orderId = Astro.url.searchParams.get("orderId");
 
 let message = "";
+let orderDetails: any = null;
+
+if (status === "success" && orderId) {
+  const { data } = await supabase.from('orders').select('*').eq('id', orderId).single();
+  if (data) {
+    // Supabase may return items as a JSON string — parse if needed
+    if (data.items && typeof data.items === 'string') {
+      try { data.items = JSON.parse(data.items); } catch {}
+    }
+    if (!Array.isArray(data.items)) {
+      data.items = [];
+    }
+    orderDetails = data;
+  }
+}
+
 if (messageFromUrl) {
   message = decodeURIComponent(messageFromUrl);
 } else {
@@ -28,58 +44,124 @@ if (messageFromUrl) {
 ---
 
 <Layout title="Estado del Pago | Tapti">
-  <div class="min-h-screen flex items-center justify-center p-4">
+  <div class="min-h-screen flex items-center justify-center p-4 py-20">
     <div
-      class="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-2xl max-w-md w-full text-center"
+      class="bg-steel-900/80 backdrop-blur-md border border-white/10 p-8 rounded-3xl max-w-2xl w-full text-center shadow-2xl"
     >
       {
         status === "success" ? (
-          <div class="text-green-400 mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-16 w-16 mx-auto mb-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <h1 class="text-3xl font-bold">¡Pago Exitoso!</h1>
+          <div class="text-green-400 mb-6">
+            <div class="bg-green-400/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-green-400/20">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-10 w-10"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="3"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <h1 class="text-4xl font-serif text-white mb-2">¡Pago Exitoso!</h1>
+            <p class="text-green-400 font-medium">Hemos recibido tu orden correctamente</p>
           </div>
         ) : (
-          <div class="text-red-400 mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-16 w-16 mx-auto mb-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <h1 class="text-3xl font-bold">Algo salió mal</h1>
+          <div class="text-red-400 mb-6">
+             <div class="bg-red-400/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-400/20">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-10 w-10"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </div>
+            <h1 class="text-3xl font-serif text-white mb-2">Algo salió mal</h1>
+            <p class="text-red-400/80">{message}</p>
           </div>
         )
       }
 
-      <p class="text-white/80 text-lg mb-8">{message}</p>
+      {status === "success" && orderDetails && (
+        <div class="bg-black/20 rounded-2xl p-6 mb-8 text-left border border-white/5 space-y-4">
+          <div class="border-b border-white/10 pb-4 mb-4">
+            <h2 class="text-honey-bronze-300 font-bold uppercase tracking-wider text-sm mb-1">Resumen de tu compra</h2>
+            <p class="text-white/60 text-xs">Te hemos enviado un email de confirmación a <span class="text-white font-medium">{orderDetails.customer_email}</span></p>
+          </div>
 
-      <a
-        href="/catalogo"
-        class="bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 font-bold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105"
-      >
-        Volver al Catálogo
-      </a>
+          <div class="space-y-2">
+            {orderDetails.items?.map((item: any) => (
+              <div class="flex justify-between text-sm">
+                <span class="text-white/80">{item.quantity}x {item.name} {item.size ? `(${item.size})` : ''}</span>
+                <span class="text-white font-medium">${(item.price * item.quantity).toLocaleString('es-CL')}</span>
+              </div>
+            ))}
+            {orderDetails.shipping_cost > 0 && (
+              <div class="flex justify-between text-sm text-white/60">
+                <span>Despacho</span>
+                <span>${orderDetails.shipping_cost.toLocaleString('es-CL')}</span>
+              </div>
+            )}
+          </div>
+
+          <div class="border-t border-white/10 pt-4 mt-4 flex justify-between items-center">
+            <span class="text-white font-bold">Total Pagado</span>
+            <span class="text-honey-bronze-400 text-xl font-bold">${orderDetails.total_amount.toLocaleString('es-CL')}</span>
+          </div>
+
+          <div class="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+              <span class="block text-honey-bronze-300 text-xs font-bold uppercase mb-1">¿Cuándo llega?</span>
+              <p class="text-white/90">{orderDetails.delivery_date === 'HOY' ? 'Hoy mismo (Envío Express)' : orderDetails.delivery_date || 'Por confirmar'}</p>
+            </div>
+            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+              <span class="block text-honey-bronze-300 text-xs font-bold uppercase mb-1">¿Dónde llega?</span>
+              <p class="text-white/90 truncate" title={orderDetails.shipping_address}>{orderDetails.shipping_address.split('\n')[0]}, {orderDetails.shipping_commune}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {!orderDetails && status === 'success' && (
+        <p class="text-white/80 text-lg mb-8">{message}</p>
+      )}
+
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a
+          href="/catalogo"
+          class="bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 font-bold py-4 px-10 rounded-xl shadow-lg transition-all hover:scale-105"
+        >
+          Ir al Catálogo
+        </a>
+        <a
+          href="/"
+          class="bg-white/5 hover:bg-white/10 text-white font-bold py-4 px-10 rounded-xl border border-white/10 transition-all"
+        >
+          Inicio
+        </a>
+      </div>
     </div>
   </div>
+
+  <script is:inline>
+    // Limpiar carrito si el pago fue exitoso
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status') === 'success') {
+      // nanostores/persistent usa 'cartItems' como clave en localStorage
+      localStorage.removeItem('cartItems');
+    }
+  </script>
 </Layout>
+
