@@ -64,4 +64,3 @@ for (let i = 2; i < lines.length; i++) {
 
 const outputPath = path.join(__dirname, '../data/catalog.json');
 fs.writeFileSync(outputPath, JSON.stringify(products, null, 2));
-console.log(`Parsed ${products.length} products to ${outputPath}`);

@@ -3,6 +3,7 @@ import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
 import SubscriptionForm from "../components/SubscriptionForm.astro";
 import ExperienceModal from "../components/ExperienceModal.astro";
+import QuoteModal from "../components/QuoteModal.astro";
 import catalogData from "../data/catalog.json";
 
 // Agrupar por categoría si es necesario, por ahora plano
@@ -132,13 +133,31 @@ const products = catalogData.flowers;
                   <span>Tamaño</span>
                   <span>Precio</span>
                 </div>
-                {Object.entries(product.sizes).map(([size, details]) => {
-                  if (!details) return null;
-                  return (
-                    <div class="flex justify-between items-center text-gray-300">
-                      <span class="font-medium text-honey-bronze-400">
-                        {size}
+                {product.isQuote ? (
+                  <div class="flex justify-between items-center text-gray-300 py-2">
+                    <span class="font-medium text-honey-bronze-400 text-sm">
+                      Rango de precio
+                    </span>
+                    <div class="flex items-center gap-3">
+                      <span class="font-bold text-sm">
+                        {product.price_range}
                       </span>
+                      <button
+                        class="quote-btn bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 rounded-full px-4 py-1.5 font-medium transition-colors text-sm"
+                        data-product-name={product.name}
+                      >
+                        Cotizar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  Object.entries(product.sizes).map(([size, details]) => {
+                    if (!details) return null;
+                    return (
+                      <div class="flex justify-between items-center text-gray-300">
+                        <span class="font-medium text-honey-bronze-400">
+                          {size}
+                        </span>
                       <div class="flex items-center gap-3">
                         <span class="font-bold">
                           ${details.total.toLocaleString("es-CL")}
@@ -188,7 +207,9 @@ const products = catalogData.flowers;
                       </div>
                     </div>
                   );
-                })}
+                })
+                )}
+                {product.isQuote === true ? "" : ""}
               </div>
 
               <div class="mt-6 pt-4 border-t border-white/10">
@@ -206,6 +227,7 @@ const products = catalogData.flowers;
   </div>
 
   <ExperienceModal />
+  <QuoteModal />
 
   {/* Subscription Modal */}
   <div
@@ -403,6 +425,21 @@ const products = catalogData.flowers;
           btn.classList.remove("bg-green-500", "text-white");
           btn.classList.add("bg-honey-bronze-500", "text-midnight-violet-950");
         }, 1000);
+      });
+    });
+
+    // Quote Logic
+    const quoteButtons = document.querySelectorAll(".quote-btn");
+    quoteButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const productName = btn.getAttribute("data-product-name");
+        if (productName) {
+          window.dispatchEvent(
+            new CustomEvent("open-quote-modal", {
+              detail: { productName },
+            })
+          );
+        }
       });
     });
 

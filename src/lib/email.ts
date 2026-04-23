@@ -116,3 +116,54 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
     console.error('Excepción al intentar enviar correo con Resend:', error);
   }
 };
+
+interface ContactEmailInfo {
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  subject?: string;
+  weddingDate?: string;
+}
+
+export const sendGeneralContactEmail = async (info: ContactEmailInfo) => {
+  try {
+    const ownerEmail = process.env.OWNER_EMAIL || 'tapti.contacto@gmail.com';
+    const subject = info.subject || 'Nueva consulta desde la web';
+    
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #D4AF37;">${subject}</h2>
+        <p>Has recibido un nuevo mensaje desde el sitio web:</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p><strong>Nombre:</strong> ${info.name}</p>
+        <p><strong>Email:</strong> ${info.email}</p>
+        <p><strong>Teléfono:</strong> ${info.phone}</p>
+        ${info.weddingDate ? `<p><strong>Fecha de Matrimonio:</strong> ${info.weddingDate}</p>` : ''}
+        <p><strong>Mensaje:</strong></p>
+        <p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; font-style: italic;">
+          ${info.message}
+        </p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #888;">Este es un aviso automático generado por el sitio web de Tapti.</p>
+      </div>
+    `;
+
+    const response = await resend.emails.send({
+      from: 'Florería Tapti <noreply@tapti.cl>',
+      to: [ownerEmail],
+      subject: subject,
+      html: htmlContent,
+    });
+
+    if (response.error) {
+      console.error('Error enviando email de contacto con Resend:', response.error);
+      return { success: false, error: response.error };
+    }
+    
+    return { success: true };
+  } catch (error) {
+    console.error('Excepción al enviar email de contacto:', error);
+    return { success: false, error };
+  }
+};
