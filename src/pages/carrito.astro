@@ -5,6 +5,7 @@ import { COMMUNES } from "../utils/communes";
 import catalog from "../data/catalog.json";
 
 const accessories = catalog.accessories || [];
+const checkoutEnabled = false;
 ---
 
 <Layout title="Tu Carrito | Tapti" hideWhatsApp={true}>
@@ -112,7 +113,27 @@ const accessories = catalog.accessories || [];
           </div>
 
           <div class="mt-8">
-            <form id="form-checkout" class="space-y-6">
+            <div class="relative">
+              {
+                !checkoutEnabled && (
+                  <div class="absolute inset-0 z-10 rounded-xl bg-midnight-violet-950/80 backdrop-blur-[1px] flex items-center justify-center p-6 text-center">
+                    <div class="max-w-md">
+                      <p class="text-xl font-serif text-honey-bronze-200 mb-2">
+                        Checkout temporalmente deshabilitado
+                      </p>
+                      <p class="text-sm text-cherry-blossom-100">
+                        Estamos validando el proceso de compra. Gracias por tu
+                        paciencia.
+                      </p>
+                    </div>
+                  </div>
+                )
+              }
+              <form
+                id="form-checkout"
+                data-checkout-enabled={checkoutEnabled ? "true" : "false"}
+                class={`space-y-6 ${!checkoutEnabled ? "pointer-events-none opacity-60 select-none" : ""}`}
+              >
               <!-- 1. Datos Personales -->
               <div class="bg-white/5 p-6 rounded-xl border border-white/10">
                 <h3
@@ -449,12 +470,16 @@ const accessories = catalog.accessories || [];
                 </button>
                 <button
                   type="submit"
-                  class="w-full sm:w-auto px-8 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-xl hover:bg-honey-bronze-400 transition-colors font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] order-1 sm:order-2 transform hover:-translate-y-0.5"
+                  disabled={!checkoutEnabled}
+                  class="w-full sm:w-auto px-8 py-3 bg-honey-bronze-500 text-midnight-violet-950 rounded-xl hover:bg-honey-bronze-400 transition-colors font-bold shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] order-1 sm:order-2 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-honey-bronze-500 disabled:hover:shadow-[0_0_20px_rgba(212,175,55,0.3)] disabled:transform-none"
                 >
-                  Ir a Pagar Seguro
+                  {checkoutEnabled
+                    ? "Ir a Pagar Seguro"
+                    : "Checkout temporalmente deshabilitado"}
                 </button>
               </div>
             </form>
+            </div>
           </div>
         </div>
       </div>
@@ -735,6 +760,14 @@ const accessories = catalog.accessories || [];
 
       formCheckout?.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const isCheckoutEnabled =
+          formCheckout.dataset.checkoutEnabled === "true";
+        if (!isCheckoutEnabled) {
+          alert(
+            "Checkout temporalmente deshabilitado mientras validamos el proceso de compra.",
+          );
+          return;
+        }
 
         // Clear previous errors
         document.querySelectorAll(".error-msg").forEach((el) => {
