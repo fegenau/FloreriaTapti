@@ -5,7 +5,7 @@ import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
 import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
 
-const CHECKOUT_ENABLED = import.meta.env.CHECKOUT_ENABLED === "true";
+// Checkout is permanently enabled
 
 const CheckoutSchema = z.object({
   name: z.string().min(3, "El nombre es muy corto"),
@@ -32,17 +32,7 @@ const CheckoutSchema = z.object({
 });
 
 export const POST: APIRoute = async ({ request }) => {
-  if (!CHECKOUT_ENABLED) {
-    return new Response(
-      JSON.stringify({
-        error: "Checkout temporalmente deshabilitado mientras validamos el proceso de compra."
-      }),
-      {
-        status: 503,
-        headers: { "Content-Type": "application/json" }
-      }
-    );
-  }
+
 
   try {
     const body = await request.json();
