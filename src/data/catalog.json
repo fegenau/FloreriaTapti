@@ -284,8 +284,8 @@
     },
     {
       "image": [
-        "images/Flores/Rosas rosadas/Rosas rosadas.PNG",
-        "images/Flores/Rosas rosadas/Rosas rosadas 2.PNG"
+        "images/Flores/Rosas rosadas/Rosas rosadas.avif",
+        "images/Flores/Rosas rosadas/Rosas rosadas 2.avif"
       ],
       "Description": "Este es un ramo romántico pero muy elegante. Ramo de rosas rosadas, mini rosas, hypericum y eucalipto.",
       "name": "Rosas rosadas",
@@ -356,8 +356,8 @@
     },
     {
       "image": [
-        "images/Flores/Graduaciones/colorido S.PNG",
-        "images/Flores/Graduaciones/colorido.PNG"
+        "images/Flores/Graduaciones/colorido S.avif",
+        "images/Flores/Graduaciones/colorido.avif"
       ],
       "Description": "Birrete con flores.",
       "name": "Colorido",
@@ -372,9 +372,9 @@
     },
     {
       "image": [
-        "images/Flores/Graduaciones/Caja Birrete.PNG",
-        "images/Flores/Graduaciones/Caja Birrete 2.PNG",
-        "images/Flores/Graduaciones/Caja Birrete 3.PNG"
+        "images/Flores/Graduaciones/Caja Birrete.avif",
+        "images/Flores/Graduaciones/Caja Birrete 2.avif",
+        "images/Flores/Graduaciones/Caja Birrete 3.avif"
       ],
       "Description": "Birrete con flores.",
       "name": "Caja Birrete",
@@ -389,8 +389,8 @@
     },
     {
       "image": [
-        "images/Flores/Graduaciones/Girasol Clásico S.PNG",
-        "images/Flores/Graduaciones/Girasol Clásico S 2.PNG"
+        "images/Flores/Graduaciones/Girasol Clásico S.avif",
+        "images/Flores/Graduaciones/Girasol Clásico S 2.avif"
       ],
       "Description": "Birrete con flores.",
       "name": "Girasol Clásico S",
@@ -404,7 +404,7 @@
       "category": "Graduaciones"
     },
     {
-      "image": ["images/Flores/Graduaciones/girasoles y clavel.PNG"],
+      "image": ["images/Flores/Graduaciones/girasoles y clavel.avif"],
       "Description": "Birrete con flores.",
       "name": "Girasoles y claveles",
       "unit_price": 800,
@@ -418,10 +418,10 @@
     },
     {
       "image": [
-        "images/Flores/Graduaciones/IMG_0163.PNG",
-        "images/Flores/Graduaciones/IMG_0166.PNG",
-        "images/Flores/Graduaciones/IMG_0167.PNG",
-        "images/Flores/Graduaciones/IMG_0168.PNG"
+        "images/Flores/Graduaciones/IMG_0163.avif",
+        "images/Flores/Graduaciones/IMG_0166.avif",
+        "images/Flores/Graduaciones/IMG_0167.avif",
+        "images/Flores/Graduaciones/IMG_0168.avif"
       ],
       "Description": "Birrete con flores.",
       "name": "Graduacion Feliz",
@@ -436,8 +436,8 @@
     },
     {
       "image": [
-        "images/Flores/Graduaciones/pink.PNG",
-        "images/Flores/Graduaciones/pink 2.PNG"
+        "images/Flores/Graduaciones/pink.avif",
+        "images/Flores/Graduaciones/pink 2.avif"
       ],
       "Description": "Birrete con flores.",
       "name": "Graduacion Pink",
