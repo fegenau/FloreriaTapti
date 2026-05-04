@@ -8,11 +8,8 @@
 >
   <div class="flex items-center space-x-6">
     <!-- Logo -->
-    <a
-      href="/"
-      class="font-serif text-xl text-honey-bronze-400 hover:text-honey-bronze-300 transition-colors"
-    >
-      Tapti
+    <a href="/" class="hover:opacity-80 transition-opacity flex items-center">
+      <img src="/images/logo-tapti.png" alt="Tapti" class="h-10 w-auto" />
     </a>
 
     <!-- Separador -->
@@ -97,7 +94,7 @@
         (acc: any, item: any) => acc + item.quantity,
         0,
       );
-      
+
       currentItemCount = count as number;
 
       if (desktopCount) {
@@ -114,7 +111,7 @@
     });
 
     function handleCartClick(e: Event) {
-      // Only show modal if we are NOT already on the cart page 
+      // Only show modal if we are NOT already on the cart page
       // and we have items in the cart
       if (currentItemCount > 0 && window.location.pathname !== "/carrito") {
         e.preventDefault();
@@ -128,9 +125,11 @@
 </script>
 
 <!-- Cabecera móvil (Marca) -->
-<div class="md:hidden fixed top-0 left-0 right-0 z-40 bg-midnight-violet-950/80 backdrop-blur-md border-b border-honey-bronze-500/20 px-6 py-4 flex justify-center items-center shadow-lg">
-  <a href="/" class="font-serif text-2xl text-honey-bronze-400 tracking-wide hover:text-honey-bronze-300 transition-colors">
-    Tapti
+<div
+  class="md:hidden fixed top-0 left-0 right-0 z-40 bg-midnight-violet-950/80 backdrop-blur-md border-b border-honey-bronze-500/20 px-6 py-4 flex justify-center items-center shadow-lg"
+>
+  <a href="/" class="hover:opacity-80 transition-opacity">
+    <img src="/images/logo-tapti.png" alt="Tapti" class="h-10 w-auto" />
   </a>
 </div>
 
@@ -144,7 +143,19 @@
       class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
     >
       <div class="text-lg mb-1 flex justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          ><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
+          ></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg
+        >
       </div>
       <span class="text-xs">Inicio</span>
     </a>
