@@ -80,7 +80,9 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 3. Start Oneclick Enrollment
     // We pass orderId in the URL to identify the order on return, as Oneclick finish only returns the token
-    const returnUrl = `http://${request.headers.get('host')}/api/webpay/return?orderId=${order.id}`;
+    const host = request.headers.get('host');
+    const protocol = host?.includes('localhost') ? 'http' : 'https';
+    const returnUrl = `${protocol}://${host}/api/webpay/return?orderId=${order.id}`;
     
     // Oneclick requires a unique username per user. We use user-{order.id} to map 1-to-1 with the subscription attempt.
     const username = `user-${order.id}`;

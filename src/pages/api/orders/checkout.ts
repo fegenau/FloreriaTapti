@@ -112,7 +112,9 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // 2. Initiate Webpay
-    const returnUrl = `http://${request.headers.get('host')}/api/webpay/return`;
+    const host = request.headers.get('host');
+    const protocol = host?.includes('localhost') ? 'http' : 'https';
+    const returnUrl = `${protocol}://${host}/api/webpay/return`;
     const { url, token } = await initTransaction(totalAmount, buyOrder, order.id, returnUrl);
 
     // 3. Update to Pending Payment
