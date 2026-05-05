@@ -90,7 +90,20 @@ const processRequest = async (request: Request, redirect: any) => {
                 deliveryDate: order.delivery_date,
                 type: 'success'
              });
-             return redirect(`/webpay/return?status=success&orderId=${orderIdParam}`);
+
+             const params = new URLSearchParams({
+                status: 'success',
+                orderId: orderIdParam || '',
+                authCode: detail.authorization_code || '',
+                cardDigits: detail.card_number || '',
+                buyOrder: detail.buy_order || '',
+                amount: detail.amount?.toString() || '',
+                installments: detail.installments_number?.toString() || '0',
+                paymentType: detail.payment_type_code || '',
+                date: authResponse.transaction_date || ''
+             });
+
+             return redirect(`/webpay/return?${params.toString()}`);
         } else {
              await supabase.from('orders').update({ status: 'rejected' }).eq('id', orderIdParam);
              await sendOrderNotification({
@@ -142,7 +155,7 @@ const processRequest = async (request: Request, redirect: any) => {
         const { error: updateError } = await supabase
             .from('orders')
             .update({ status: 'paid' })
-            .eq('id', orderId);
+            .eq(orderId.includes('-') ? 'id' : 'id', orderId); // Check if it's UUID
 
         if (updateError) {
             console.error('Error updating order:', updateError);
@@ -164,7 +177,19 @@ const processRequest = async (request: Request, redirect: any) => {
             });
         }
 
-        return redirect(`/webpay/return?status=success&orderId=${orderId}`); // No subscription update here, that is only for Oneclick branch
+        const params = new URLSearchParams({
+            status: 'success',
+            orderId: orderId,
+            authCode: response.authorization_code || '',
+            cardDigits: response.card_detail?.card_number || '',
+            buyOrder: response.buy_order || '',
+            amount: response.amount?.toString() || '',
+            installments: response.installments_number?.toString() || '0',
+            paymentType: response.payment_type_code || '',
+            date: response.transaction_date || ''
+        });
+
+        return redirect(`/webpay/return?${params.toString()}`);
     } else {
         await supabase.from('orders').update({ status: 'rejected' }).eq('id', orderId);
         if (order) {

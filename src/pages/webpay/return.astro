@@ -14,6 +14,46 @@ const status = Astro.url.searchParams.get("status") || "unknown";
 const messageFromUrl = Astro.url.searchParams.get("message");
 const orderId = Astro.url.searchParams.get("orderId");
 
+// New fields from Transbank
+const authCode = Astro.url.searchParams.get("authCode");
+const cardDigits = Astro.url.searchParams.get("cardDigits");
+const buyOrder = Astro.url.searchParams.get("buyOrder");
+const amountParam = Astro.url.searchParams.get("amount");
+const installments = Astro.url.searchParams.get("installments");
+const paymentType = Astro.url.searchParams.get("paymentType");
+const transDate = Astro.url.searchParams.get("date");
+
+const getPaymentType = (type: string | null) => {
+  if (!type) return "No especificado";
+  const types: Record<string, string> = {
+    'VD': 'Venta Débito',
+    'VN': 'Venta Normal (Crédito)',
+    'VC': 'Venta en Cuotas',
+    'SI': '3 Cuotas sin interés',
+    'S2': '2 Cuotas sin interés',
+    'NC': 'N Cuotas sin interés',
+    'VP': 'Venta Prepago'
+  };
+  return types[type] || type;
+};
+
+const formatDate = (dateStr: string | null) => {
+    if (!dateStr) return "N/A";
+    try {
+        const date = new Date(dateStr);
+        return date.toLocaleString('es-CL', { 
+            timeZone: 'America/Santiago',
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch {
+        return dateStr;
+    }
+}
+
 let message = "";
 let orderDetails: any = null;
 
@@ -89,65 +129,122 @@ if (messageFromUrl) {
               </svg>
             </div>
             <h1 class="text-3xl font-serif text-white mb-2">Algo salió mal</h1>
-            <p class="text-red-400/80">{message}</p>
+            <p class="text-red-400 font-medium mb-4">{message}</p>
+            
+            {status === 'failed' && (
+              <div class="bg-red-400/5 border border-red-400/20 rounded-xl p-4 text-left text-sm text-red-200/70 space-y-2 max-w-md mx-auto">
+                <p class="font-bold text-red-400 mb-1">Las posibles causas de este rechazo son:</p>
+                <ul class="list-disc pl-5 space-y-1">
+                  <li>Error en el ingreso de los datos de su tarjeta (fecha y/o código de seguridad).</li>
+                  <li>Su tarjeta no cuenta con saldo suficiente.</li>
+                  <li>Tarjeta aún no habilitada en el sistema financiero.</li>
+                </ul>
+              </div>
+            )}
           </div>
         )
       }
 
-      {status === "success" && orderDetails && (
-        <div class="bg-black/20 rounded-2xl p-6 mb-8 text-left border border-white/5 space-y-4">
-          <div class="border-b border-white/10 pb-4 mb-4">
-            <h2 class="text-honey-bronze-300 font-bold uppercase tracking-wider text-sm mb-1">Resumen de tu compra</h2>
-            <p class="text-white/60 text-xs">Te hemos enviado un email de confirmación a <span class="text-white font-medium">{orderDetails.customer_email}</span></p>
-          </div>
+      {status === "success" && (
+        <div class="space-y-6">
+            {/* Voucher Section */}
+            <div class="bg-white/5 rounded-2xl p-6 text-left border border-white/10">
+                <h2 class="text-honey-bronze-300 font-bold uppercase tracking-wider text-xs mb-4 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Comprobante de Pago
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+                    <div class="flex justify-between md:block">
+                        <span class="text-white/40 block">Orden de Pedido</span>
+                        <span class="text-white font-medium">{buyOrder || orderId || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between md:block">
+                        <span class="text-white/40 block">Comercio</span>
+                        <span class="text-white font-medium">Florería Tapti</span>
+                    </div>
+                    <div class="flex justify-between md:block">
+                        <span class="text-white/40 block">Fecha</span>
+                        <span class="text-white font-medium">{formatDate(transDate)}</span>
+                    </div>
+                    <div class="flex justify-between md:block">
+                        <span class="text-white/40 block">Código de Autorización</span>
+                        <span class="text-white font-medium">{authCode || 'N/A'}</span>
+                    </div>
+                    <div class="flex justify-between md:block">
+                        <span class="text-white/40 block">Tarjeta (últimos 4 dígitos)</span>
+                        <span class="text-white font-medium">**** **** **** {cardDigits || '****'}</span>
+                    </div>
+                    <div class="flex justify-between md:block">
+                        <span class="text-white/40 block">Tipo de Pago</span>
+                        <span class="text-white font-medium">{getPaymentType(paymentType)}</span>
+                    </div>
+                    {installments && installments !== '0' && (
+                        <div class="flex justify-between md:block">
+                            <span class="text-white/40 block">Cuotas</span>
+                            <span class="text-white font-medium">{installments}</span>
+                        </div>
+                    )}
+                    <div class="flex justify-between md:block border-t border-white/5 pt-2 mt-2 md:border-0 md:pt-0 md:mt-0">
+                        <span class="text-white/40 block">Monto Total</span>
+                        <span class="text-honey-bronze-400 font-bold">${Number(amountParam || orderDetails?.total_amount || 0).toLocaleString('es-CL')} CLP</span>
+                    </div>
+                </div>
+            </div>
 
-          <div class="space-y-2">
-            {orderDetails.items?.map((item: any) => (
-              <div class="flex justify-between text-sm">
-                <span class="text-white/80">{item.quantity}x {item.name} {item.size ? `(${item.size})` : ''}</span>
-                <span class="text-white font-medium">${(item.price * item.quantity).toLocaleString('es-CL')}</span>
-              </div>
-            ))}
-            {orderDetails.shipping_cost > 0 && (
-              <div class="flex justify-between text-sm text-white/60">
-                <span>Despacho</span>
-                <span>${orderDetails.shipping_cost.toLocaleString('es-CL')}</span>
-              </div>
+            {orderDetails && (
+                <div class="bg-black/20 rounded-2xl p-6 text-left border border-white/5 space-y-4">
+                <div class="border-b border-white/10 pb-4 mb-4">
+                    <h2 class="text-honey-bronze-300 font-bold uppercase tracking-wider text-xs mb-1">Detalle de Productos</h2>
+                    <p class="text-white/60 text-[10px]">Confirmación enviada a {orderDetails.customer_email}</p>
+                </div>
+
+                <div class="space-y-2">
+                    {orderDetails.items?.map((item: any) => (
+                    <div class="flex justify-between text-sm">
+                        <span class="text-white/80">{item.quantity}x {item.name} {item.size ? `(${item.size})` : ''}</span>
+                        <span class="text-white font-medium">${(item.price * item.quantity).toLocaleString('es-CL')}</span>
+                    </div>
+                    ))}
+                    {orderDetails.shipping_cost > 0 && (
+                    <div class="flex justify-between text-sm text-white/60">
+                        <span>Despacho</span>
+                        <span>${orderDetails.shipping_cost.toLocaleString('es-CL')}</span>
+                    </div>
+                    )}
+                </div>
+
+                <div class="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <span class="block text-honey-bronze-300 text-[10px] font-bold uppercase mb-1">¿Cuándo llega?</span>
+                    <p class="text-white/90">{orderDetails.delivery_date === 'HOY' ? 'Hoy mismo (Envío Express)' : orderDetails.delivery_date || 'Por confirmar'}</p>
+                    </div>
+                    <div class="bg-white/5 p-3 rounded-xl border border-white/5">
+                    <span class="block text-honey-bronze-300 text-[10px] font-bold uppercase mb-1">¿Dónde llega?</span>
+                    <p class="text-white/90 truncate" title={orderDetails.shipping_address}>{orderDetails.shipping_address.split('\n')[0]}, {orderDetails.shipping_commune}</p>
+                    </div>
+                </div>
+                </div>
             )}
-          </div>
-
-          <div class="border-t border-white/10 pt-4 mt-4 flex justify-between items-center">
-            <span class="text-white font-bold">Total Pagado</span>
-            <span class="text-honey-bronze-400 text-xl font-bold">${orderDetails.total_amount.toLocaleString('es-CL')}</span>
-          </div>
-
-          <div class="pt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-              <span class="block text-honey-bronze-300 text-xs font-bold uppercase mb-1">¿Cuándo llega?</span>
-              <p class="text-white/90">{orderDetails.delivery_date === 'HOY' ? 'Hoy mismo (Envío Express)' : orderDetails.delivery_date || 'Por confirmar'}</p>
-            </div>
-            <div class="bg-white/5 p-3 rounded-xl border border-white/5">
-              <span class="block text-honey-bronze-300 text-xs font-bold uppercase mb-1">¿Dónde llega?</span>
-              <p class="text-white/90 truncate" title={orderDetails.shipping_address}>{orderDetails.shipping_address.split('\n')[0]}, {orderDetails.shipping_commune}</p>
-            </div>
-          </div>
         </div>
       )}
 
-      {!orderDetails && status === 'success' && (
+      {!orderDetails && status === 'success' && !authCode && (
         <p class="text-white/80 text-lg mb-8">{message}</p>
       )}
 
-      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-10">
         <a
           href="/catalogo"
-          class="bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 font-bold py-4 px-10 rounded-xl shadow-lg transition-all hover:scale-105"
+          class="bg-honey-bronze-500 hover:bg-honey-bronze-400 text-midnight-violet-950 font-bold py-4 px-10 rounded-xl shadow-lg transition-all hover:scale-105 text-center"
         >
           Ir al Catálogo
         </a>
         <a
           href="/"
-          class="bg-white/5 hover:bg-white/10 text-white font-bold py-4 px-10 rounded-xl border border-white/10 transition-all"
+          class="bg-white/5 hover:bg-white/10 text-white font-bold py-4 px-10 rounded-xl border border-white/10 transition-all text-center"
         >
           Inicio
         </a>
@@ -159,7 +256,6 @@ if (messageFromUrl) {
     // Limpiar carrito si el pago fue exitoso
     const params = new URLSearchParams(window.location.search);
     if (params.get('status') === 'success') {
-      // nanostores/persistent usa 'cartItems' como clave en localStorage
       localStorage.removeItem('cartItems');
     }
   </script>
