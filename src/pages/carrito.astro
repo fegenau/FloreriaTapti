@@ -576,30 +576,10 @@ const accessories = catalog.accessories || [];
         if (cartSubtotal)
           cartSubtotal.innerText = `$${subtotalGlobal.toLocaleString("es-CL")}`;
 
-        let type = "normal";
-        const expressChecked = document.querySelector(
-          'input[name="delivery_type"]:checked',
-        ) as HTMLInputElement;
-        if (expressChecked) type = expressChecked.value;
+        // Despacho gratuito temporalmente
+        shippingGlobal = 0;
 
-        if (type === "express") {
-          shippingGlobal = EXPRESS_DELIVERY_PRICE;
-        } else {
-          // Normal: Get from commune or 0 if not selected
-          const communeVal = selectCommune?.value;
-          if (communeVal) {
-            try {
-              shippingGlobal = getCommunePrice(communeVal);
-            } catch (e) {
-              shippingGlobal = 0;
-            }
-          } else {
-            shippingGlobal = 0;
-          }
-        }
-
-        if (cartShipping)
-          cartShipping.innerText = `$${shippingGlobal.toLocaleString("es-CL")}`;
+        if (cartShipping) cartShipping.innerText = `$0 (Gratis)`;
         if (cartTotal)
           cartTotal.innerText = `$${(subtotalGlobal + shippingGlobal).toLocaleString("es-CL")}`;
       }
