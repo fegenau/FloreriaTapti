@@ -38,23 +38,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
     const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items, receiver_name, receiver_phone, dedication } = CheckoutSchema.parse(body);
 
-    let shippingCost = 0;
-    if (delivery_type === 'express') {
-      // Validate hour in Santiago
-      const santiagoTime = new Date().toLocaleString("en-US", { timeZone: "America/Santiago" });
-      const currentHour = new Date(santiagoTime).getHours();
-      
-      if (currentHour >= 13) {
-        throw new Error("El Delivery Express no está disponible después de las 13:00 hrs");
-      }
-      shippingCost = EXPRESS_DELIVERY_PRICE;
-    } else {
-      try {
-        shippingCost = getCommunePrice(commune);
-      } catch (err) {
-        shippingCost = 0; // fallback in case of missing commune
-      }
-    }
+    let shippingCost = 0; // Despacho gratuito temporalmente
 
     // Calculate total incl. shipping
     const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0) + shippingCost;
