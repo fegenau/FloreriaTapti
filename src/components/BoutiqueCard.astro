@@ -7,6 +7,7 @@ interface Props extends HTMLAttributes<"div"> {
   background?: string;
   className?: string;
   disableAnimation?: boolean;
+  contentAlignment?: "start" | "center" | "end";
 }
 
 const {
@@ -15,6 +16,7 @@ const {
   background,
   className = "",
   disableAnimation = false,
+  contentAlignment = "end",
   ...rest
 } = Astro.props;
 
@@ -32,6 +34,12 @@ const variantClasses = {
   contact:
     "bg-gradient-to-br from-tapti-deep to-slate-800 border border-tapti-gold/20",
   services: "bg-tapti-deep/50 backdrop-blur-lg border border-tapti-gold/30",
+};
+
+const alignmentClasses = {
+  start: "justify-start",
+  center: "justify-center",
+  end: "justify-end",
 };
 
 const animationClasses = disableAnimation
@@ -55,7 +63,7 @@ const animationClasses = disableAnimation
 
   <!-- Contenido -->
   <div
-    class="relative h-full flex flex-col justify-end p-6 md:p-8 lg:p-12 text-white z-20"
+    class={`relative min-h-full flex flex-col ${alignmentClasses[contentAlignment]} p-6 md:p-8 lg:p-12 text-white z-20`}
   >
     <slot />
   </div>
