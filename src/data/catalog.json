@@ -160,9 +160,9 @@
     },
     {
       "image": [
-        "images/Flores/Girasoles clasico/GirasolClasico1.avif",
-        "images/Flores/Girasoles clasico/GirasolClasico2.avif"
-
+        "images/Flores/Girasoles clasico/GirasolClasico3.avif",
+        "images/Flores/Girasoles clasico/GirasolClasico2.avif",
+        "images/Flores/Girasoles clasico/GirasolClasico1.avif"
       ],
       "Description": "Este es uno de los ramos favoritos de todos para todos. Ramo de girasoles, mini rosas en color damasco, gypsophilia y follaje.",
       "name": "Girasoles clasico",
@@ -200,6 +200,7 @@
     },
     {
       "image": [
+        "images/Flores/Tulipanes/Tulipanes1.avif",
         "images/Flores/Tulipanes/Tulipanes.jpeg",
         "images/Flores/Tulipanes/Tulipanes 2.webp"
       ],
@@ -464,9 +465,10 @@
     },
     {
       "image": [
+        "images/Flores/Bouquet Alquimia/BouquetAlquimia3.avif",
         "images/Flores/Bouquet Alquimia/BouquetAlquimia.avif",
-        "images/Flores/Bouquet Alquimia/BouquetAlquimia2.avif",
-        "images/Flores/Bouquet Alquimia/BouquetAlquimia3.avif"
+        "images/Flores/Bouquet Alquimia/BouquetAlquimia2.avif"
+        
       ],
       "Description": "Ramo con flores variadas de alta categoría tales como dahlias, tulipanes, lisianthus, escabiosas, mini rosas, claveles y otros, es una mezcla mágica creada con intención. (Incluye jarrón)",
       "name": "Bouquet Alquimia",
