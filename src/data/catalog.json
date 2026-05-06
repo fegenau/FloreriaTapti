@@ -10,15 +10,12 @@
       "unit_price": 200,
       "sizes": {
         "S": {
-          "qty": 55,
           "total": 36000
         },
         "M": {
-          "qty": 78,
           "total": 52500
         },
         "L": {
-          "qty": 102,
           "total": 71500
         }
       },
@@ -31,15 +28,12 @@
       "unit_price": 1000,
       "sizes": {
         "S": {
-          "qty": 42,
           "total": 25000
         },
         "M": {
-          "qty": 63,
           "total": 37500
         },
         "L": {
-          "qty": 74,
           "total": 45000
         }
       },
@@ -55,15 +49,12 @@
       "unit_price": 800,
       "sizes": {
         "S": {
-          "qty": 8,
           "total": 25000
         },
         "M": {
-          "qty": 13,
           "total": 41750
         },
         "L": {
-          "qty": 19,
           "total": 62000
         },
         "XL": null
@@ -80,15 +71,12 @@
       "unit_price": 800,
       "sizes": {
         "S": {
-          "qty": 9,
           "total": 25500
         },
         "M": {
-          "qty": 16,
           "total": 45500
         },
         "L": {
-          "qty": 23,
           "total": 65500
         }
       },
@@ -96,27 +84,22 @@
     },
     {
       "image": [
-        "images/Flores/Coloridos gerberas/Coloridos gerberas.png",
-        "images/Flores/Coloridos gerberas/Ramo Girasoles y Gerberas 2.avif"
+        "images/Flores/Coloridos gerberas/RamoColorido1.avif",
+        "images/Flores/Coloridos gerberas/RamoColorido2.avif",
+        "images/Flores/Coloridos gerberas/RamoColorido3.avif"
       ],
-      "Description": "Es un ramo para celebraciones, con él expresas mucha felicidad, cualquier espacio se llenará de alegría con este ramo. Ramo de girasoles, gerberas, mini rosas de colores vivos, claveles verdes, cardo azul, hypericum y follaje",
-      "name": "Coloridos gerberas",
+      "Description": "Ramo de colores vibrantes, compuesto de girasoles, mini rosas, mables, cremones, claveles y otros",
+      "name": "Ramo Coloridos",
       "unit_price": 800,
       "sizes": {
         "S": {
-          "qty": 17,
-          "total": 30750
+          "total": 27000
         },
         "M": {
-          "qty": 19,
-          "total": 36500
-        },
-        "L": {
-          "qty": 25,
-          "total": 47000
+          "total": 37000
         }
       },
-      "category": "Colección General"
+      "category": "Dia de la Madre"
     },
     {
       "image": [
@@ -128,15 +111,12 @@
       "unit_price": 1000,
       "sizes": {
         "S": {
-          "qty": 17,
           "total": 30750
         },
         "M": {
-          "qty": 24,
           "total": 42750
         },
         "L": {
-          "qty": 33,
           "total": 61750
         }
       },
@@ -149,15 +129,12 @@
       "unit_price": 1000,
       "sizes": {
         "S": {
-          "qty": 17,
           "total": 33750
         },
         "M": {
-          "qty": 25,
           "total": 48000
         },
         "L": {
-          "qty": 38,
           "total": 75250
         }
       },
@@ -170,15 +147,12 @@
       "unit_price": 3000,
       "sizes": {
         "S": {
-          "qty": 15,
           "total": 30750
         },
         "M": {
-          "qty": 23,
           "total": 47500
         },
         "L": {
-          "qty": 32,
           "total": 67250
         }
       },
@@ -186,27 +160,22 @@
     },
     {
       "image": [
-        "images/Flores/Girasoles clasico/Girasoles clasico.png",
-        "images/Flores/Girasoles clasico/Ramo girasoles clásico.webp"
+        "images/Flores/Girasoles clasico/GirasolClasico1.avif",
+        "images/Flores/Girasoles clasico/GirasolClasico2.avif"
+
       ],
       "Description": "Este es uno de los ramos favoritos de todos para todos. Ramo de girasoles, mini rosas en color damasco, gypsophilia y follaje.",
       "name": "Girasoles clasico",
       "unit_price": 1000,
       "sizes": {
         "S": {
-          "qty": 11,
-          "total": 22500
+          "total": 26000
         },
         "M": {
-          "qty": 16,
-          "total": 32500
-        },
-        "L": {
-          "qty": 25,
-          "total": 50500
+          "total": 36000
         }
       },
-      "category": "Colección General"
+      "category": "Dia de la Madre"
     },
     {
       "image": [
@@ -218,15 +187,12 @@
       "unit_price": 800,
       "sizes": {
         "S": {
-          "qty": 12,
           "total": 24250
         },
         "M": {
-          "qty": 17,
           "total": 34000
         },
         "L": {
-          "qty": 25,
           "total": 49500
         }
       },
@@ -241,21 +207,11 @@
       "name": "Tulipan",
       "unit_price": 1400,
       "sizes": {
-        "S": null,
-        "M": {
-          "qty": 7,
-          "total": 22500
-        },
-        "L": {
-          "qty": 11,
-          "total": 34500
-        },
-        "XL": {
-          "qty": 16,
-          "total": 50000
+        "Unico ": {
+          "total": 34000
         }
       },
-      "category": "Colección General"
+      "category": "Dia de la Madre"
     },
     {
       "image": ["images/Flores/Rosas rojas/Rosas rojas.jpeg"],
@@ -264,19 +220,15 @@
       "unit_price": 800,
       "sizes": {
         "S": {
-          "qty": 10,
           "total": 21250
         },
         "M": {
-          "qty": 21,
           "total": 45000
         },
         "L": {
-          "qty": 37,
           "total": 82500
         },
         "XL": {
-          "qty": 65,
           "total": 150000
         }
       },
@@ -292,19 +244,15 @@
       "unit_price": 800,
       "sizes": {
         "S": {
-          "qty": 12,
           "total": 24250
         },
         "M": {
-          "qty": 25,
           "total": 51500
         },
         "L": {
-          "qty": 43,
           "total": 92000
         },
         "XL": {
-          "qty": 73,
           "total": 162500
         }
       },
@@ -317,7 +265,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 70000
         }
       },
@@ -330,7 +277,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 70000
         }
       },
@@ -364,7 +310,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 15000
         }
       },
@@ -381,7 +326,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 15000
         }
       },
@@ -397,7 +341,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 15000
         }
       },
@@ -410,7 +353,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 15000
         }
       },
@@ -428,7 +370,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 15000
         }
       },
@@ -444,7 +385,6 @@
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "qty": 1,
           "total": 15000
         }
       },
@@ -461,7 +401,6 @@
       "unit_price": 180000,
       "sizes": {
         "Único": {
-          "qty": 1,
           "total": 180000
         }
       },
@@ -472,23 +411,126 @@
       "image": [
         "images/Flores/Cuadro Flores/Cuadro Foto 3.avif",
         "images/Flores/Cuadro Flores/Cuadro Foto.avif",
-        "images/Flores/Cuadro Flores/Cuadro Foto 2.avif"
+        "images/Flores/Cuadro Flores/Cuadro Foto 2.avif",
+        "images/Flores/Cuadro Flores/CuadroFlores.avif"
       ],
-      "Description": "Marco de foto de madera, puedes incluir hasta 2 fotos, rodeadas de las flores más hermosas, prensadas y enmarcada en un cuadro de doble vidrio. Esto es un regalo hermoso para aquellas personas que dicen que 'no le gustan las flores', lo que realmente no le gusta es que mueran, esto es un regalo que las preserva para siempre decorando sus recuerdos más significativos.",
-      "name": "Cuadro de flores prensadas",
+      "Description": "Cuadro de doble vidrio decorado con flores prensadas y 2 fotos instantáneas. (Foto referencial con medida 18x23)",
+      "name": "Memoria Viva",
       "unit_price": 30000,
       "sizes": {
-        "Pequeño": {
-          "qty": 1,
+        "Pequeño(18x23)": {
           "total": 30000
         },
-        "Mediano": {
-          "qty": 1,
-          "total": 40000
+        "Mediano(28x28)": {
+          "total": 35000
         }
       },
-      "category": "Decoración"
-    }
+      "category": "Dia de la Madre"
+    },
+    {
+      "image": [
+        "images/Flores/Jardin secreto/JardinSecreto1.avif", 
+        "images/Flores/Jardin secreto/JardinSecreto2.avif"
+      ],
+      "Description": "Balde metálico de jardín repleto de Mables y follaje",
+      "name": "Jardín Secreto",
+      "unit_price": 30000,
+      "sizes": {
+        "Unico": {
+          "total": 30000
+        }
+      },
+      "category": "Dia de la Madre"
+    },
+    {
+      "image": [
+        "images/Flores/Pastel nude/DuoPastel.avif",
+        "images/Flores/Pastel nude/DuoPastel2.avif",
+        "images/Flores/Pastel nude/DuoPastel3.avif"
+      ],
+      "Description": "Ramo que mezcla tonos damascos con lila, es elegante, suave y delicado",
+      "name": "Duo Pastel",
+      "sizes": {
+        "S": {
+          "total": 27000
+        },
+        "M":{
+          "total": 37000
+        }
+      },
+      "category": "Dia de la Madre"
+    },
+    {
+      "image": [
+        "images/Flores/Flores toscana/FloresToscana.avif",
+        "images/Flores/Flores toscana/FloresToscana2.avif"
+      ],
+      "Description": "Ramo floral de Lilium, mini rosas, astromelias y diferentes follajes.",
+      "name": "Flores de la Toscana",
+      "sizes": {
+        "S": {
+          "total": 27000
+        },
+        "M":{
+          "total": 37000
+        }
+      },
+      "category": "Dia de la Madre"
+    },
+    {
+      "image": [
+        "images/Flores/Bouquet Alquimia/BouquetAlquimia.avif",
+        "images/Flores/Bouquet Alquimia/BouquetAlquimia2.avif",
+        "images/Flores/Bouquet Alquimia/BouquetAlquimia3.avif"
+      ],
+      "Description": "Ramo con flores variadas de alta categoría tales como dahlias, tulipanes, lisianthus, escabiosas, mini rosas, claveles y otros, es una mezcla mágica creada con intención. (Incluye jarrón)",
+      "name": "Bouquet Alquimia",
+      "sizes": {
+        "Unico": {
+          "total": 90000
+        }
+      },
+      "category": "Dia de la Madre"
+    },
+    {
+      "image": [
+        "images/Flores/Elixir Floral/ElixirFloral.avif",
+        "images/Flores/Elixir Floral/ElixirFloral1.avif",
+        "images/Flores/Elixir Floral/ElixirFloral2.avif",
+        "images/Flores/Elixir Floral/ElixirFloral3.avif"
+      ],
+      "Description": "Arreglo de flores que oculta una botella a elección (Vino, Espumante, Late harvest o Gin), pide el catálogo y sorprende con algo original.",
+      "name": "Elixir Floral",
+      "sizes": {
+        "Flores + Late Harvest (Misiones de Rengo)": {
+          "total": 34000
+        },
+        "Flores + GIN MOM":{
+          "total": 40000
+        },
+        "Flores + Brut Rose (Viñamar)": {
+          "total": 40000
+        }         
+    },
+    "category": "Dia de la Madre"
+  },
+  {
+      "image": [
+        "images/Flores/Experiencia Oso/ExpercienciaOsoTapti.avif",
+        "images/Flores/Experiencia Oso/ExpercienciaOsoTapti1.avif",
+        "images/Flores/Experiencia Oso/ExpercienciaOsoTapti2.avif",
+        "images/Flores/Experiencia Oso/ExpercienciaOsoTapti3.avif"
+      ],
+      "Description": "Te invitamos a sumergirte en una experiencia mágica y creativa, donde podrás crear junto a tu hijo o a alguien especial un encantador “Oso floral” de Tapti. Nuestro kit incluye todo lo necesario: 40 varitas repletas de flores vibrantes, un oso hidratado listo para transformarse y adorables detalles de ojos + nariz de peluche que le darán vida a tu creación.",
+      "name": "Experiencia Oso Tapti",
+       "unit_price": 50000,
+      "sizes": {
+        "Regala Recuerdos": {
+          "total": 50000
+        }         
+    },
+    "category": "Dia de la Madre"
+  }
   ],
   "accessories": [
     {
