@@ -332,21 +332,6 @@
       "category": "Graduaciones"
     },
     {
-      "image": [
-        "images/Flores/Graduaciones/Girasol Clásico S.avif",
-        "images/Flores/Graduaciones/Girasol Clásico S 2.avif"
-      ],
-      "Description": "Birrete con flores.",
-      "name": "Girasol Clásico S",
-      "unit_price": 800,
-      "sizes": {
-        "Unico": {
-          "total": 15000
-        }
-      },
-      "category": "Graduaciones"
-    },
-    {
       "image": ["images/Flores/Graduaciones/girasoles y clavel.avif"],
       "Description": "Birrete con flores.",
       "name": "Girasoles y claveles",
