@@ -322,28 +322,6 @@ const accessories = catalog.accessories || [];
                         >
                         </p>
                       </div>
-
-                      <label
-                        id="label-express-delivery"
-                        class="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-transparent hover:bg-white/5 transition-colors"
-                        style="display: none;"
-                      >
-                        <input
-                          type="radio"
-                          name="delivery_type"
-                          value="express"
-                          class="mt-1 accent-honey-bronze-500"
-                        />
-                        <div>
-                          <span class="block text-white font-medium"
-                            >Delivery Express Mismo Día ($5.990)</span
-                          >
-                          <span class="text-xs text-honey-bronze-300 block mt-1"
-                            >Recíbelo hoy mismo (solo compras antes de las
-                            13:00hrs).</span
-                          >
-                        </div>
-                      </label>
                     </div>
                   </div>
 
@@ -498,13 +476,22 @@ const accessories = catalog.accessories || [];
       const radiosDeliveryType = document.querySelectorAll(
         'input[name="delivery_type"]',
       );
-      const labelExpress = document.getElementById("label-express-delivery");
       const datePickerContainer = document.getElementById(
         "date-picker-container",
       );
       const inputDeliveryDate = document.getElementById(
         "input-delivery-date",
       ) as HTMLInputElement;
+
+      if (inputDeliveryDate) {
+        const now = new Date();
+        now.setDate(now.getDate() + 2); // Add 2 days for preparation
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, "0");
+        const day = now.getDate().toString().padStart(2, "0");
+        const minDate = `${year}-${month}-${day}`;
+        inputDeliveryDate.min = minDate;
+      }
 
       let subtotalGlobal = 0;
       let shippingGlobal = 0;
@@ -604,41 +591,6 @@ const accessories = catalog.accessories || [];
           cartTotal.innerText = `$${(subtotalGlobal + shippingGlobal).toLocaleString("es-CL")}`;
       }
 
-      function applyExpressLogic() {
-        const currentHour = new Date().getHours();
-        const expressInput = document.querySelector(
-          'input[value="express"]',
-        ) as HTMLInputElement;
-
-        if (labelExpress) {
-          labelExpress.style.display = "flex";
-
-          if (currentHour >= 13) {
-            labelExpress.classList.add("opacity-40", "cursor-not-allowed");
-            labelExpress.classList.remove("hover:bg-white/5", "cursor-pointer");
-            if (expressInput) {
-              expressInput.disabled = true;
-              const msg = labelExpress.querySelector(".text-honey-bronze-300");
-              if (msg)
-                msg.textContent = "No disponible después de las 13:00hrs.";
-            }
-          } else {
-            labelExpress.classList.remove("opacity-40", "cursor-not-allowed");
-            labelExpress.classList.add("hover:bg-white/5", "cursor-pointer");
-            if (expressInput) expressInput.disabled = false;
-          }
-        }
-
-        // If express was selected and time expired or just loaded, force normal
-        if (expressInput && expressInput.checked && expressInput.disabled) {
-          const normalInput = document.querySelector(
-            'input[value="normal"]',
-          ) as HTMLInputElement;
-          if (normalInput) normalInput.checked = true;
-        }
-        updateDatepickerVisibility();
-      }
-
       function updateDatepickerVisibility() {
         const type = (
           document.querySelector(
@@ -661,7 +613,7 @@ const accessories = catalog.accessories || [];
         radio.addEventListener("change", updateDatepickerVisibility),
       );
 
-      applyExpressLogic();
+      updateDatepickerVisibility();
 
       btnCancel?.addEventListener("click", () => {
         if (confirm("¿Estás seguro de que quieres vaciar tu carrito?")) {
