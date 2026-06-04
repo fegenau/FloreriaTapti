@@ -1,63 +1,303 @@
-
 ---
 import Layout from "../../components/Layout.astro";
+import ExperienceModal from "../../components/ExperienceModal.astro";
+import QuoteModal from "../../components/QuoteModal.astro";
+import catalogData from "../../data/catalog.json";
+import { slugify } from "../../utils/slugify.js";
+
 const { slug } = Astro.params;
-const products = (await import('../../data/products.json')).default;
-const product = products.find(p => p.slug === slug);
-if (!product) throw new Error('Producto no encontrado');
+const products = catalogData.flowers as any[];
+
+const product = products.find((p: any) => slugify(p.name) === slug);
+if (!product) return Astro.redirect('/catalogo');
+
+function getStartingPrice(p: any): number | null {
+  if (p.isQuote) return null;
+  const prices: number[] = Object.values(p.sizes as Record<string, any>)
+    .filter((s: any): s is { total: number } => s !== null)
+    .map((s: any) => s.total);
+  return prices.length > 0 ? Math.min(...prices) : null;
+}
+
+const startingPrice = getStartingPrice(product);
+const validSizes: [string, { total: number }][] = product.isQuote
+  ? []
+  : (Object.entries(product.sizes as Record<string, any>).filter(
+      (e): e is [string, { total: number }] => e[1] !== null
+    ));
+
+// Productos relacionados de la misma categoría
+const related = products
+  .filter((p: any) => p.category === product.category && slugify(p.name) !== slug)
+  .slice(0, 4);
 ---
-<Layout title={`${product.name} — Tapti`}>
-  <section class="max-w-6xl mx-auto px-4 py-12 grid md:grid-cols-2 gap-8">
-    <img src={product.image} alt={product.name} class="rounded-xl border border-white/10 w-full object-cover" />
-    <div>
-      <h1 class="font-serif text-3xl text-tapti-gold">{product.name}</h1>
-      <p class="mt-2 text-white/80">{product.description}</p>
-      <form id="addToCart" class="mt-6 space-y-4">
+
+<Layout title={`${product.name} | Tapti`}>
+  <div class="min-h-screen pt-24 pb-16">
+    <div class="max-w-5xl mx-auto px-6">
+
+      <!-- Breadcrumb -->
+      <nav class="flex items-center gap-1.5 text-xs text-white/35 mb-10">
+        <a href="/" class="hover:text-white/70 transition-colors">Inicio</a>
+        <span>/</span>
+        <a href="/catalogo" class="hover:text-white/70 transition-colors">Catálogo</a>
+        <span>/</span>
+        <span class="text-white/55">{product.category}</span>
+        <span>/</span>
+        <span class="text-white/70">{product.name}</span>
+      </nav>
+
+      <!-- Product layout -->
+      <div class="grid md:grid-cols-2 gap-10 lg:gap-16">
+
+        <!-- Left: Image gallery -->
         <div>
-          <label class="block text-sm mb-1">Tamaño</label>
-          <select name="size" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full">
-            {product.sizes.map(s => <option value={s.k}>{s.k} — ${s.price.toLocaleString('es-CL')}</option>)}
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm mb-1">Dedicatoria (opcional)</label>
-          <input name="note" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full" placeholder="Con cariño..." />
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm mb-1">Fecha de entrega</label>
-            <input type="date" name="date" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full" />
+          <!-- Main image -->
+          <div class="aspect-square overflow-hidden rounded-lg bg-white/5 mb-3">
+            <img
+              id="main-image"
+              src={`/${product.image[0]}`}
+              alt={product.name}
+              class="w-full h-full object-cover transition-opacity duration-300"
+            />
           </div>
-          <div>
-            <label class="block text-sm mb-1">Comuna</label>
-            <input name="comuna" class="bg-white/5 border border-white/10 rounded px-3 py-2 w-full" placeholder="Providencia" />
+          <!-- Thumbnails -->
+          {product.image.length > 1 && (
+            <div class="flex gap-2 flex-wrap">
+              {product.image.map((img: string, i: number) => (
+                <button
+                  class={`thumbnail-btn w-16 h-16 overflow-hidden rounded-md border-2 transition-all flex-shrink-0 ${i === 0 ? 'border-brand-400' : 'border-transparent hover:border-white/30'}`}
+                  data-src={`/${img}`}
+                  type="button"
+                >
+                  <img src={`/${img}`} alt={`${product.name} ${i + 1}`}
+                    class="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <!-- Right: Product info -->
+        <div class="flex flex-col">
+
+          <h1 class="font-serif text-2xl lg:text-3xl text-white/90 mb-3 leading-snug">
+            {product.name}
+          </h1>
+
+          <!-- Price -->
+          {startingPrice != null ? (
+            <p id="price-display" class="text-xl font-semibold text-white mb-6">
+              ${startingPrice.toLocaleString('es-CL')}
+            </p>
+          ) : (
+            <p class="text-lg text-brand-400 mb-6">{product.price_range || 'Consultar precio'}</p>
+          )}
+
+          <!-- Description -->
+          <p class="text-sm text-white/60 leading-relaxed mb-8">{product.Description}</p>
+
+          <!-- Size selector -->
+          {!product.isQuote && validSizes.length > 1 && (
+            <div class="mb-8">
+              <p class="text-xs text-white/45 uppercase tracking-widest mb-3">Tamaño</p>
+              <div class="flex flex-wrap gap-2" id="size-selector">
+                {validSizes.map(([size, details]: [string, { total: number }], i: number) => (
+                  <button
+                    type="button"
+                    class={`size-btn px-4 py-2 rounded-md border text-sm transition-all ${
+                      i === 0
+                        ? 'border-brand-400 bg-brand-400/15 text-white'
+                        : 'border-white/15 text-white/50 hover:border-white/30 hover:text-white/80'
+                    }`}
+                    data-size={size}
+                    data-price={details.total}
+                  >
+                    {size} &mdash; ${details.total.toLocaleString('es-CL')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <!-- CTA button -->
+          {product.isQuote ? (
+            <button
+              id="quote-btn"
+              type="button"
+              data-product-name={product.name}
+              class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
+            >
+              Solicitar Cotización
+            </button>
+          ) : product.hasForm ? (
+            <button
+              id="experience-btn"
+              type="button"
+              class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
+            >
+              Solicitar Experiencia
+            </button>
+          ) : (
+            <button
+              id="add-to-cart-btn"
+              type="button"
+              class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
+            >
+              Añadir al Carrito
+            </button>
+          )}
+
+          <!-- Info badge -->
+          <div class="mt-2">
+            <div class="flex items-start gap-2.5 bg-white/4 rounded-lg px-4 py-3">
+              <span class="text-green-400 text-sm mt-0.5 flex-shrink-0">✓</span>
+              <span class="text-xs text-white/55 leading-relaxed">
+                ¿Tienes duda? Escríbenos al WhatsApp y te ayudaremos a resolverla.
+              </span>
+            </div>
           </div>
         </div>
-        <button type="submit" class="px-5 py-3 rounded-full bg-tapti-gold text-tapti-deep font-medium">Agregar al carrito</button>
-      </form>
-      <script>
-        import { addCartItem } from '../../store/cartStore.js';
-        
-        const productData = JSON.parse('{JSON.stringify(product)}');
-        const form = document.getElementById('addToCart') as HTMLFormElement | null;
-        form?.addEventListener('submit', (e) => {
-          e.preventDefault();
-          const targetForm = e.currentTarget as HTMLFormElement;
-          const data = Object.fromEntries(new FormData(targetForm));
-          
-          const price = (productData.sizes.find((s:any) => s.k === data.size)?.price) || productData.price;
-          
-          const item = {
-            id: productData.slug,
-            name: productData.name,
-            image: productData.image
-          };
-          
-          addCartItem(item, data.size as string, price, 1);
-          
-          window.dispatchEvent(new Event('open-accessories-modal'));
-        });
-      </script>
+      </div>
+
+      <!-- Related products -->
+      {related.length > 0 && (
+        <div class="mt-20 border-t border-white/10 pt-14">
+          <h2 class="font-serif text-xl text-white/70 mb-8 text-center tracking-wide">
+            También te puede interesar
+          </h2>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {related.map((p: any) => {
+              const relPrice = getStartingPrice(p);
+              return (
+                <a href={`/producto/${slugify(p.name)}`} class="group block">
+                  <div class="aspect-square overflow-hidden rounded-sm bg-white/5 mb-2.5">
+                    <img
+                      src={`/${p.image[0]}`}
+                      alt={p.name}
+                      class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      loading="lazy"
+                    />
+                  </div>
+                  <p class="text-sm text-white/75 leading-snug">{p.name}</p>
+                  {relPrice != null ? (
+                    <p class="text-sm text-white/40 mt-0.5">${relPrice.toLocaleString('es-CL')}</p>
+                  ) : (
+                    <p class="text-sm text-brand-400 mt-0.5">{p.price_range || 'Cotizar'}</p>
+                  )}
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
     </div>
-  </section>
+  </div>
+
+  <!-- Hidden data element for client script -->
+  <div id="page-data"
+    data-product={JSON.stringify(product)}
+    data-starting-price={startingPrice ?? 0}
+    class="hidden"
+  ></div>
+
+  <ExperienceModal />
+  <QuoteModal />
 </Layout>
+
+<script>
+  import { addCartItem } from '../../store/cartStore.js';
+
+  document.addEventListener('astro:page-load', () => {
+    const pageDataEl = document.getElementById('page-data') as HTMLElement;
+    const product = JSON.parse(pageDataEl?.dataset.product || '{}');
+    let selectedSize = '';
+    let selectedPrice = parseInt(pageDataEl?.dataset.startingPrice || '0');
+
+    // --- Thumbnail gallery ---
+    const mainImage = document.getElementById('main-image') as HTMLImageElement;
+    document.querySelectorAll<HTMLButtonElement>('.thumbnail-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const src = btn.dataset.src;
+        if (src && mainImage) {
+          mainImage.style.opacity = '0.6';
+          setTimeout(() => {
+            mainImage.src = src;
+            mainImage.style.opacity = '1';
+          }, 150);
+        }
+        // Update active border
+        document.querySelectorAll('.thumbnail-btn').forEach(b => {
+          b.classList.remove('border-brand-400');
+          b.classList.add('border-transparent');
+        });
+        btn.classList.add('border-brand-400');
+        btn.classList.remove('border-transparent');
+      });
+    });
+
+    // --- Size selector ---
+    const sizeBtns = document.querySelectorAll<HTMLButtonElement>('.size-btn');
+    const priceDisplay = document.getElementById('price-display');
+
+    // Init from first button
+    if (sizeBtns.length > 0) {
+      selectedSize = sizeBtns[0].dataset.size || '';
+      selectedPrice = parseInt(sizeBtns[0].dataset.price || '0');
+    }
+
+    sizeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sizeBtns.forEach(b => {
+          b.classList.remove('border-brand-400', 'bg-brand-400/15', 'text-white');
+          b.classList.add('border-white/15', 'text-white/50');
+        });
+        btn.classList.add('border-brand-400', 'bg-brand-400/15', 'text-white');
+        btn.classList.remove('border-white/15', 'text-white/50');
+
+        selectedSize = btn.dataset.size || '';
+        selectedPrice = parseInt(btn.dataset.price || '0');
+
+        if (priceDisplay) {
+          priceDisplay.textContent = `$${selectedPrice.toLocaleString('es-CL')}`;
+        }
+      });
+    });
+
+    // --- Add to cart ---
+    const cartBtn = document.getElementById('add-to-cart-btn');
+    cartBtn?.addEventListener('click', () => {
+      if (!selectedSize && sizeBtns.length === 0) {
+        // Single size product (no size buttons), use product name as size
+        addCartItem(product, 'Único', selectedPrice);
+      } else {
+        addCartItem(product, selectedSize, selectedPrice);
+      }
+
+      const original = cartBtn.textContent || '';
+      cartBtn.textContent = '✓ Añadido al carrito';
+      cartBtn.classList.add('bg-green-700');
+      cartBtn.classList.remove('bg-brand-500', 'hover:bg-brand-400');
+
+      setTimeout(() => {
+        cartBtn.textContent = original;
+        cartBtn.classList.remove('bg-green-700');
+        cartBtn.classList.add('bg-brand-500', 'hover:bg-brand-400');
+      }, 2000);
+    });
+
+    // --- Quote modal ---
+    document.getElementById('quote-btn')?.addEventListener('click', () => {
+      const productName = (document.getElementById('quote-btn') as HTMLElement)?.dataset.productName || product.name;
+      window.dispatchEvent(new CustomEvent('open-quote-modal', { detail: { productName } }));
+    });
+
+    // --- Experience modal ---
+    document.getElementById('experience-btn')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('open-experience-form', {
+        detail: { product, size: selectedSize || 'Único', price: selectedPrice }
+      }));
+    });
+  });
+</script>

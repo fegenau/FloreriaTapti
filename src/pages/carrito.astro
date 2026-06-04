@@ -36,81 +36,7 @@ const accessories = catalog.accessories || [];
           <!-- Items will be injected here -->
         </div>
 
-        <!-- Extras Section -->
-        <div class="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
-          <h3 class="text-xl font-serif text-honey-bronze-100 mb-2">
-            ¿Deseas agregar algo más?
-          </h3>
-          <p class="text-sm text-cherry-blossom-100 mb-6">
-            Complementa tu regalo con estos detalles especiales.
-          </p>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {
-              accessories.map((item) => (
-                <div class="bg-black/20 rounded-lg p-4 border border-white/5 flex flex-col items-center text-center">
-                  <div class="w-16 h-16 bg-black/30 rounded-full mb-3 flex items-center justify-center overflow-hidden">
-                    {item.image ? (
-                      <img
-                        src={
-                          item.image.startsWith("/") ||
-                          item.image.startsWith("http")
-                            ? item.image
-                            : "/" + item.image
-                        }
-                        alt={item.name}
-                        class="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span class="text-3xl">🎁</span>
-                    )}
-                  </div>
-                  <h4 class="font-medium text-honey-bronze-200 mb-1">
-                    {item.name}
-                  </h4>
-                  <p class="text-xs text-gray-400 mb-3 flex-grow">
-                    {item.description}
-                  </p>
-                  <p class="font-bold text-white mb-3">
-                    ${item.price.toLocaleString("es-CL")}
-                  </p>
-                  <button
-                    type="button"
-                    class="btn-add-accessory px-4 py-2 bg-white/10 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 rounded-full text-xs transition-all border border-white/20"
-                    data-id={item.id}
-                    data-name={item.name}
-                    data-price={item.price}
-                    data-image={item.image}
-                  >
-                    Agregar
-                  </button>
-                </div>
-              ))
-            }
-          </div>
-        </div>
-
-        <div class="border-t border-white/10 pt-6 mt-8">
-          <div class="space-y-2 mb-6">
-            <div
-              class="flex justify-between items-center text-lg text-cherry-blossom-100"
-            >
-              <span>Subtotal Productos</span>
-              <span id="cart-subtotal">$0</span>
-            </div>
-            <div
-              class="flex justify-between items-center text-lg text-cherry-blossom-100"
-              id="shipping-row"
-            >
-              <span>Costo de Envío</span>
-              <span id="cart-shipping">$0</span>
-            </div>
-            <div
-              class="flex justify-between items-center text-2xl font-serif text-honey-bronze-100 pt-4 border-t border-white/10"
-            >
-              <span>Total a Pagar</span>
-              <span id="cart-total">$0</span>
-            </div>
-          </div>
+      
 
           <div class="mt-8">
             <div class="relative">
@@ -246,7 +172,7 @@ const accessories = catalog.accessories || [];
                           >
                           {
                             COMMUNES.map((c) => (
-                              <option value={c.name}>{c.name}</option>
+                              <option value={c.name}>{c.name} - ${c.price.toLocaleString("es-CL")}</option>
                             ))
                           }
                         </select>
@@ -374,6 +300,82 @@ const accessories = catalog.accessories || [];
                     </div>
                   </div>
                 </div>
+
+                  <!-- Extras Section -->
+        <div class="mb-8 bg-white/5 p-6 rounded-lg border border-white/10">
+          <h3 class="text-xl font-serif text-honey-bronze-100 mb-2">
+            ¿Deseas agregar algo más?
+          </h3>
+          <p class="text-sm text-cherry-blossom-100 mb-6">
+            Complementa tu regalo con estos detalles especiales.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {
+              accessories.map((item) => (
+                <div class="bg-black/20 rounded-lg p-4 border border-white/5 flex flex-col items-center text-center">
+                  <div class="w-16 h-16 bg-black/30 rounded-full mb-3 flex items-center justify-center overflow-hidden">
+                    {item.image ? (
+                      <img
+                        src={
+                          item.image.startsWith("/") ||
+                          item.image.startsWith("http")
+                            ? item.image
+                            : "/" + item.image
+                        }
+                        alt={item.name}
+                        class="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span class="text-3xl">🎁</span>
+                    )}
+                  </div>
+                  <h4 class="font-medium text-honey-bronze-200 mb-1">
+                    {item.name}
+                  </h4>
+                  <p class="text-xs text-gray-400 mb-3 flex-grow">
+                    {item.description}
+                  </p>
+                  <p class="font-bold text-white mb-3">
+                    ${item.price.toLocaleString("es-CL")}
+                  </p>
+                  <button
+                    type="button"
+                    class="btn-add-accessory px-4 py-2 bg-white/10 hover:bg-honey-bronze-500 hover:text-midnight-violet-950 rounded-full text-xs transition-all border border-white/20"
+                    data-id={item.id}
+                    data-name={item.name}
+                    data-price={item.price}
+                    data-image={item.image}
+                  >
+                    Agregar
+                  </button>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+
+        <div class="border-t border-white/10 pt-6 mt-8">
+          <div class="space-y-2 mb-6">
+            <div
+              class="flex justify-between items-center text-lg text-cherry-blossom-100"
+            >
+              <span>Subtotal Productos</span>
+              <span id="cart-subtotal">$0</span>
+            </div>
+            <div
+              class="flex justify-between items-center text-lg text-cherry-blossom-100"
+              id="shipping-row"
+            >
+              <span>Costo de Envío</span>
+              <span id="cart-shipping">$0</span>
+            </div>
+            <div
+              class="flex justify-between items-center text-2xl font-serif text-honey-bronze-100 pt-4 border-t border-white/10"
+            >
+              <span>Total a Pagar</span>
+              <span id="cart-total">$0</span>
+            </div>
+          </div>
 
                 <!-- 3. Fechas Importantes (Opcional) -->
                 <div class="bg-white/5 p-6 rounded-xl border border-white/10">

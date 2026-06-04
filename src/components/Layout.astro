@@ -72,14 +72,35 @@ const {
         });
       </script>
       <FloatingNav />
-      <main class={hideHeader ? "min-h-screen" : "min-h-[70vh]"}>
+      <main
+        class:list={[
+          hideHeader ? "min-h-screen" : "min-h-[70vh]",
+          "pt-25 md:pt-32",
+        ]}
+      >
         <slot />
       </main>
       {
         !hideFooter && (
           <footer class="border-t border-white/10">
-            <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex items-center justify-center">
+            <div
+              class="max-w-6xl mx-auto px-4 py-8 text-sm flex flex-col gap-4 items-center justify-center text-center"
+            >
               <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
+              <div class="flex gap-4">
+                <a href="/terminos-y-condiciones" class="hover:underline"
+                  >Términos y Condiciones</a
+                >
+                <span>|</span>
+                <a href="/politica-de-privacidad" class="hover:underline"
+                  >Política de Privacidad</a
+                >
+              </div>
+              <p class="text-xs text-white/50 max-w-md">
+                Solamente utilizamos los datos personales para la boleta
+                generada y/o para la utilización de conversaciones con el mismo
+                vía WhatsApp.
+              </p>
             </div>
           </footer>
         )
