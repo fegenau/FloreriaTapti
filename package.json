@@ -13,7 +13,7 @@
     "@astrojs/tailwind": "^5.1.0",
     "@nanostores/persistent": "^1.2.0",
     "@supabase/supabase-js": "^2.89.0",
-    "astro": "^5.16.6",
+    "astro": "^6.4.6",
     "clsx": "^2.1.1",
     "nanostores": "^1.1.0",
     "resend": "^6.9.3",
