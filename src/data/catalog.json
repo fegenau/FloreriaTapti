@@ -66,7 +66,7 @@
           "stems": "28 varas"
         }
       },
-      "category": "Colección General"
+      "category": "Ramos Mixtos"
     },
     {
       "image": [
@@ -80,18 +80,18 @@
       "sizes": {
         "Pequeño": {
           "total": 26000,
-          "stems": "12 varas" 
+          "stems": "12 varas"
         },
         "Mediano": {
           "total": 40000,
-          "stems": "20 varas" 
+          "stems": "20 varas"
         },
         "Grande": {
           "total": 52000,
           "stems": "28 varas"
         }
       },
-      "category": "Colección General"
+      "category": "Ramos Mixtos"
     },
     {
       "image": [
@@ -117,7 +117,7 @@
           "stems": "35 varas"
         }
       },
-      "category": "Dia de la Madre"
+      "category": "Ramos Mixtos"
     },
     {
       "image": [
@@ -142,7 +142,7 @@
           "stems": "35 varas"
         }
       },
-      "category": "Colección General"
+      "category": "Ramos Mixtos"
     },
     {
       "image": ["images/Flores/Pastel nude/Pastel nude.png"],
@@ -161,10 +161,10 @@
         },
         "Grande": {
           "total": 49000,
-          "stems": "35 varas" 
+          "stems": "35 varas"
         }
       },
-      "category": "Colección General"
+      "category": "Ramos Mixtos"
     },
     {
       "image": ["images/Flores/Gerberas pastel/Gerberas pastel.png"],
@@ -179,20 +179,22 @@
         },
         "Mediano": {
           "total": 38000,
-          "stems": "25 varas" 
+          "stems": "25 varas"
         },
         "Grande": {
           "total": 50000,
           "stems": "35 varas"
         }
       },
-      "category": "Colección General"
+      "category": "Ramos Mixtos"
     },
     {
       "image": [
-        "images/Flores/Girasoles clasico/GirasolClasico3.avif",
-        "images/Flores/Girasoles clasico/GirasolClasico2.avif",
-        "images/Flores/Girasoles clasico/GirasolClasico1.avif"
+        "images/PAGINA WEB (FOTOS)/Girasol Clásico/Girasol Clásico.avif",
+        "images/PAGINA WEB (FOTOS)/Girasol Clásico/Girasol Clásico (2).avif",
+        "images/PAGINA WEB (FOTOS)/Girasol Clásico/Girasol Clásico (3).avif",
+        "images/PAGINA WEB (FOTOS)/Girasol Clásico/Girasol Clásico (4).avif",
+        "images/PAGINA WEB (FOTOS)/Girasol Clásico/Girasol Clásico (5).avif"
       ],
       "Description": "Este es uno de los ramos favoritos de todos para todos. Ramo de girasoles, mini rosas en color damasco, gypsophilia y follaje.",
       "name": "Girasoles clasico",
@@ -241,9 +243,9 @@
     },
     {
       "image": [
-        "images/Flores/Tulipanes/Tulipanes1.avif",
-        "images/Flores/Tulipanes/Tulipanes.jpeg",
-        "images/Flores/Tulipanes/Tulipanes 2.webp"
+        "images/PAGINA WEB (FOTOS)/Tulipan/Tulipan.avif",
+        "images/PAGINA WEB (FOTOS)/Tulipan/Tulipan (2).avif",
+        "images/PAGINA WEB (FOTOS)/Tulipan/Tulipan (3).avif"
       ],
       "Description": "Este es un ramo clásico pero muy elegante. Ramo de tulipanes y gypsophilia.",
       "name": "Tulipan",
@@ -327,7 +329,7 @@
           "total": 70000
         }
       },
-      "category": "Canastos"
+      "category": "Nacimientos"
     },
     {
       "image": ["images/Flores/Canastos/canasto niñas.png"],
@@ -340,7 +342,7 @@
           "total": 70000
         }
       },
-      "category": "Canastos"
+      "category": "Nacimientos"
     },
     {
       "image": ["images/Flores/Ramo novia/Ramo Novia rosa-damasco.jpg"],
@@ -364,8 +366,10 @@
     },
     {
       "image": [
-        "images/Flores/Graduaciones/colorido S.avif",
-        "images/Flores/Graduaciones/colorido.avif"
+        "images/PAGINA WEB (FOTOS)/Colorido/Colorido.avif",
+        "images/PAGINA WEB (FOTOS)/Colorido/Colorido (2).avif",
+        "images/PAGINA WEB (FOTOS)/Colorido/Colorido (3).avif",
+        "images/PAGINA WEB (FOTOS)/Colorido/Colorido (4).avif"
       ],
       "Description": "Birrete con flores.",
       "name": "Colorido",
@@ -457,7 +461,7 @@
           "total": 180000
         }
       },
-      "category": "Experiencias",
+      "category": "Aniversarios",
       "hasForm": true
     },
     {
@@ -479,7 +483,7 @@
           "total": 35000
         }
       },
-      "category": "Dia de la Madre"
+      "category": "Arreglos Florales"
     },
     {
       "image": [
@@ -495,13 +499,14 @@
           "total": 30000
         }
       },
-      "category": "Dia de la Madre"
+      "category": "Arreglos Florales"
     },
     {
       "image": [
-        "images/Flores/Pastel nude/DuoPastel.avif",
-        "images/Flores/Pastel nude/DuoPastel2.avif",
-        "images/Flores/Pastel nude/DuoPastel3.avif"
+        "images/PAGINA WEB (FOTOS)/Dúo Pastel/Dúo Pastel.avif",
+        "images/PAGINA WEB (FOTOS)/Dúo Pastel/Dúo Pastel (2).avif",
+        "images/PAGINA WEB (FOTOS)/Dúo Pastel/Dúo Pastel (3).avif",
+        "images/PAGINA WEB (FOTOS)/Dúo Pastel/Dúo Pastel (4).avif"
       ],
       "Description": "Ramo que mezcla tonos damascos con lila, es elegante, suave y delicado. Varas por tamaño: S 15 varas, M 25 varas, L 35 varas.",
       "name": "Duo Pastel",
@@ -520,12 +525,12 @@
           "stems": 35
         }
       },
-      "category": "Dia de la Madre"
+      "category": "Ramos Deluxe"
     },
     {
       "image": [
-        "images/Flores/Flores toscana/FloresToscana.avif",
-        "images/Flores/Flores toscana/FloresToscana2.avif"
+        "images/PAGINA WEB (FOTOS)/Toscana/Toscana.avif",
+        "images/PAGINA WEB (FOTOS)/Toscana/Toscana (2).avif"
       ],
       "Description": "Ramo floral de Lilium, mini rosas, astromelias y diferentes follajes. Varas por tamaño: S 15 varas, M 25 varas, L 35 varas.",
       "name": "Flores de la Toscana",
@@ -544,7 +549,7 @@
           "stems": 30
         }
       },
-      "category": "Dia de la Madre"
+      "category": "Ramos Deluxe"
     },
     {
       "image": [
@@ -562,14 +567,14 @@
           "stems": "90 varas aprox"
         }
       },
-      "category": "Dia de la Madre"
+      "category": "Ramos Deluxe"
     },
     {
       "image": [
-        "images/Flores/Elixir Floral/ElixirFloral.avif",
-        "images/Flores/Elixir Floral/ElixirFloral1.avif",
-        "images/Flores/Elixir Floral/ElixirFloral2.avif",
-        "images/Flores/Elixir Floral/ElixirFloral3.avif"
+        "images/PAGINA WEB (FOTOS)/Box elixir/Box elixir 1.avif",
+        "images/PAGINA WEB (FOTOS)/Box elixir/Box elixir 2.avif",
+        "images/PAGINA WEB (FOTOS)/Box elixir/Box elixir 3.avif",
+        "images/PAGINA WEB (FOTOS)/Box elixir/Box elixir 4.avif"
       ],
       "Description": "Arreglo de flores que oculta una botella a elección (Vino, Espumante, Late harvest o Gin), pide el catálogo y sorprende con algo original.",
       "name": "Elixir Floral",
@@ -586,9 +591,9 @@
         "Flores + Brut Rose (Viñamar)": {
           "total": 40000,
           "stems": "Arreglo especial"
-        }         
+        }
     },
-    "category": "Dia de la Madre"
+    "category": "Aniversarios"
   },
   {
       "image": [
@@ -605,9 +610,400 @@
         "Regala Recuerdos": {
           "total": 50000,
           "stems": "40 varitas"
-        }         
+        }
     },
-    "category": "Dia de la Madre"
+    "category": "Aniversarios"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/la Rosa con el clavel/la Rosa con el clavel.avif",
+      "images/PAGINA WEB (FOTOS)/la Rosa con el clavel/la Rosa con el clavel (2).avif"
+    ],
+    "Description": "Ramo de rosas y claveles en combinación armoniosa, acompañado de follaje. Para toda ocasión.",
+    "name": "La Rosa con el Clavel",
+    "flowerType": ["Rosas"],
+    "unit_price": 900,
+    "sizes": {
+      "Pequeño": {
+        "total": 25000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 38000,
+        "stems": "16 varas"
+      },
+      "Grande": {
+        "total": 52000,
+        "stems": "22 varas"
+      }
+    },
+    "category": "Ramos Mixtos"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Lilium oriental/Lilium oriental.avif",
+      "images/PAGINA WEB (FOTOS)/Lilium oriental/Lilium oriental (2).avif"
+    ],
+    "Description": "Ramo de Lilium oriental, elegante y aromático, ideal para sorprender en cualquier ocasión especial.",
+    "name": "Lilium Oriental",
+    "flowerType": ["Lilium"],
+    "unit_price": 4000,
+    "sizes": {
+      "Mediano": {
+        "total": 35000,
+        "stems": "6 lilium"
+      },
+      "Grande": {
+        "total": 50000,
+        "stems": "10 lilium"
+      }
+    },
+    "category": "Ramos Deluxe"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Manzana Rosada/Manzana Rosada.avif",
+      "images/PAGINA WEB (FOTOS)/Manzana Rosada/Manzana Rosada (2).avif",
+      "images/PAGINA WEB (FOTOS)/Manzana Rosada/Manzana Rosada (3).avif"
+    ],
+    "Description": "Ramo en tonos rosados con flores variadas y un toque fresco, inspirado en los colores del manzano en flor.",
+    "name": "Manzana Rosada",
+    "flowerType": [],
+    "unit_price": 800,
+    "sizes": {
+      "Pequeño": {
+        "total": 24000,
+        "stems": "12 varas"
+      },
+      "Mediano": {
+        "total": 36000,
+        "stems": "20 varas"
+      },
+      "Grande": {
+        "total": 48000,
+        "stems": "28 varas"
+      }
+    },
+    "category": "Ramos Mixtos"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Primavera/Primavera.avif",
+      "images/PAGINA WEB (FOTOS)/Primavera/Primavera (2).avif",
+      "images/PAGINA WEB (FOTOS)/Primavera/Primavera (3).avif",
+      "images/PAGINA WEB (FOTOS)/Primavera/Primavera (4).avif"
+    ],
+    "Description": "Ramo colorido inspirado en la primavera, con flores variadas de temporada y follaje fresco.",
+    "name": "Primavera",
+    "flowerType": [],
+    "unit_price": 850,
+    "sizes": {
+      "Pequeño": {
+        "total": 26000,
+        "stems": "15 varas"
+      },
+      "Mediano": {
+        "total": 39000,
+        "stems": "22 varas"
+      },
+      "Grande": {
+        "total": 53000,
+        "stems": "30 varas"
+      }
+    },
+    "category": "Ramos Mixtos"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias blancas/Astromelias blancas.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias blancas/Astromelias blancas (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias blancas/Astromelias blancas (3).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias blancas/Astromelias blancas (4).avif"
+    ],
+    "Description": "Ramo minimalista de astromelias blancas, delicado y elegante, ideal para un detalle sencillo y sofisticado.",
+    "name": "Astromelias Blancas",
+    "flowerType": [],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias coloridas/Astromelias coloridas.avif"
+    ],
+    "Description": "Ramo minimalista de astromelias de colores surtidos, fresco y alegre, según disponibilidad de temporada.",
+    "name": "Astromelias Coloridas",
+    "flowerType": [],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias Rosadas/Astromelias Rosadas.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias Rosadas/Astromelias Rosadas (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias Rosadas/Astromelias Rosadas (3).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias Rosadas/Astromelias Rosadas (4).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Astromelias Rosadas/Astromelias Rosadas (5).avif"
+    ],
+    "Description": "Ramo minimalista de astromelias rosadas, delicado y romántico, perfecto para un regalo sencillo.",
+    "name": "Astromelias Rosadas",
+    "flowerType": [],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Clavel damasco/Clavel damasco.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Clavel damasco/Clavel damasco (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Clavel damasco/Clavel damasco (3).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Clavel damasco/Clavel damasco (4).avif"
+    ],
+    "Description": "Ramo minimalista de claveles en tono damasco, simple y sofisticado.",
+    "name": "Clavel Damasco",
+    "flowerType": [],
+    "unit_price": 600,
+    "sizes": {
+      "Pequeño": {
+        "total": 14000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 20000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 28000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mable rosado/Mable rosado.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mable rosado/Mable rosado (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mable rosado/Mable rosado (3).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mable rosado/Mable rosado (4).avif"
+    ],
+    "Description": "Ramo minimalista de mable rosado, fresco y delicado, ideal para un detalle simple.",
+    "name": "Mable Rosado",
+    "flowerType": [],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 16000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 23000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 31000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini claveles rosados/Mini claveles rosados.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini claveles rosados/Mini claveles rosados (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini claveles rosados/Mini claveles rosados (3).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini claveles rosados/Mini claveles rosados (4).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini claveles rosados/Mini claveles rosados (5).avif"
+    ],
+    "Description": "Ramo minimalista de mini claveles rosados, tierno y delicado.",
+    "name": "Mini Claveles Rosados",
+    "flowerType": [],
+    "unit_price": 600,
+    "sizes": {
+      "Pequeño": {
+        "total": 14000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 20000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 28000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas amarillas/Mini rosas amarillas.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas amarillas/Mini rosas amarillas (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas amarillas/Mini rosas amarillas (3).avif"
+    ],
+    "Description": "Ramo minimalista de mini rosas amarillas, alegre y luminoso.",
+    "name": "Mini Rosas Amarillas",
+    "flowerType": ["Rosas"],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas naranjas/Mini rosas naranjas.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas naranjas/Mini rosas naranjas (2).avif"
+    ],
+    "Description": "Ramo minimalista de mini rosas naranjas, vibrante y cálido.",
+    "name": "Mini Rosas Naranjas",
+    "flowerType": ["Rosas"],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rojas/Mini rosas rojas.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rojas/Mini rosas rojas (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rojas/Mini rosas rojas (3).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rojas/Mini rosas rojas (4).avif"
+    ],
+    "Description": "Ramo minimalista de mini rosas rojas, clásico y romántico en formato sencillo.",
+    "name": "Mini Rosas Rojas",
+    "flowerType": ["Rosas"],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rosada y amarilla/Mini rosas rosada y amarilla.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rosada y amarilla/Mini rosas rosada y amarilla (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rosada y amarilla/Mini rosas rosada y amarilla (3).avif"
+    ],
+    "Description": "Ramo minimalista de mini rosas en combinación rosada y amarilla, fresco y alegre.",
+    "name": "Mini Rosas Rosada y Amarilla",
+    "flowerType": ["Rosas"],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
+  },
+  {
+    "image": [
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rosadas/Mini rosas rosadas.avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rosadas/Mini rosas rosadas (2).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rosadas/Mini rosas rosadas (3).avif",
+      "images/PAGINA WEB (FOTOS)/Colección Minimalista/Mini rosas rosadas/Mini rosas rosadas (4).avif"
+    ],
+    "Description": "Ramo minimalista de mini rosas rosadas, romántico y delicado en formato sencillo.",
+    "name": "Mini Rosas Rosadas",
+    "flowerType": ["Rosas"],
+    "unit_price": 700,
+    "sizes": {
+      "Pequeño": {
+        "total": 15000,
+        "stems": "10 varas"
+      },
+      "Mediano": {
+        "total": 22000,
+        "stems": "15 varas"
+      },
+      "Grande": {
+        "total": 30000,
+        "stems": "20 varas"
+      }
+    },
+    "category": "Colección Minimalista"
   }
   ],
   "accessories": [

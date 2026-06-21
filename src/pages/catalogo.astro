@@ -4,7 +4,7 @@ import catalogData from "../data/catalog.json";
 import { slugify } from "../utils/slugify.js";
 
 const products = catalogData.flowers as any[];
-const categories = [...new Set(products.map((p: any) => p.category).filter(Boolean))] as string[];
+const categories = [...new Set([...products.map((p: any) => p.category).filter(Boolean), "Condolencias"])] as string[];
 const flowerTypes = [...new Set(products.flatMap((p: any) => p.flowerType || []))] as string[];
 
 function getStartingPrice(product: any): number | null {
@@ -346,6 +346,14 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
     if (flowerParam) {
       document.querySelectorAll<HTMLInputElement>('.flower-filter').forEach(cb => {
         if (cb.value.toLowerCase() === flowerParam.toLowerCase()) cb.checked = true;
+      });
+    }
+
+    // --- Preselección de filtro de categoría vía query param (?categoria=Nacimientos) ---
+    const categoriaParam = new URLSearchParams(window.location.search).get('categoria');
+    if (categoriaParam) {
+      document.querySelectorAll<HTMLInputElement>('.category-filter').forEach(cb => {
+        if (cb.value.toLowerCase() === categoriaParam.toLowerCase()) cb.checked = true;
       });
     }
 

@@ -30,17 +30,54 @@ const mainServices = [
   {
     title: "Suscripciones Mensuales",
     description: "Esto es más que un regalo, es una experiencia completa",
-    image: "/images/Flores/Experiencia Tapti/Experiencia Tapti.avif",
+    image: "/images/Flores/Jardin secreto/JardinSecreto1.avif",
     url: "/suscripciones",
   },
 ];
 
 import catalogData from "../data/catalog.json";
 
-const selectedIndices = [0, 8, 11, 10, 4, 6];
-const bestSellers = selectedIndices
-  .map((index) => catalogData.flowers[index])
-  .filter(Boolean);
+const categoryShowcase = [
+  {
+    title: "Ramos Mixtos",
+    category: "Ramos Mixtos",
+    description: "Combinaciones de flores variadas para cada ocasión",
+  },
+  {
+    title: "Ramos Deluxe",
+    category: "Ramos Deluxe",
+    description: "Nuestra selección premium de ramos exclusivos",
+    image: "images/Flores/Bouquet Alquimia/BouquetAlquimia.avif",
+  },
+  {
+    title: "Condolencias",
+    category: "Condolencias",
+    description: "Arreglos para acompañar en momentos difíciles",
+  },
+  {
+    title: "Nacimientos",
+    category: "Nacimientos",
+    description: "Canastos y detalles para dar la bienvenida al mundo",
+  },
+  {
+    title: "Arreglos Florales",
+    category: "Arreglos Florales",
+    description: "Composiciones únicas para decorar cualquier espacio",
+  },
+  {
+    title: "Aniversarios",
+    category: "Aniversarios",
+    description: "Regalos y experiencias para celebrar momentos especiales",
+  },
+].map((item) => {
+  const match = (catalogData.flowers as any[]).find(
+    (f) => f.category === item.category,
+  );
+  return {
+    ...item,
+    image: item.image ?? match?.image?.[0] ?? "/images/Banner.jpg",
+  };
+});
 
 const specialOccasions = [
   {
@@ -123,23 +160,23 @@ const specialOccasions = [
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {
-            bestSellers.map((product) => (
+            categoryShowcase.map((item) => (
               <BoutiqueCard
                 variant="gallery"
                 size="large"
-                background={product.image[0].replace(/ /g, "%20")}
+                background={item.image}
                 className="min-h-[400px] group cursor-pointer"
-                onclick="window.location.href='/catalogo'"
+                onclick={`window.location.href='/catalogo?categoria=${encodeURIComponent(item.category)}'`}
               >
                 <div class="space-y-4 relative z-10">
                   <h3 class="font-serif text-2xl md:text-3xl text-honey-bronze-400 mb-3 group-hover:text-honey-bronze-300 transition-colors">
-                    {product.name}
+                    {item.title}
                   </h3>
                   <p class="text-cherry-blossom-100 mb-4 text-sm md:text-base line-clamp-3 group-hover:text-cherry-blossom-50 transition-colors">
-                    {product.Description}
+                    {item.description}
                   </p>
                   <a
-                    href="/catalogo"
+                    href={`/catalogo?categoria=${encodeURIComponent(item.category)}`}
                     class="inline-flex items-center text-honey-bronze-400 hover:text-honey-bronze-300 font-medium transition-colors group/link text-lg relative z-10"
                   >
                     Ver Detalles
