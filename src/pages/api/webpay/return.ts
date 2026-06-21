@@ -62,8 +62,8 @@ const processRequest = async (request: Request, redirect: any) => {
 
         const tbkUser = finishResponse.tbk_user;
 
-        // 2. Update Subscription
-        await supabase.from('subscriptions').update({ tbk_user: tbkUser, is_active: true }).eq('order_id', orderIdParam);
+        // 2. Update Subscription Request
+        await supabase.from('subscription_requests').update({ tbk_user: tbkUser, is_active: true }).eq('order_id', orderIdParam);
 
         // 3. Authorize First Payment
         const { data: order } = await supabase.from('orders').select('*').eq('id', orderIdParam).single();

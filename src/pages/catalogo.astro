@@ -5,6 +5,7 @@ import { slugify } from "../utils/slugify.js";
 
 const products = catalogData.flowers as any[];
 const categories = [...new Set(products.map((p: any) => p.category).filter(Boolean))] as string[];
+const flowerTypes = [...new Set(products.flatMap((p: any) => p.flowerType || []))] as string[];
 
 function getStartingPrice(product: any): number | null {
   if (product.isQuote) return null;
@@ -102,6 +103,27 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
           </div>
         </div>
 
+        <!-- Tipo de flor -->
+        <div class="mb-8">
+          <button id="toggle-flower" class="w-full flex items-center justify-between mb-4">
+            <span class="text-sm font-semibold text-white tracking-wide">Tipo de flor</span>
+            <svg id="flower-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              stroke-linecap="round" stroke-linejoin="round"
+              class="text-white/40 transition-transform duration-200">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
+          </button>
+          <div id="flower-list" class="space-y-2.5">
+            {flowerTypes.map(flower => (
+              <label class="flex items-center gap-2.5 cursor-pointer group">
+                <input type="checkbox" class="flower-filter w-3.5 h-3.5 rounded-sm border border-white/30 bg-white/5 cursor-pointer accent-brand-400" value={flower} />
+                <span class="text-sm text-white/55 group-hover:text-white/90 transition-colors leading-tight">{flower}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
         <!-- Precio -->
         <div class="mb-8">
           <button id="toggle-price" class="w-full flex items-center justify-between mb-4">
@@ -153,6 +175,7 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
                 href={`/producto/${slug}`}
                 class="catalog-item group block"
                 data-category={product.category || ''}
+                data-flower={(product.flowerType || []).join(',')}
                 data-price={startingPrice ?? 0}
                 data-name={product.name.toLowerCase()}
               >
@@ -283,8 +306,12 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
     const noResults = document.getElementById('no-results');
 
     function applyFilters() {
-      const selected = Array.from(
+      const selectedCats = Array.from(
         document.querySelectorAll<HTMLInputElement>('.category-filter:checked')
+      ).map(cb => cb.value);
+
+      const selectedFlowers = Array.from(
+        document.querySelectorAll<HTMLInputElement>('.flower-filter:checked')
       ).map(cb => cb.value);
 
       const lo = parseInt(rMin?.value || '0');
@@ -293,13 +320,15 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
       let visible = 0;
       grid?.querySelectorAll<HTMLElement>('.catalog-item').forEach(item => {
         const cat = item.dataset.category || '';
+        const flowers = (item.dataset.flower || '').split(',').filter(Boolean);
         const price = parseInt(item.dataset.price || '0');
         const isQuote = price === 0;
 
-        const catOk = selected.length === 0 || selected.includes(cat);
+        const catOk = selectedCats.length === 0 || selectedCats.includes(cat);
+        const flowerOk = selectedFlowers.length === 0 || flowers.some(f => selectedFlowers.includes(f));
         const priceOk = isQuote || (price >= lo && price <= hi);
 
-        const show = catOk && priceOk;
+        const show = catOk && flowerOk && priceOk;
         item.style.display = show ? '' : 'none';
         if (show) visible++;
       });
@@ -308,9 +337,17 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
       noResults?.classList.toggle('hidden', visible > 0);
     }
 
-    document.querySelectorAll('.category-filter').forEach(cb =>
+    document.querySelectorAll('.category-filter, .flower-filter').forEach(cb =>
       cb.addEventListener('change', applyFilters)
     );
+
+    // --- Preselección de filtro de flor vía query param (?flor=tulipanes) ---
+    const flowerParam = new URLSearchParams(window.location.search).get('flor');
+    if (flowerParam) {
+      document.querySelectorAll<HTMLInputElement>('.flower-filter').forEach(cb => {
+        if (cb.value.toLowerCase() === flowerParam.toLowerCase()) cb.checked = true;
+      });
+    }
 
     rMin?.addEventListener('input', () => {
       if (parseInt(rMin.value) > parseInt(rMax.value)) rMin.value = rMax.value;
@@ -372,6 +409,7 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
       });
     }
     setupSection('toggle-cat', 'cat-list', 'cat-chevron');
+    setupSection('toggle-flower', 'flower-list', 'flower-chevron');
     setupSection('toggle-price', 'price-list', 'price-chevron');
 
     // --- Carousel on hover ---
@@ -394,5 +432,6 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
     });
 
     updateFill();
+    applyFilters();
   });
 </script>

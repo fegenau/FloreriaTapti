@@ -27,6 +27,12 @@ const mainServices = [
     image: "/images/Flores/Experiencia Tapti/Experiencia Tapti.avif",
     url: "/catalogo",
   },
+  {
+    title: "Suscripciones Mensuales",
+    description: "Esto es más que un regalo, es una experiencia completa",
+    image: "/images/Flores/Experiencia Tapti/Experiencia Tapti.avif",
+    url: "/suscripciones",
+  },
 ];
 
 import catalogData from "../data/catalog.json";
@@ -38,26 +44,26 @@ const bestSellers = selectedIndices
 
 const specialOccasions = [
   {
-    title: "Bodas y Aniversarios",
+    title: "Rosas",
     image:
-      "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=300&fit=crop&crop=center",
-    url: "/catalogo?ocasion=bodas",
+      "/images/Flores/Rosas rojas/Rosas rojas.avif",
+    url: "/catalogo?flor=Rosas",
   },
   {
-    title: "Cumpleaños",
+    title: "Girasoles",
     image:
-      "https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?w=400&h=300&fit=crop&crop=center",
-    url: "/catalogo?ocasion=cumpleanos",
+      "/images/Flores/Girasoles clasico/Ramo girasoles clásico.webp",
+    url: "/catalogo?flor=Girasoles",
   },
   {
-    title: "Condolencias",
+    title: "Lilium",
     image: "/images/Flores/Condolencias.jpeg",
-    url: "/catalogo?ocasion=condolencias",
+    url: "/catalogo?flor=Lilium",
   },
   {
-    title: "San Valentín",
-    image: "/images/Flores/Rosas rojas/Rosas rojas.jpeg",
-    url: "/catalogo?ocasion=san-valentin",
+    title: "Tulipanes",
+    image: "/images/Flores/Tulipanes/Tulipanes.jpeg",
+    url: "/catalogo?flor=Tulipanes",
   },
 ];
 ---
@@ -106,36 +112,13 @@ const specialOccasions = [
       </div>
     </BoutiqueCard>
 
-    <!-- Ocasiones Especiales -->
-    <div class="px-4 md:px-6">
-      <div class="max-w-7xl mx-auto">
-        <h2
-          class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
-        >
-          Te acompañamos en momentos especiales
-        </h2>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {
-            specialOccasions.map((occasion) => (
-              <OccasionCard
-                title={occasion.title}
-                image={occasion.image}
-                url={occasion.url}
-                className="aspect-[4/3]"
-              />
-            ))
-          }
-        </div>
-      </div>
-    </div>
-
     <!-- Productos Destacados - Ancho completo -->
     <div class="px-4 md:px-6">
       <div class="max-w-7xl mx-auto">
         <h2
           class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
         >
-          Nuestros Favoritos
+          Nuestros Ramos Favoritos
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -181,6 +164,31 @@ const specialOccasions = [
         </div>
       </div>
     </div>
+
+    <!-- Ocasiones Especiales -->
+    <div class="px-4 md:px-6">
+      <div class="max-w-7xl mx-auto">
+        <h2
+          class="font-serif text-3xl md:text-4xl text-honey-bronze-400 mb-8 text-center"
+        >
+          Nuestras Flores Favoritas
+        </h2>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {
+            specialOccasions.map((occasion) => (
+              <OccasionCard
+                title={occasion.title}
+                image={occasion.image}
+                url={occasion.url}
+                className="aspect-[4/3]"
+              />
+            ))
+          }
+        </div>
+      </div>
+    </div>
+
+    
 
     <!-- Servicios Principales - Cards Verticales usando datos -->
     <div class="px-4 md:px-6">
@@ -246,7 +254,7 @@ const specialOccasions = [
             prioritario a nuestras nuevas colecciones
           </p>
           <a
-            href="/membresias"
+            href="/suscripciones"
             class="inline-flex items-center px-10 py-5 bg-gradient-to-r from-honey-bronze-500 to-honey-bronze-400 text-midnight-violet-950 font-semibold rounded-full hover:from-honey-bronze-400 hover:to-honey-bronze-300 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg relative z-10"
           >
             Conocer Membresías

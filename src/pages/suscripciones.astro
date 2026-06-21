@@ -1,0 +1,119 @@
+---
+import Layout from "../components/Layout.astro";
+import SubscriptionModal from "../components/SubscriptionModal.astro";
+---
+
+<Layout title="Suscripciones Mensuales | Tapti">
+  <div class="min-h-screen pt-24 pb-16 text-white">
+    <div class="max-w-4xl mx-auto px-6">
+      <h1 class="font-serif text-4xl lg:text-5xl text-honey-bronze-400 mb-4 text-center">
+        Planes de Suscripción
+      </h1>
+      <p class="text-center text-lg text-cherry-blossom-100 mb-12">(Valor Mensual)</p>
+
+      <div class="bg-midnight-violet-900/50 border border-white/10 rounded-lg shadow-lg overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left">
+            <thead class="bg-white/5">
+              <tr>
+                <th class="p-4 font-semibold text-sm uppercase tracking-wider">Plan</th>
+                <th class="p-4 font-semibold text-sm uppercase tracking-wider text-center">Una vez al mes <span class="block text-xs normal-case text-white/50">(1 ramo)</span></th>
+                <th class="p-4 font-semibold text-sm uppercase tracking-wider text-center">Quincenal <span class="block text-xs normal-case text-white/50">(2 ramos)</span></th>
+                <th class="p-4 font-semibold text-sm uppercase tracking-wider text-center">Todas las semanas <span class="block text-xs normal-case text-white/50">(4 ramos)</span></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/10">
+              <tr>
+                <td class="p-4 font-medium">Ramo S <span class="text-white/50 text-sm">(15-20 Varas)</span></td>
+                <td class="p-4 text-center">$25.000</td>
+                <td class="p-4 text-center">$46.000</td>
+                <td class="p-4 text-center">$84.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-medium">Ramo M <span class="text-white/50 text-sm">(20-25 Varas)</span></td>
+                <td class="p-4 text-center">$33.000</td>
+                <td class="p-4 text-center">$62.000</td>
+                <td class="p-4 text-center">$116.000</td>
+              </tr>
+              <tr>
+                <td class="p-4 font-medium">Ramo L <span class="text-white/50 text-sm">(25-30 Varas)</span></td>
+                <td class="p-4 text-center">$42.000</td>
+                <td class="p-4 text-center">$78.000</td>
+                <td class="p-4 text-center">$148.000</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="mt-10 text-center text-white/70 space-y-2 text-sm">
+        <p>**Servicio disponible para las comunas de Las Condes, Vitacura, La Reina, Providencia y Ñuñoa.</p>
+      </div>
+
+      <div class="mt-16 grid md:grid-cols-2 gap-8 text-center">
+        <div class="bg-white/5 p-6 rounded-lg border border-white/10">
+          <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">¿En qué consiste mi suscripción?</h3>
+          <p class="text-white/70">Recibirás un ramo sorpresa con flores frescas según el plan que hayas elegido, los cuales serán distintos para cada semana del mes en curso.</p>
+        </div>
+        <div class="bg-white/5 p-6 rounded-lg border border-white/10">
+          <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">¿Cómo activo mi suscripción?</h3>
+          <p class="text-white/70">Debes elegir tu plan, el pago se realiza una vez al mes y al menos 2 días antes de la primera entrega. Los días de entrega serán fijos (miércoles o jueves de cada semana según tu comuna).</p>
+        </div>
+        <div class="bg-white/5 p-6 rounded-lg border border-white/10">
+          <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">Regalo con tu suscripción</h3>
+          <p class="text-white/70">Recibirás tu florero de bienvenida gratis en la primera entrega, luego recibirás únicamente los ramos listos para colocar en tu jarrón.</p>
+        </div>
+        <div class="bg-white/5 p-6 rounded-lg border border-white/10">
+          <h3 class="font-serif text-xl text-honey-bronze-400 mb-3">¿Cuándo puedo cancelar o modificar?</h3>
+          <p class="text-white/70">Puedes cancelar o modificar con 2 semanas de anticipación sin ningún costo adicional.</p>
+        </div>
+      </div>
+
+      <div class="text-center mt-12">
+        <button id="open-modal-btn" class="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm">
+          Suscribirse Ahora
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <SubscriptionModal />
+
+  <script>
+    const openBtn = document.getElementById('open-modal-btn');
+    const closeBtn = document.getElementById('close-modal-btn');
+    const modal = document.getElementById('subscription-modal');
+    const modalContent = document.getElementById('subscription-modal-content');
+
+    function openModal() {
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      setTimeout(() => {
+        modalContent.classList.remove('opacity-0', '-translate-y-4');
+      }, 10);
+    }
+
+    function closeModal() {
+      modalContent.classList.add('opacity-0', '-translate-y-4');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }, 300);
+    }
+
+    openBtn.addEventListener('click', openModal);
+    closeBtn.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+  </script>
+</Layout>

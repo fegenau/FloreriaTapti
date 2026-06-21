@@ -20,10 +20,10 @@ function getStartingPrice(p: any): number | null {
 }
 
 const startingPrice = getStartingPrice(product);
-const validSizes: [string, { total: number }][] = product.isQuote
+const validSizes: [string, { total: number; stems?: string | number }][] = product.isQuote
   ? []
   : (Object.entries(product.sizes as Record<string, any>).filter(
-      (e): e is [string, { total: number }] => e[1] !== null
+      (e): e is [string, { total: number; stems?: string | number }] => e[1] !== null
     ));
 
 // Productos relacionados de la misma categoría
@@ -95,14 +95,38 @@ const related = products
           )}
 
           <!-- Description -->
-          <p class="text-sm text-white/60 leading-relaxed mb-8">{product.Description}</p>
+          <div class="text-sm text-white/60 leading-relaxed mb-8 space-y-4">
+            <p>{product.Description}</p>
+            
+            <!-- Tamaños y Varas -->
+            {!product.isQuote && validSizes.length > 0 && (
+              <div class="pt-2">
+                {validSizes.map(([size, details]) => (
+                  <p>
+                    <span class="text-white/80 capitalize">{size}</span>: {details.stems}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            <!-- Info Estática -->
+            <div class="pt-2 space-y-2">
+              <p>
+                <span class="text-white/80">Envoltorio:</span> Papel y cinta
+              </p>
+              <p class="text-xs text-white/50">
+                El diseño es referencial, puede cambiar según las flores de estación disponibles.
+                Sin embargo, el ramo mantendrá la misma categoría, color y esencia.
+              </p>
+            </div>
+          </div>
 
           <!-- Size selector -->
           {!product.isQuote && validSizes.length > 1 && (
             <div class="mb-8">
               <p class="text-xs text-white/45 uppercase tracking-widest mb-3">Tamaño</p>
               <div class="flex flex-wrap gap-2" id="size-selector">
-                {validSizes.map(([size, details]: [string, { total: number }], i: number) => (
+                {validSizes.map(([size, details]: [string, { total: number, stems?: string | number }], i: number) => (
                   <button
                     type="button"
                     class={`size-btn px-4 py-2 rounded-md border text-sm transition-all ${
@@ -113,7 +137,7 @@ const related = products
                     data-size={size}
                     data-price={details.total}
                   >
-                    {size} &mdash; ${details.total.toLocaleString('es-CL')}
+                    {size}
                   </button>
                 ))}
               </div>
@@ -240,6 +264,7 @@ const related = products
     // --- Size selector ---
     const sizeBtns = document.querySelectorAll<HTMLButtonElement>('.size-btn');
     const priceDisplay = document.getElementById('price-display');
+    const stemsInfo = document.getElementById('stems-info');
 
     // Init from first button
     if (sizeBtns.length > 0) {
@@ -258,9 +283,17 @@ const related = products
 
         selectedSize = btn.dataset.size || '';
         selectedPrice = parseInt(btn.dataset.price || '0');
+        const selectedStems = btn.dataset.stems || 'N/A';
 
         if (priceDisplay) {
           priceDisplay.textContent = `$${selectedPrice.toLocaleString('es-CL')}`;
+        }
+
+        if (stemsInfo) {
+          const stemsText = stemsInfo.querySelector('p:last-child');
+          if (stemsText) {
+            stemsText.textContent = `${selectedStems} varas`;
+          }
         }
       });
     });

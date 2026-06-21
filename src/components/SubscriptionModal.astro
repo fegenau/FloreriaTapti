@@ -1,0 +1,322 @@
+<div id="subscription-modal" class="fixed inset-0 bg-black/80 z-50 hidden items-center justify-center" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div id="subscription-modal-content" class="bg-midnight-violet-900 border border-white/10 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 lg:p-8 transform transition-all opacity-0 -translate-y-4">
+
+    <div class="flex justify-between items-start mb-6">
+      <div>
+        <h2 id="modal-title" class="font-serif text-2xl lg:text-3xl text-honey-bronze-400">Formulario de Suscripción</h2>
+        <p class="text-sm text-white/60 mt-1">Completa tus datos para crear tu suscripción de flores.</p>
+      </div>
+      <button id="close-modal-btn" type="button" class="text-white/50 hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
+    <div id="subscription-view-form">
+      <form id="subscription-form" class="space-y-5" novalidate>
+
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label for="sub-plan" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Plan</label>
+            <select id="sub-plan" name="plan" class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+              <option value="s">Ramo S (15-20 Varas)</option>
+              <option value="m">Ramo M (20-25 Varas)</option>
+              <option value="l">Ramo L (25-30 Varas)</option>
+            </select>
+          </div>
+          <div>
+            <label for="sub-frequency" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Frecuencia</label>
+            <select id="sub-frequency" name="frequency" class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+              <option value="monthly">Una vez al mes</option>
+              <option value="biweekly">Quincenal (2 ramos)</option>
+              <option value="weekly">Todas las semanas (4 ramos)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="subscription-total-box" class="flex items-center justify-between bg-white/5 border border-white/15 rounded-md px-4 py-3">
+          <span class="text-xs text-white/45 uppercase tracking-widest">Total mensual estimado</span>
+          <span id="subscription-total" class="text-xl font-serif text-honey-bronze-400">$25.000</span>
+        </div>
+
+        <hr class="border-white/10 my-6"/>
+
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label for="sub-name" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Nombre Completo</label>
+            <input type="text" id="sub-name" name="name" required class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+          </div>
+          <div>
+            <label for="sub-rut" class="block text-xs text-white/45 uppercase tracking-widest mb-2">RUT</label>
+            <input type="text" id="sub-rut" name="rut" required placeholder="11.111.111-1" class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+            <p id="sub-rut-error" class="hidden text-xs text-red-400 mt-1">RUT inválido. Verifica el formato (ej: 11.111.111-1).</p>
+          </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-5">
+          <div>
+            <label for="sub-email" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Email</label>
+            <input type="email" id="sub-email" name="email" required class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+          </div>
+          <div>
+            <label for="sub-phone" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Teléfono</label>
+            <input type="tel" id="sub-phone" name="phone" required class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+          </div>
+        </div>
+
+        <div>
+          <label for="sub-address" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Dirección de Envío</label>
+          <input type="text" id="sub-address" name="address" required class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+        </div>
+
+        <div>
+          <label for="sub-commune" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Comuna</label>
+          <select id="sub-commune" name="commune" required class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+            <option value="Las Condes">Las Condes</option>
+            <option value="Vitacura">Vitacura</option>
+            <option value="La Reina">La Reina</option>
+            <option value="Providencia">Providencia</option>
+            <option value="Ñuñoa">Ñuñoa</option>
+          </select>
+        </div>
+
+        <div class="pt-4">
+          <button type="submit" class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm">
+            Continuar al Pago
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div id="subscription-view-review" class="hidden">
+      <h3 class="font-serif text-xl text-honey-bronze-400 mb-4">Resumen de tu suscripción</h3>
+      <dl class="divide-y divide-white/10 text-sm">
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Plan</dt>
+          <dd id="review-plan" class="text-white font-medium text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Frecuencia</dt>
+          <dd id="review-frequency" class="text-white font-medium text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Total mensual</dt>
+          <dd id="review-total" class="text-honey-bronze-400 font-serif text-lg text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Nombre</dt>
+          <dd id="review-name" class="text-white font-medium text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">RUT</dt>
+          <dd id="review-rut" class="text-white font-medium text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Email</dt>
+          <dd id="review-email" class="text-white font-medium text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Teléfono</dt>
+          <dd id="review-phone" class="text-white font-medium text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Dirección</dt>
+          <dd id="review-address" class="text-white font-medium text-right"></dd>
+        </div>
+        <div class="flex justify-between py-3">
+          <dt class="text-white/50">Comuna</dt>
+          <dd id="review-commune" class="text-white font-medium text-right"></dd>
+        </div>
+      </dl>
+      <div class="pt-6 flex gap-3">
+        <button id="review-back-btn" type="button" class="flex-1 py-3.5 bg-white/10 hover:bg-white/15 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm">
+          Volver
+        </button>
+        <button id="review-confirm-btn" type="button" class="flex-1 py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm">
+          Confirmar Suscripción
+        </button>
+      </div>
+    </div>
+
+    <div id="subscription-view-success" class="hidden text-center py-8">
+      <div class="mx-auto mb-4 w-14 h-14 rounded-full bg-brand-500/20 flex items-center justify-center">
+        <svg class="w-8 h-8 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+      </div>
+      <h3 class="font-serif text-xl text-honey-bronze-400 mb-2">¡Listo!</h3>
+      <p class="text-white/70 mb-6 max-w-sm mx-auto">Hemos recibido tu solicitud de suscripción. Pronto nos pondremos en contacto contigo para coordinar el pago y la primera entrega.</p>
+      <button id="success-close-btn" type="button" class="px-8 py-3 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm">
+        Cerrar
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // @ts-nocheck
+  import { validateRut } from '../lib/rutValidator';
+
+  const PLAN_PRICES = {
+    s: { monthly: 25000, biweekly: 46000, weekly: 84000 },
+    m: { monthly: 33000, biweekly: 62000, weekly: 116000 },
+    l: { monthly: 42000, biweekly: 78000, weekly: 148000 },
+  };
+
+  const PLAN_LABELS = {
+    s: 'Ramo S (15-20 Varas)',
+    m: 'Ramo M (20-25 Varas)',
+    l: 'Ramo L (25-30 Varas)',
+  };
+
+  const FREQUENCY_LABELS = {
+    monthly: 'Una vez al mes',
+    biweekly: 'Quincenal (2 ramos)',
+    weekly: 'Todas las semanas (4 ramos)',
+  };
+
+  const modal = document.getElementById('subscription-modal');
+  const form = document.getElementById('subscription-form') as HTMLFormElement;
+  const planSelect = document.getElementById('sub-plan') as HTMLSelectElement;
+  const frequencySelect = document.getElementById('sub-frequency') as HTMLSelectElement;
+  const totalDisplay = document.getElementById('subscription-total');
+  const rutInput = document.getElementById('sub-rut') as HTMLInputElement;
+  const rutError = document.getElementById('sub-rut-error');
+
+  const viewForm = document.getElementById('subscription-view-form');
+  const viewReview = document.getElementById('subscription-view-review');
+  const viewSuccess = document.getElementById('subscription-view-success');
+
+  function getTotal() {
+    return PLAN_PRICES[planSelect.value][frequencySelect.value];
+  }
+
+  function updateTotal() {
+    if (totalDisplay) {
+      totalDisplay.textContent = `$${getTotal().toLocaleString('es-CL')}`;
+    }
+  }
+
+  planSelect?.addEventListener('change', updateTotal);
+  frequencySelect?.addEventListener('change', updateTotal);
+  updateTotal();
+
+  function showView(view: HTMLElement | null) {
+    [viewForm, viewReview, viewSuccess].forEach((v) => v?.classList.add('hidden'));
+    view?.classList.remove('hidden');
+  }
+
+  function resetModal() {
+    showView(viewForm);
+    rutError?.classList.add('hidden');
+    rutInput?.classList.remove('border-red-500');
+  }
+
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    rutError?.classList.add('hidden');
+    rutInput?.classList.remove('border-red-500');
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    if (!validateRut(rutInput.value.trim())) {
+      rutError?.classList.remove('hidden');
+      rutInput?.classList.add('border-red-500');
+      rutInput?.focus();
+      return;
+    }
+
+    const data = new FormData(form);
+
+    const reviewFields: Record<string, string> = {
+      'review-plan': PLAN_LABELS[data.get('plan') as string],
+      'review-frequency': FREQUENCY_LABELS[data.get('frequency') as string],
+      'review-total': `$${getTotal().toLocaleString('es-CL')}`,
+      'review-name': data.get('name') as string,
+      'review-rut': data.get('rut') as string,
+      'review-email': data.get('email') as string,
+      'review-phone': data.get('phone') as string,
+      'review-address': data.get('address') as string,
+      'review-commune': data.get('commune') as string,
+    };
+
+    for (const [id, value] of Object.entries(reviewFields)) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = value;
+    }
+
+    showView(viewReview);
+  });
+
+  document.getElementById('review-back-btn')?.addEventListener('click', () => {
+    showView(viewForm);
+  });
+
+  const confirmBtn = document.getElementById('review-confirm-btn') as HTMLButtonElement;
+
+  confirmBtn?.addEventListener('click', async () => {
+    const data = new FormData(form);
+    const payload = {
+      plan: data.get('plan'),
+      frequency: data.get('frequency'),
+      name: data.get('name'),
+      rut: data.get('rut'),
+      email: data.get('email'),
+      phone: data.get('phone'),
+      address: data.get('address'),
+      commune: data.get('commune'),
+    };
+
+    const originalLabel = confirmBtn.textContent;
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Procesando...';
+
+    try {
+      const response = await fetch('/api/subscriptions/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.url && result.token) {
+        const redirectForm = document.createElement('form');
+        redirectForm.action = result.url;
+        redirectForm.method = 'POST';
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = 'token_ws';
+        input.value = result.token;
+        redirectForm.appendChild(input);
+        document.body.appendChild(redirectForm);
+        redirectForm.submit();
+      } else {
+        alert(result.error || 'Error al crear la suscripción. Intenta nuevamente.');
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = originalLabel;
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Ocurrió un error inesperado');
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = originalLabel;
+    }
+  });
+
+  document.getElementById('success-close-btn')?.addEventListener('click', () => {
+    document.getElementById('close-modal-btn')?.click();
+  });
+
+  document.getElementById('close-modal-btn')?.addEventListener('click', resetModal);
+
+  modal?.addEventListener('click', (e) => {
+    if (e.target === modal) resetModal();
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !modal?.classList.contains('hidden')) resetModal();
+  });
+</script>

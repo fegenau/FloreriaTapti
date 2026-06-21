@@ -5,18 +5,22 @@
       "image": [
         "images/Flores/Astromelias Surtidas/Astromelias Surtidas1.webp"
       ],
-      "Description": "Ramo de Astromelias de diferentes colores según disponibilidad por la temporada, acompañado de gypsophila. Para toda ocasión. ",
+      "Description": "Ramo de Astromelias de diferentes colores según disponibilidad por la temporada, acompañado de gypsophila. Para toda ocasión.",
       "name": "Astromelias surtidas",
+      "flowerType": [],
       "unit_price": 200,
       "sizes": {
-        "S": {
-          "total": 36000
+        "Mediano": {
+          "total": 32000,
+          "stems": "40 varas"
         },
-        "M": {
-          "total": 52500
+        "Grande": {
+          "total": 50000,
+          "stems": "60 varas"
         },
-        "L": {
-          "total": 71500
+        "Extra Grande": {
+          "total": 65000,
+          "stems": "80 varas"
         }
       },
       "category": "Colección General"
@@ -25,16 +29,16 @@
       "image": ["images/Flores/Astromelia Lilium/Astromelia Lilium.png"],
       "Description": "Ramo de Astromelia de colores y Lilium color blanco. Es un ramo clásico, para toda ocasión.",
       "name": "Astromelias  lilium",
+      "flowerType": ["Lilium"],
       "unit_price": 1000,
       "sizes": {
-        "S": {
-          "total": 25000
+        "Mediano": {
+          "total": 38000,
+          "stems": "40 varas"
         },
-        "M": {
-          "total": 37500
-        },
-        "L": {
-          "total": 45000
+        "Grande": {
+          "total": 55000,
+          "stems": "60 varas"
         }
       },
       "category": "Colección General"
@@ -46,18 +50,21 @@
       ],
       "Description": "Es un ramo muy diferente, si quieres realmente sorprender a alguien que siempre reciba flores, este es el ramo que buscas!. Ramo de Hortencias en tonos celestes o azules, cardo azul, lisianthus claro y claveles blancos.",
       "name": "Hortensias lisianthus celestes",
+      "flowerType": [],
       "unit_price": 800,
       "sizes": {
-        "S": {
-          "total": 25000
+        "Pequeño": {
+          "total": 26000,
+          "stems": "12 varas"
         },
-        "M": {
-          "total": 41750
+        "Mediano": {
+          "total": 40000,
+          "stems": "20 varas"
         },
-        "L": {
-          "total": 62000
-        },
-        "XL": null
+        "Grande": {
+          "total": 52000,
+          "stems": "28 varas"
+        }
       },
       "category": "Colección General"
     },
@@ -68,16 +75,20 @@
       ],
       "Description": "Es un ramo muy alegre y romantico, si quieres sorprender con un ramo diferente, elige este. Ramo de Hortencias en tonos claros y rosados, perritos, mini rosas y claveles verdes.",
       "name": "Hortensias minirosas",
+      "flowerType": ["Rosas"],
       "unit_price": 800,
       "sizes": {
-        "S": {
-          "total": 25500
+        "Pequeño": {
+          "total": 26000,
+          "stems": "12 varas" 
         },
-        "M": {
-          "total": 45500
+        "Mediano": {
+          "total": 40000,
+          "stems": "20 varas" 
         },
-        "L": {
-          "total": 65500
+        "Grande": {
+          "total": 52000,
+          "stems": "28 varas"
         }
       },
       "category": "Colección General"
@@ -88,15 +99,22 @@
         "images/Flores/Coloridos gerberas/RamoColorido2.avif",
         "images/Flores/Coloridos gerberas/RamoColorido3.avif"
       ],
-      "Description": "Ramo de colores vibrantes, compuesto de girasoles, mini rosas, mables, cremones, claveles y otros",
+      "Description": "Ramo de colores vibrantes, compuesto de girasoles, mini rosas, mables, cremones, claveles y otros .",
       "name": "Ramo Coloridos",
+      "flowerType": ["Girasoles", "Rosas"],
       "unit_price": 800,
       "sizes": {
-        "S": {
-          "total": 27000
+        "Pequeño": {
+          "total": 26000,
+          "stems": "15 varas"
         },
-        "M": {
-          "total": 37000
+        "Mediano": {
+          "total": 38000,
+          "stems": "25 varas"
+        },
+        "Grande": {
+          "total": 49000,
+          "stems": "35 varas"
         }
       },
       "category": "Dia de la Madre"
@@ -108,16 +126,20 @@
       ],
       "Description": "Este es el ramo favorito de muchas, debido a sus colores vibrantes y diferente. Ramo con mini rosas, claveles verdes y rosas, hypericum, cremón blanco craspedia y follaje.",
       "name": "Colorido calido",
+      "flowerType": ["Rosas"],
       "unit_price": 1000,
       "sizes": {
-        "S": {
-          "total": 30750
+        "Pequeño": {
+          "total": 25000,
+          "stems": "15 varas"
         },
-        "M": {
-          "total": 42750
+        "Mediano": {
+          "total": 38000,
+          "stems": "25 varas"
         },
-        "L": {
-          "total": 61750
+        "Grande": {
+          "total": 49000,
+          "stems": "35 varas"
         }
       },
       "category": "Colección General"
@@ -126,16 +148,20 @@
       "image": ["images/Flores/Pastel nude/Pastel nude.png"],
       "Description": "Este es un ramo para destacar por sobre lo tradicional, definitivamente si quieres impresionar con un ramo único, esta es tu mejor opción. Ramo tiene Cremones, hypericum, mini rosas, limonium, alelí o perritos, cardo azul (arañitas) y follaje.",
       "name": "Pastel nude",
+      "flowerType": ["Rosas"],
       "unit_price": 1000,
       "sizes": {
-        "S": {
-          "total": 33750
+        "Pequeño": {
+          "total": 25000,
+          "stems": "15 varas"
         },
-        "M": {
-          "total": 48000
+        "Mediano": {
+          "total": 38000,
+          "stems": "25 varas"
         },
-        "L": {
-          "total": 75250
+        "Grande": {
+          "total": 49000,
+          "stems": "35 varas" 
         }
       },
       "category": "Colección General"
@@ -144,16 +170,20 @@
       "image": ["images/Flores/Gerberas pastel/Gerberas pastel.png"],
       "Description": "Este es un ramo muy romántico, las gerberas pueden ser amarillas o rosadas. Ramo contiene mini rosas, gerberas, hypericum, daisy, claveles, gypsophilia y follaje.",
       "name": "Gerberas pastel",
+      "flowerType": ["Rosas"],
       "unit_price": 3000,
       "sizes": {
-        "S": {
-          "total": 30750
+        "Pequeño": {
+          "total": 25000,
+          "stems": "15 varas"
         },
-        "M": {
-          "total": 47500
+        "Mediano": {
+          "total": 38000,
+          "stems": "25 varas" 
         },
-        "L": {
-          "total": 67250
+        "Grande": {
+          "total": 50000,
+          "stems": "35 varas"
         }
       },
       "category": "Colección General"
@@ -166,13 +196,20 @@
       ],
       "Description": "Este es uno de los ramos favoritos de todos para todos. Ramo de girasoles, mini rosas en color damasco, gypsophilia y follaje.",
       "name": "Girasoles clasico",
+      "flowerType": ["Girasoles"],
       "unit_price": 1000,
       "sizes": {
-        "S": {
-          "total": 26000
+        "Pequeño": {
+          "total": 25000,
+          "stems": "4 girasoles - 15 varas"
         },
-        "M": {
-          "total": 36000
+        "Mediano": {
+          "total": 35000,
+          "stems": "6 girasoles - 20 varas"
+        },
+        "Grande": {
+          "total": 45000,
+          "stems": "8 girasoles - 25 varas"
         }
       },
       "category": "Dia de la Madre"
@@ -184,16 +221,20 @@
       ],
       "Description": "Este es un ramo romántico y alegre. Ramo de girasoles, mini rosas en tonos rosados, claveles, hypericum y follaje.",
       "name": "Girasoles rosado",
+      "flowerType": ["Girasoles"],
       "unit_price": 800,
       "sizes": {
-        "S": {
-          "total": 24250
+        "Pequeño": {
+          "total": 27000,
+          "stems": "4 girasoles - 15 varas"
         },
-        "M": {
-          "total": 34000
+        "Mediano": {
+          "total": 39000,
+          "stems": "6 girasoles - 25 varas"
         },
-        "L": {
-          "total": 49500
+        "Grande": {
+          "total": 49000,
+          "stems": "8 girasoles - 30 varas"
         }
       },
       "category": "Colección General"
@@ -206,31 +247,42 @@
       ],
       "Description": "Este es un ramo clásico pero muy elegante. Ramo de tulipanes y gypsophilia.",
       "name": "Tulipan",
+      "flowerType": ["Tulipanes"],
       "unit_price": 1400,
       "sizes": {
-        "Unico ": {
-          "total": 34000
+        "Mediano": {
+          "total": 35000,
+          "stems": "10 tulipanes"
+        },
+        "Grande": {
+          "total": 55000,
+          "stems": "20 tulipanes"
         }
       },
       "category": "Dia de la Madre"
     },
     {
-      "image": ["images/Flores/Rosas rojas/Rosas rojas.jpeg"],
+      "image": ["images/Flores/Rosas rojas/Rosas rojas.avif"],
       "Description": "Este es un ramo clásico pero muy elegante. Ramo de rosas rojas, eucalipto y gypsophilia.",
       "name": "Rosas rojas",
+      "flowerType": ["Rosas"],
       "unit_price": 800,
       "sizes": {
-        "S": {
-          "total": 21250
+        "Pequeño": {
+          "total": 25000,
+          "stems": "6 rosas"
         },
-        "M": {
-          "total": 45000
+        "Mediano": {
+          "total": 38000,
+          "stems": "12 rosas"
         },
-        "L": {
-          "total": 82500
+        "Grande": {
+          "total": 58000,
+          "stems": "24 rosas"
         },
-        "XL": {
-          "total": 150000
+        "Extra Grande": {
+          "total": 98000,
+          "stems": "50 rosas"
         }
       },
       "category": "Colección General"
@@ -242,19 +294,24 @@
       ],
       "Description": "Este es un ramo romántico pero muy elegante. Ramo de rosas rosadas, mini rosas, hypericum y eucalipto.",
       "name": "Rosas rosadas",
+      "flowerType": ["Rosas"],
       "unit_price": 800,
       "sizes": {
-        "S": {
-          "total": 24250
+        "Pequeño": {
+          "total": 28000,
+          "stems": "6 rosas"
         },
-        "M": {
-          "total": 51500
+        "Mediano": {
+          "total": 42000,
+          "stems": "12 rosas"
         },
-        "L": {
-          "total": 92000
+        "Grande": {
+          "total": 65000,
+          "stems": "24 rosas"
         },
-        "XL": {
-          "total": 162500
+        "Extra Grande": {
+          "total": 110000,
+          "stems": "50 rosas"
         }
       },
       "category": "Colección General"
@@ -263,6 +320,7 @@
       "image": ["images/Flores/Canastos/canasto niño.png"],
       "Description": "Un canasto de Bienvenida al mundo en tonos celestes. Canasto de hortensias, claveles, cremones, lisianthus, cardo azul (arañitas), craspedia y follaje. Este canasto puede ir con un peluche de recién nacido, gorro y/o calcetines.",
       "name": "Canasto nacimientos niño",
+      "flowerType": [],
       "unit_price": 800,
       "sizes": {
         "Unico": {
@@ -275,6 +333,7 @@
       "image": ["images/Flores/Canastos/canasto niñas.png"],
       "Description": "Un canasto de Bienvenida al mundo en tonos rosados. Canasto de hortensias, claveles, astromelia, mable, hypericum y follaje. Este canasto puede ir con un peluche de recién nacida, gorro y/o calcetines.",
       "name": "Canasto nacimientos niña",
+      "flowerType": [],
       "unit_price": 800,
       "sizes": {
         "Unico": {
@@ -287,6 +346,7 @@
       "image": ["images/Flores/Ramo novia/Ramo Novia rosa-damasco.jpg"],
       "Description": "Los ramos de novia son únicos y exclusivos para cada novia (o novio). Primero nos reunimos con la persona interesada para entender colores, flores, texturas, tamaño, diseño y otros, así definimos el ramo que quiere, buscamos que la novia o novio tengan su ramo soñado, que los haga lucir hermosos con las flores más frescas y hermosas de la temporada. Luego se realiza la cotización, se define fecha y horario de entrega.",
       "name": "Ramo de novia rosas rosadas",
+      "flowerType": ["Rosas"],
       "price_range": "Rango $45.000 - $90.000",
       "isQuote": true,
       "sizes": {},
@@ -296,6 +356,7 @@
       "image": ["images/Flores/Ramo novia/Ramo novia rosas-Peonías 2.jpg"],
       "Description": "Los ramos de novia son únicos y exclusivos para cada novia (o novio). Primero nos reunimos con la persona interesada para entender colores, flores, texturas, tamaño, diseño y otros, así definimos el ramo que quiere, buscamos que la novia o novio tengan su ramo soñado, que los haga lucir hermosos con las flores más frescas y hermosas de la temporada. Luego se realiza la cotización, se define fecha y horario de entrega.",
       "name": "Ramo de novia peonías",
+      "flowerType": [],
       "price_range": "Rango $45.000 - $90.000",
       "isQuote": true,
       "sizes": {},
@@ -308,6 +369,7 @@
       ],
       "Description": "Birrete con flores.",
       "name": "Colorido",
+      "flowerType": [],
       "unit_price": 800,
       "sizes": {
         "Unico": {
@@ -324,6 +386,7 @@
       ],
       "Description": "Birrete con flores.",
       "name": "Caja Birrete",
+      "flowerType": [],
       "unit_price": 800,
       "sizes": {
         "Unico": {
@@ -336,6 +399,7 @@
       "image": ["images/Flores/Graduaciones/girasoles y clavel.avif"],
       "Description": "Birrete con flores.",
       "name": "Girasoles y claveles",
+      "flowerType": ["Girasoles"],
       "unit_price": 800,
       "sizes": {
         "Unico": {
@@ -353,6 +417,7 @@
       ],
       "Description": "Birrete con flores.",
       "name": "Graduacion Feliz",
+      "flowerType": [],
       "unit_price": 800,
       "sizes": {
         "Unico": {
@@ -368,6 +433,7 @@
       ],
       "Description": "Birrete con flores.",
       "name": "Graduacion Pink",
+      "flowerType": [],
       "unit_price": 800,
       "sizes": {
         "Unico": {
@@ -384,6 +450,7 @@
       ],
       "Description": "Esto es más que un regalo es la experiencia completa, tu elijes la hora el lugar y lo que quieras beber, del resto nos preocupamos nosotros. Esto incluye: Ramo de flores Premium, Caja de bombones variados de producción nacional, una manta tejida, un canasto de picnic, dos copas, el bebestible que escojas, una Candle Tapti e incluye una sorpresa decorativa para hacer más especial el momento. Te ayudamos a crear la experiencia más especial e inmersiva al puro estilo Bridgerton, lleno de romanticismo con detalles exclusivos para ti y tu acompañante.",
       "name": "Experiencia Tapti",
+      "flowerType": [],
       "unit_price": 180000,
       "sizes": {
         "Único": {
@@ -402,6 +469,7 @@
       ],
       "Description": "Cuadro de doble vidrio decorado con flores prensadas y 2 fotos instantáneas. (Foto referencial con medida 18x23)",
       "name": "Memoria Viva",
+      "flowerType": [],
       "unit_price": 30000,
       "sizes": {
         "Pequeño(18x23)": {
@@ -420,6 +488,7 @@
       ],
       "Description": "Balde metálico de jardín repleto de Mables y follaje",
       "name": "Jardín Secreto",
+      "flowerType": [],
       "unit_price": 30000,
       "sizes": {
         "Unico": {
@@ -434,14 +503,21 @@
         "images/Flores/Pastel nude/DuoPastel2.avif",
         "images/Flores/Pastel nude/DuoPastel3.avif"
       ],
-      "Description": "Ramo que mezcla tonos damascos con lila, es elegante, suave y delicado",
+      "Description": "Ramo que mezcla tonos damascos con lila, es elegante, suave y delicado. Varas por tamaño: S 15 varas, M 25 varas, L 35 varas.",
       "name": "Duo Pastel",
+      "flowerType": [],
       "sizes": {
-        "S": {
-          "total": 27000
+        "Pequeño": {
+          "total": 25000,
+          "stems": 15
         },
-        "M":{
-          "total": 37000
+        "Mediano":{
+          "total": 37000,
+          "stems": 25
+        },
+        "Grande":{
+          "total": 49000,
+          "stems": 35
         }
       },
       "category": "Dia de la Madre"
@@ -451,14 +527,21 @@
         "images/Flores/Flores toscana/FloresToscana.avif",
         "images/Flores/Flores toscana/FloresToscana2.avif"
       ],
-      "Description": "Ramo floral de Lilium, mini rosas, astromelias y diferentes follajes.",
+      "Description": "Ramo floral de Lilium, mini rosas, astromelias y diferentes follajes. Varas por tamaño: S 15 varas, M 25 varas, L 35 varas.",
       "name": "Flores de la Toscana",
+      "flowerType": ["Lilium", "Rosas"],
       "sizes": {
-        "S": {
-          "total": 27000
+        "Pequeño": {
+          "total": 25000,
+          "stems": 15
         },
-        "M":{
-          "total": 37000
+        "Mediano":{
+          "total": 37000,
+          "stems": 20
+        },
+        "Grande":{
+          "total": 49000,
+          "stems": 30
         }
       },
       "category": "Dia de la Madre"
@@ -470,11 +553,13 @@
         "images/Flores/Bouquet Alquimia/BouquetAlquimia2.avif"
         
       ],
-      "Description": "Ramo con flores variadas de alta categoría tales como dahlias, tulipanes, lisianthus, escabiosas, mini rosas, claveles y otros, es una mezcla mágica creada con intención. (Incluye jarrón)",
+      "Description": "Ramo con flores variadas de alta categoría tales como dahlias, tulipanes, lisianthus, escabiosas, mini rosas, claveles y otros, es una mezcla mágica creada con intención. (Incluye jarrón). Varas por tamaño: Único 1 (tamaño especial: 90 varas aprox).",
       "name": "Bouquet Alquimia",
+      "flowerType": ["Tulipanes", "Rosas"],
       "sizes": {
         "Unico": {
-          "total": 90000
+          "total": 90000,
+          "stems": "90 varas aprox"
         }
       },
       "category": "Dia de la Madre"
@@ -488,15 +573,19 @@
       ],
       "Description": "Arreglo de flores que oculta una botella a elección (Vino, Espumante, Late harvest o Gin), pide el catálogo y sorprende con algo original.",
       "name": "Elixir Floral",
+      "flowerType": [],
       "sizes": {
         "Flores + Late Harvest (Misiones de Rengo)": {
-          "total": 34000
+          "total": 34000,
+          "stems": "Arreglo especial"
         },
         "Flores + GIN MOM":{
-          "total": 40000
+          "total": 40000,
+          "stems": "Arreglo especial"
         },
         "Flores + Brut Rose (Viñamar)": {
-          "total": 40000
+          "total": 40000,
+          "stems": "Arreglo especial"
         }         
     },
     "category": "Dia de la Madre"
@@ -510,10 +599,12 @@
       ],
       "Description": "Te invitamos a sumergirte en una experiencia mágica y creativa, donde podrás crear junto a tu hijo o a alguien especial un encantador “Oso floral” de Tapti. Nuestro kit incluye todo lo necesario: 40 varitas repletas de flores vibrantes, un oso hidratado listo para transformarse y adorables detalles de ojos + nariz de peluche que le darán vida a tu creación.",
       "name": "Experiencia Oso Tapti",
+      "flowerType": [],
        "unit_price": 50000,
       "sizes": {
         "Regala Recuerdos": {
-          "total": 50000
+          "total": 50000,
+          "stems": "40 varitas"
         }         
     },
     "category": "Dia de la Madre"
