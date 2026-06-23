@@ -306,12 +306,12 @@
         "images/Flores/Graduaciones/colorido S.avif",
         "images/Flores/Graduaciones/colorido.avif"
       ],
-      "Description": "Birrete con flores.",
-      "name": "Colorido",
+      "Description": "Ramo de mini rosas, maules, claveles y mas.",
+      "name": "Colores del exito",
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "total": 15000
+          "total": 20000
         }
       },
       "category": "Graduaciones"
@@ -322,12 +322,12 @@
         "images/Flores/Graduaciones/Caja Birrete 2.avif",
         "images/Flores/Graduaciones/Caja Birrete 3.avif"
       ],
-      "Description": "Birrete con flores.",
-      "name": "Caja Birrete",
+      "Description": "Caja con flores en tonos rosados y blancos.",
+      "name": "Flores de Logros",
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "total": 15000
+          "total": 35000
         }
       },
       "category": "Graduaciones"
@@ -351,12 +351,12 @@
         "images/Flores/Graduaciones/IMG_0167.avif",
         "images/Flores/Graduaciones/IMG_0168.avif"
       ],
-      "Description": "Birrete con flores.",
+      "Description": "Birrete con flores en tonalidade rosadas y verdes o amarillas y verdes.",
       "name": "Graduacion Feliz",
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "total": 15000
+          "total": 17000
         }
       },
       "category": "Graduaciones"
@@ -367,11 +367,11 @@
         "images/Flores/Graduaciones/pink 2.avif"
       ],
       "Description": "Birrete con flores.",
-      "name": "Graduacion Pink",
+      "name": "Sueños Rosados",
       "unit_price": 800,
       "sizes": {
         "Unico": {
-          "total": 15000
+          "total": 20000
         }
       },
       "category": "Graduaciones"
