@@ -17,7 +17,7 @@
         <div class="grid md:grid-cols-2 gap-5">
           <div>
             <label for="sub-plan" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Plan</label>
-            <select id="sub-plan" name="plan" class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+            <select id="sub-plan" name="plan" class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition [&>option]:text-gray-900">
               <option value="s">Ramo S (15-20 Varas)</option>
               <option value="m">Ramo M (20-25 Varas)</option>
               <option value="l">Ramo L (25-30 Varas)</option>
@@ -25,7 +25,7 @@
           </div>
           <div>
             <label for="sub-frequency" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Frecuencia</label>
-            <select id="sub-frequency" name="frequency" class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+            <select id="sub-frequency" name="frequency" class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition [&>option]:text-gray-900">
               <option value="monthly">Una vez al mes</option>
               <option value="biweekly">Quincenal (2 ramos)</option>
               <option value="weekly">Todas las semanas (4 ramos)</option>
@@ -69,8 +69,8 @@
         </div>
 
         <div>
-          <label for="sub-commune" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Comuna</label>
-          <select id="sub-commune" name="commune" required class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition">
+          <label for="sub-commune" class="block text-xs text-white/45 uppercase tracking-widest mb-2">Comuna <span class="normal-case text-white/35">(Servicio disponible en las siguientes comunas)</span></label>
+          <select id="sub-commune" name="commune" required class="w-full bg-white/5 border border-white/15 rounded-md px-3 py-2 text-white focus:ring-2 focus:ring-brand-400 focus:border-brand-400 outline-none transition [&>option]:text-gray-900">
             <option value="Las Condes">Las Condes</option>
             <option value="Vitacura">Vitacura</option>
             <option value="La Reina">La Reina</option>
