@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 import { finishOneclick, authorizeOneclick, confirmTransaction } from '../../../lib/webpay'; // keep confirmTransaction just in case, but usually we'd remove it if unused here.
-import { sendOrderNotification } from '../../../lib/email';
+import { sendOrderNotification, sendSubscriptionActivatedNotification } from '../../../lib/email';
 // Actually, checkout.ts uses initTransaction which defaults to Webpay Plus, and that needs a return handler too?
 // Wait. checkout.ts sets returnUrl to /api/webpay/return as well!
 // This file needs to handle BOTH Webpay Plus (for cart) AND Oneclick (for subscription).
@@ -161,20 +161,52 @@ const processRequest = async (request: Request, redirect: any) => {
             console.error('Error updating order:', updateError);
             return redirect(`/webpay/return?status=warning&message=Pago+exitoso+pero+error+actualizando+orden`);
         }
-        
+
+        // Check if this order belongs to a subscription request (no-op lookup for regular cart orders)
+        const { data: subscriptionRequest } = await supabase
+            .from('subscription_requests')
+            .select('*')
+            .eq('order_id', orderId)
+            .maybeSingle();
+
+        if (subscriptionRequest) {
+            await supabase.from('subscription_requests').update({ is_active: true }).eq('order_id', orderId);
+        }
+
         if (order) {
-            await sendOrderNotification({
-                email: order.customer_email,
-                orderId: orderId,
-                address: order.shipping_address,
-                customerName: order.customer_name,
-                customerPhone: order.customer_phone,
-                items: order.items,
-                shippingCost: order.shipping_cost,
-                deliveryType: order.delivery_type,
-                deliveryDate: order.delivery_date,
-                type: 'success'
-            });
+            if (subscriptionRequest) {
+                const startDate = new Date();
+                const endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 30);
+
+                await sendSubscriptionActivatedNotification({
+                    orderId: orderId,
+                    email: order.customer_email,
+                    customerName: order.customer_name,
+                    customerRut: order.customer_rut,
+                    customerPhone: order.customer_phone,
+                    address: order.shipping_address,
+                    commune: order.shipping_commune,
+                    plan: subscriptionRequest.plan,
+                    frequency: subscriptionRequest.frequency,
+                    monthlyAmount: subscriptionRequest.monthly_amount,
+                    startDate,
+                    endDate,
+                });
+            } else {
+                await sendOrderNotification({
+                    email: order.customer_email,
+                    orderId: orderId,
+                    address: order.shipping_address,
+                    customerName: order.customer_name,
+                    customerPhone: order.customer_phone,
+                    items: order.items,
+                    shippingCost: order.shipping_cost,
+                    deliveryType: order.delivery_type,
+                    deliveryDate: order.delivery_date,
+                    type: 'success'
+                });
+            }
         }
 
         const params = new URLSearchParams({

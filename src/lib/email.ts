@@ -117,6 +117,95 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
   }
 };
 
+const SUBSCRIPTION_PLAN_LABELS: Record<string, string> = {
+  s: 'Ramo S (15-20 Varas)',
+  m: 'Ramo M (20-25 Varas)',
+  l: 'Ramo L (25-30 Varas)',
+};
+
+const SUBSCRIPTION_FREQUENCY_LABELS: Record<string, string> = {
+  monthly: 'Una vez al mes',
+  biweekly: 'Quincenal (2 ramos)',
+  weekly: 'Todas las semanas (4 ramos)',
+};
+
+interface SubscriptionEmailInfo {
+  orderId: string;
+  email: string;
+  customerName: string;
+  customerRut: string;
+  customerPhone: string;
+  address: string;
+  commune: string;
+  plan: string;
+  frequency: string;
+  monthlyAmount: number;
+  startDate: Date;
+  endDate: Date;
+}
+
+export const sendSubscriptionActivatedNotification = async (info: SubscriptionEmailInfo) => {
+  const planLabel = SUBSCRIPTION_PLAN_LABELS[info.plan] || info.plan;
+  const frequencyLabel = SUBSCRIPTION_FREQUENCY_LABELS[info.frequency] || info.frequency;
+  const formattedStart = info.startDate.toLocaleDateString('es-CL');
+  const formattedEnd = info.endDate.toLocaleDateString('es-CL');
+
+  try {
+    const customerHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #4CAF50;">¡Tu suscripción está activa!</h2>
+        <p>Hemos recibido tu pago y tu suscripción de flores ya se encuentra activa.</p>
+        <p><strong>N° de orden:</strong> ${info.orderId}</p>
+        <p><strong>Plan:</strong> ${planLabel}</p>
+        <p><strong>Frecuencia:</strong> ${frequencyLabel}</p>
+        <p><strong>Vigencia:</strong> del ${formattedStart} al ${formattedEnd} (30 días)</p>
+        <br/>
+        <p>Una persona de Tapti se pondrá en contacto contigo a la brevedad para coordinar los días y detalles de distribución.</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #888;">Este es un correo automático. Por favor, no respondas a este mensaje.</p>
+      </div>
+    `;
+
+    await resend.emails.send({
+      from: 'Florería Tapti <noreply@tapti.cl>',
+      to: [info.email],
+      subject: 'Tu suscripción Tapti está activa',
+      html: customerHtml,
+    });
+
+    const ownerEmail = process.env.OWNER_EMAIL || 'tapti.contacto@gmail.com';
+    const ownerHtml = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #4CAF50;">¡Nueva suscripción activa!</h2>
+        <p><strong>N° de orden:</strong> ${info.orderId}</p>
+        <p><strong>Vigencia:</strong> del ${formattedStart} al ${formattedEnd} (30 días)</p>
+        <h3>Detalles del Plan</h3>
+        <p><strong>Plan:</strong> ${planLabel}</p>
+        <p><strong>Frecuencia:</strong> ${frequencyLabel}</p>
+        <p><strong>Monto mensual:</strong> $${info.monthlyAmount.toLocaleString('es-CL')}</p>
+        <h3>Datos del Cliente</h3>
+        <p><strong>Nombre:</strong> ${info.customerName}</p>
+        <p><strong>RUT:</strong> ${info.customerRut}</p>
+        <p><strong>Email:</strong> ${info.email}</p>
+        <p><strong>Teléfono:</strong> ${info.customerPhone}</p>
+        <p><strong>Dirección:</strong> ${info.address}</p>
+        <p><strong>Comuna:</strong> ${info.commune}</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #888;">Recuerda contactar al cliente para coordinar la distribución.</p>
+      </div>
+    `;
+
+    await resend.emails.send({
+      from: 'Florería Tapti <noreply@tapti.cl>',
+      to: [ownerEmail],
+      subject: `Nueva suscripción activa - Orden ${info.orderId}`,
+      html: ownerHtml,
+    });
+  } catch (error) {
+    console.error('Excepción al enviar email de suscripción:', error);
+  }
+};
+
 interface ContactEmailInfo {
   name: string;
   email: string;
