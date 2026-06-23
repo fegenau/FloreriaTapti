@@ -101,7 +101,17 @@ export default {
 					'deep':  '#0B1220',  // Azul midnight
 					'ivory': '#F8FAFC',  // Blanco suave
 					'gold':  '#7FAED6'   // Celeste premium (acento)
-				}
+				},
+				// Nueva paleta "Equilibrada y elegante"
+				'sky-soft':      '#8CB4D3', // Fondo principal (Hero)
+				'marfil':        '#FAF7F2', // Fondo de secciones (Productos)
+				'terracota': {
+					DEFAULT: '#D97A6A', // CTA (Comprar ahora)
+					hover:   '#C56756'  // Hover CTA
+				},
+				'azul-profundo': '#27485A', // Títulos
+				'grafito':       '#444444', // Texto
+				'borde-claro':   '#DCE3EA'  // Bordes
 			}
 		},
 	},

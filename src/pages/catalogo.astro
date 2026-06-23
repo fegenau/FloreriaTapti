@@ -28,12 +28,12 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
   <div class="min-h-screen pt-24 pb-16">
 
     <!-- Top bar -->
-    <div class="border-b border-white/10 mb-6">
+    <div class="border-b border-borde-claro mb-6">
       <div class="max-w-screen-xl mx-auto px-6 py-3 flex items-center relative">
 
         <!-- Filter toggle -->
         <button id="toggle-sidebar"
-          class="flex items-center gap-1.5 text-white/60 hover:text-white transition-colors text-sm">
+          class="flex items-center gap-1.5 text-grafito/70 hover:text-azul-profundo transition-colors text-sm">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="4" y1="6" x2="20" y2="6"/>
@@ -50,14 +50,14 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
 
         <!-- Product count (centrado) -->
         <span id="product-count"
-          class="absolute left-1/2 -translate-x-1/2 text-sm text-white/50 pointer-events-none">
+          class="absolute left-1/2 -translate-x-1/2 text-sm text-grafito/60 pointer-events-none">
           {products.length} productos
         </span>
 
         <!-- Sort -->
         <div class="ml-auto relative">
           <button id="sort-toggle"
-            class="flex items-center gap-1 text-sm text-white/60 hover:text-white transition-colors">
+            class="flex items-center gap-1 text-sm text-grafito/70 hover:text-azul-profundo transition-colors">
             <span id="sort-label">Más vendidos</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -65,11 +65,11 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
             </svg>
           </button>
           <div id="sort-dropdown"
-            class="hidden absolute right-0 top-full mt-2 bg-steel-800 border border-white/10 rounded-lg shadow-2xl z-50 w-52 py-1">
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors" data-sort="default">Más vendidos</button>
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors" data-sort="price-asc">Precio: menor a mayor</button>
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors" data-sort="price-desc">Precio: mayor a menor</button>
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors" data-sort="name">Nombre A-Z</button>
+            class="hidden absolute right-0 top-full mt-2 bg-white border border-borde-claro rounded-lg shadow-2xl z-50 w-52 py-1">
+            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="default">Más vendidos</button>
+            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="price-asc">Precio: menor a mayor</button>
+            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="price-desc">Precio: mayor a menor</button>
+            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="name">Nombre A-Z</button>
           </div>
         </div>
       </div>
@@ -85,19 +85,19 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
         <!-- Categoría -->
         <div class="mb-8">
           <button id="toggle-cat" class="w-full flex items-center justify-between mb-4">
-            <span class="text-sm font-semibold text-white tracking-wide">Categoría</span>
+            <span class="text-sm font-semibold text-azul-profundo tracking-wide">Categoría</span>
             <svg id="cat-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round"
-              class="text-white/40 transition-transform duration-200">
+              class="text-grafito/40 transition-transform duration-200">
               <polyline points="18 15 12 9 6 15"/>
             </svg>
           </button>
           <div id="cat-list" class="space-y-2.5">
             {categories.map(cat => (
               <label class="flex items-center gap-2.5 cursor-pointer group">
-                <input type="checkbox" class="category-filter w-3.5 h-3.5 rounded-sm border border-white/30 bg-white/5 cursor-pointer accent-brand-400" value={cat} />
-                <span class="text-sm text-white/55 group-hover:text-white/90 transition-colors leading-tight">{cat}</span>
+                <input type="checkbox" class="category-filter w-3.5 h-3.5 rounded-sm border border-borde-claro bg-white cursor-pointer accent-terracota" value={cat} />
+                <span class="text-sm text-grafito/70 group-hover:text-azul-profundo transition-colors leading-tight">{cat}</span>
               </label>
             ))}
           </div>
@@ -106,19 +106,19 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
         <!-- Tipo de flor -->
         <div class="mb-8">
           <button id="toggle-flower" class="w-full flex items-center justify-between mb-4">
-            <span class="text-sm font-semibold text-white tracking-wide">Tipo de flor</span>
+            <span class="text-sm font-semibold text-azul-profundo tracking-wide">Tipo de flor</span>
             <svg id="flower-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round"
-              class="text-white/40 transition-transform duration-200">
+              class="text-grafito/40 transition-transform duration-200">
               <polyline points="18 15 12 9 6 15"/>
             </svg>
           </button>
           <div id="flower-list" class="space-y-2.5">
             {flowerTypes.map(flower => (
               <label class="flex items-center gap-2.5 cursor-pointer group">
-                <input type="checkbox" class="flower-filter w-3.5 h-3.5 rounded-sm border border-white/30 bg-white/5 cursor-pointer accent-brand-400" value={flower} />
-                <span class="text-sm text-white/55 group-hover:text-white/90 transition-colors leading-tight">{flower}</span>
+                <input type="checkbox" class="flower-filter w-3.5 h-3.5 rounded-sm border border-borde-claro bg-white cursor-pointer accent-terracota" value={flower} />
+                <span class="text-sm text-grafito/70 group-hover:text-azul-profundo transition-colors leading-tight">{flower}</span>
               </label>
             ))}
           </div>
@@ -127,32 +127,32 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
         <!-- Precio -->
         <div class="mb-8">
           <button id="toggle-price" class="w-full flex items-center justify-between mb-4">
-            <span class="text-sm font-semibold text-white tracking-wide">Precio</span>
+            <span class="text-sm font-semibold text-azul-profundo tracking-wide">Precio</span>
             <svg id="price-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
               viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
               stroke-linecap="round" stroke-linejoin="round"
-              class="text-white/40 transition-transform duration-200">
+              class="text-grafito/40 transition-transform duration-200">
               <polyline points="18 15 12 9 6 15"/>
             </svg>
           </button>
           <div id="price-list">
             <!-- Min/Max inputs -->
             <div class="flex gap-2 mb-4">
-              <div class="flex-1 bg-white/5 border border-white/15 rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
-                <span class="text-white/35 text-xs flex-shrink-0">$</span>
+              <div class="flex-1 bg-white border border-borde-claro rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
+                <span class="text-grafito/50 text-xs flex-shrink-0">$</span>
                 <input type="number" id="price-min-input" value="0"
-                  class="w-full bg-transparent text-white text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
+                  class="w-full bg-transparent text-grafito text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
               </div>
-              <div class="flex-1 bg-white/5 border border-white/15 rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
-                <span class="text-white/35 text-xs flex-shrink-0">$</span>
+              <div class="flex-1 bg-white border border-borde-claro rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
+                <span class="text-grafito/50 text-xs flex-shrink-0">$</span>
                 <input type="number" id="price-max-input" value={maxCatalogPrice}
-                  class="w-full bg-transparent text-white text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
+                  class="w-full bg-transparent text-grafito text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
               </div>
             </div>
             <!-- Dual range slider -->
             <div id="price-slider-wrap" class="relative h-5" data-max={maxCatalogPrice}>
-              <div class="absolute top-1/2 -translate-y-1/2 w-full h-[3px] bg-white/15 rounded-full">
-                <div id="range-fill" class="absolute h-full bg-brand-400 rounded-full" style="left:0%;right:0%"></div>
+              <div class="absolute top-1/2 -translate-y-1/2 w-full h-[3px] bg-borde-claro rounded-full">
+                <div id="range-fill" class="absolute h-full bg-terracota rounded-full" style="left:0%;right:0%"></div>
               </div>
               <input type="range" id="price-range-min" class="price-range"
                 min="0" max={maxCatalogPrice} value="0" step="1000" />
@@ -181,7 +181,7 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
               >
                 <!-- Image carousel -->
                 <div
-                  class="relative aspect-square overflow-hidden rounded-sm bg-white/5 group/carousel"
+                  class="relative aspect-square overflow-hidden rounded-sm bg-marfil border border-borde-claro group/carousel"
                   data-images={JSON.stringify(
                     product.image.length > 1
                       ? product.image
@@ -210,13 +210,13 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
                 </div>
                 <!-- Info -->
                 <div class="mt-2.5 px-0.5">
-                  <p class="text-sm text-white/80 leading-snug">{product.name}</p>
+                  <p class="text-sm text-grafito leading-snug">{product.name}</p>
                   {startingPrice != null ? (
-                    <p class="text-sm text-white/45 mt-0.5">
+                    <p class="text-sm text-azul-profundo font-medium mt-0.5">
                       ${startingPrice.toLocaleString('es-CL')}
                     </p>
                   ) : (
-                    <p class="text-sm text-brand-400 mt-0.5">{product.price_range || 'Cotizar'}</p>
+                    <p class="text-sm text-terracota mt-0.5">{product.price_range || 'Cotizar'}</p>
                   )}
                 </div>
               </a>
@@ -224,7 +224,7 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
           })}
         </div>
 
-        <p id="no-results" class="hidden text-center py-24 text-white/30 text-sm">
+        <p id="no-results" class="hidden text-center py-24 text-grafito/40 text-sm">
           No hay productos que coincidan con los filtros.
         </p>
       </main>
@@ -252,20 +252,20 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
     pointer-events: all;
     width: 15px;
     height: 15px;
-    background: white;
+    background: #D97A6A;
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   }
   input[type='range'].price-range::-moz-range-thumb {
     pointer-events: all;
     width: 15px;
     height: 15px;
-    background: white;
+    background: #D97A6A;
     border-radius: 50%;
     cursor: pointer;
     border: none;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   }
 </style>
 

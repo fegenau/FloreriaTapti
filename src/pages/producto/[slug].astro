@@ -37,14 +37,14 @@ const related = products
     <div class="max-w-5xl mx-auto px-6">
 
       <!-- Breadcrumb -->
-      <nav class="flex items-center gap-1.5 text-xs text-white/35 mb-10">
-        <a href="/" class="hover:text-white/70 transition-colors">Inicio</a>
+      <nav class="flex items-center gap-1.5 text-xs text-grafito/50 mb-10">
+        <a href="/" class="hover:text-terracota transition-colors">Inicio</a>
         <span>/</span>
-        <a href="/catalogo" class="hover:text-white/70 transition-colors">Catálogo</a>
+        <a href="/catalogo" class="hover:text-terracota transition-colors">Catálogo</a>
         <span>/</span>
-        <span class="text-white/55">{product.category}</span>
+        <span class="text-grafito/70">{product.category}</span>
         <span>/</span>
-        <span class="text-white/70">{product.name}</span>
+        <span class="text-azul-profundo">{product.name}</span>
       </nav>
 
       <!-- Product layout -->
@@ -53,7 +53,7 @@ const related = products
         <!-- Left: Image gallery -->
         <div>
           <!-- Main image -->
-          <div class="aspect-square overflow-hidden rounded-lg bg-white/5 mb-3">
+          <div class="aspect-square overflow-hidden rounded-lg bg-marfil border border-borde-claro mb-3">
             <img
               id="main-image"
               src={`/${product.image[0]}`}
@@ -66,7 +66,7 @@ const related = products
             <div class="flex gap-2 flex-wrap">
               {product.image.map((img: string, i: number) => (
                 <button
-                  class={`thumbnail-btn w-16 h-16 overflow-hidden rounded-md border-2 transition-all flex-shrink-0 ${i === 0 ? 'border-brand-400' : 'border-transparent hover:border-white/30'}`}
+                  class={`thumbnail-btn w-16 h-16 overflow-hidden rounded-md border-2 transition-all flex-shrink-0 ${i === 0 ? 'border-terracota' : 'border-transparent hover:border-borde-claro'}`}
                   data-src={`/${img}`}
                   type="button"
                 >
@@ -81,29 +81,30 @@ const related = products
         <!-- Right: Product info -->
         <div class="flex flex-col">
 
-          <h1 class="font-serif text-2xl lg:text-3xl text-white/90 mb-3 leading-snug">
+          <h1 class="font-serif text-3xl lg:text-4xl font-semibold text-azul-profundo mb-2 leading-snug">
             {product.name}
           </h1>
+          <div class="w-14 h-1.5 bg-terracota rounded-full mb-4"></div>
 
           <!-- Price -->
           {startingPrice != null ? (
-            <p id="price-display" class="text-xl font-semibold text-white mb-6">
+            <p id="price-display" class="text-xl font-semibold text-azul-profundo mb-6">
               ${startingPrice.toLocaleString('es-CL')}
             </p>
           ) : (
-            <p class="text-lg text-brand-400 mb-6">{product.price_range || 'Consultar precio'}</p>
+            <p class="text-lg text-terracota mb-6">{product.price_range || 'Consultar precio'}</p>
           )}
 
           <!-- Description -->
-          <div class="text-sm text-white/60 leading-relaxed mb-8 space-y-4">
+          <div class="text-sm text-grafito/80 leading-relaxed mb-8 space-y-4">
             <p>{product.Description}</p>
-            
+
             <!-- Tamaños y Varas -->
             {!product.isQuote && validSizes.length > 0 && (
               <div class="pt-2">
                 {validSizes.map(([size, details]) => (
                   <p>
-                    <span class="text-white/80 capitalize">{size}</span>: {details.stems}
+                    <span class="text-azul-profundo capitalize">{size}</span>: {details.stems}
                   </p>
                 ))}
               </div>
@@ -112,9 +113,9 @@ const related = products
             <!-- Info Estática -->
             <div class="pt-2 space-y-2">
               <p>
-                <span class="text-white/80">Envoltorio:</span> Papel y cinta
+                <span class="text-azul-profundo">Envoltorio:</span> Papel y cinta
               </p>
-              <p class="text-xs text-white/50">
+              <p class="text-xs text-grafito/60">
                 El diseño es referencial, puede cambiar según las flores de estación disponibles.
                 Sin embargo, el ramo mantendrá la misma categoría, color y esencia.
               </p>
@@ -124,15 +125,15 @@ const related = products
           <!-- Size selector -->
           {!product.isQuote && validSizes.length > 1 && (
             <div class="mb-8">
-              <p class="text-xs text-white/45 uppercase tracking-widest mb-3">Tamaño</p>
+              <p class="text-xs text-grafito/55 uppercase tracking-widest mb-3">Tamaño</p>
               <div class="flex flex-wrap gap-2" id="size-selector">
                 {validSizes.map(([size, details]: [string, { total: number, stems?: string | number }], i: number) => (
                   <button
                     type="button"
                     class={`size-btn px-4 py-2 rounded-md border text-sm transition-all ${
                       i === 0
-                        ? 'border-brand-400 bg-brand-400/15 text-white'
-                        : 'border-white/15 text-white/50 hover:border-white/30 hover:text-white/80'
+                        ? 'border-terracota bg-terracota/15 text-azul-profundo font-medium'
+                        : 'border-borde-claro text-grafito/60 hover:border-terracota hover:text-azul-profundo'
                     }`}
                     data-size={size}
                     data-price={details.total}
@@ -150,7 +151,7 @@ const related = products
               id="quote-btn"
               type="button"
               data-product-name={product.name}
-              class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
+              class="w-full py-3.5 bg-terracota hover:bg-terracota-hover text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
             >
               Solicitar Cotización
             </button>
@@ -158,7 +159,7 @@ const related = products
             <button
               id="experience-btn"
               type="button"
-              class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
+              class="w-full py-3.5 bg-terracota hover:bg-terracota-hover text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
             >
               Solicitar Experiencia
             </button>
@@ -166,7 +167,7 @@ const related = products
             <button
               id="add-to-cart-btn"
               type="button"
-              class="w-full py-3.5 bg-brand-500 hover:bg-brand-400 text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
+              class="w-full py-3.5 bg-terracota hover:bg-terracota-hover text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
             >
               Añadir al Carrito
             </button>
@@ -174,9 +175,9 @@ const related = products
 
           <!-- Info badge -->
           <div class="mt-2">
-            <div class="flex items-start gap-2.5 bg-white/4 rounded-lg px-4 py-3">
-              <span class="text-green-400 text-sm mt-0.5 flex-shrink-0">✓</span>
-              <span class="text-xs text-white/55 leading-relaxed">
+            <div class="flex items-start gap-2.5 bg-marfil border border-borde-claro rounded-lg px-4 py-3">
+              <span class="text-green-600 text-sm mt-0.5 flex-shrink-0">✓</span>
+              <span class="text-xs text-grafito/70 leading-relaxed">
                 ¿Tienes duda? Escríbenos al WhatsApp y te ayudaremos a resolverla.
               </span>
             </div>
@@ -186,8 +187,8 @@ const related = products
 
       <!-- Related products -->
       {related.length > 0 && (
-        <div class="mt-20 border-t border-white/10 pt-14">
-          <h2 class="font-serif text-xl text-white/70 mb-8 text-center tracking-wide">
+        <div class="mt-20 border-t border-borde-claro pt-14">
+          <h2 class="font-serif text-xl text-azul-profundo mb-8 text-center tracking-wide">
             También te puede interesar
           </h2>
           <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
@@ -195,7 +196,7 @@ const related = products
               const relPrice = getStartingPrice(p);
               return (
                 <a href={`/producto/${slugify(p.name)}`} class="group block">
-                  <div class="aspect-square overflow-hidden rounded-sm bg-white/5 mb-2.5">
+                  <div class="aspect-square overflow-hidden rounded-sm bg-marfil border border-borde-claro mb-2.5">
                     <img
                       src={`/${p.image[0]}`}
                       alt={p.name}
@@ -203,11 +204,11 @@ const related = products
                       loading="lazy"
                     />
                   </div>
-                  <p class="text-sm text-white/75 leading-snug">{p.name}</p>
+                  <p class="text-sm text-grafito leading-snug">{p.name}</p>
                   {relPrice != null ? (
-                    <p class="text-sm text-white/40 mt-0.5">${relPrice.toLocaleString('es-CL')}</p>
+                    <p class="text-sm text-azul-profundo font-medium mt-0.5">${relPrice.toLocaleString('es-CL')}</p>
                   ) : (
-                    <p class="text-sm text-brand-400 mt-0.5">{p.price_range || 'Cotizar'}</p>
+                    <p class="text-sm text-terracota mt-0.5">{p.price_range || 'Cotizar'}</p>
                   )}
                 </a>
               );
@@ -253,10 +254,10 @@ const related = products
         }
         // Update active border
         document.querySelectorAll('.thumbnail-btn').forEach(b => {
-          b.classList.remove('border-brand-400');
+          b.classList.remove('border-terracota');
           b.classList.add('border-transparent');
         });
-        btn.classList.add('border-brand-400');
+        btn.classList.add('border-terracota');
         btn.classList.remove('border-transparent');
       });
     });
@@ -275,11 +276,11 @@ const related = products
     sizeBtns.forEach(btn => {
       btn.addEventListener('click', () => {
         sizeBtns.forEach(b => {
-          b.classList.remove('border-brand-400', 'bg-brand-400/15', 'text-white');
-          b.classList.add('border-white/15', 'text-white/50');
+          b.classList.remove('border-terracota', 'bg-terracota/15', 'text-azul-profundo', 'font-medium');
+          b.classList.add('border-borde-claro', 'text-grafito/60');
         });
-        btn.classList.add('border-brand-400', 'bg-brand-400/15', 'text-white');
-        btn.classList.remove('border-white/15', 'text-white/50');
+        btn.classList.add('border-terracota', 'bg-terracota/15', 'text-azul-profundo', 'font-medium');
+        btn.classList.remove('border-borde-claro', 'text-grafito/60');
 
         selectedSize = btn.dataset.size || '';
         selectedPrice = parseInt(btn.dataset.price || '0');
@@ -311,12 +312,12 @@ const related = products
       const original = cartBtn.textContent || '';
       cartBtn.textContent = '✓ Añadido al carrito';
       cartBtn.classList.add('bg-green-700');
-      cartBtn.classList.remove('bg-brand-500', 'hover:bg-brand-400');
+      cartBtn.classList.remove('bg-terracota', 'hover:bg-terracota-hover');
 
       setTimeout(() => {
         cartBtn.textContent = original;
         cartBtn.classList.remove('bg-green-700');
-        cartBtn.classList.add('bg-brand-500', 'hover:bg-brand-400');
+        cartBtn.classList.add('bg-terracota', 'hover:bg-terracota-hover');
       }, 2000);
     });
 

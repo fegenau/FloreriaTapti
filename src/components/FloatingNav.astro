@@ -1,10 +1,13 @@
 ---
 // Navegación flotante moderna para reemplazar el navbar tradicional
+const currentPath = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === "/" ? currentPath === "/" : currentPath.startsWith(href);
 ---
 
 <nav
-  class="fixed top-6 left-1/2 -translate-x-1/2 z-40 backdrop-blur-md rounded-full px-6 py-3 shadow-2xl hidden md:block border border-brand-400/20"
-  style="background-color: #111827;"
+  class="fixed top-6 left-1/2 -translate-x-1/2 z-40 backdrop-blur-md rounded-full px-6 py-3 shadow-lg hidden md:block border border-borde-claro"
+  style="background-color: #FAF7F2;"
 >
   <div class="flex items-center space-x-6">
     <!-- Logo -->
@@ -13,43 +16,67 @@
     </a>
 
     <!-- Separador -->
-    <div class="w-px h-6 bg-honey-bronze-500/30"></div>
+    <div class="w-px h-6 bg-borde-claro"></div>
 
     <!-- Links de navegación -->
     <div class="flex items-center space-x-4">
       <a
         href="/catalogo"
-        class="text-sm text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors px-3 py-1 rounded-full hover:bg-honey-bronze-500/10"
+        aria-current={isActive("/catalogo") ? "page" : undefined}
+        class:list={[
+          "text-sm transition-colors px-3 py-1 rounded-full",
+          isActive("/catalogo")
+            ? "text-terracota font-semibold bg-terracota/10"
+            : "text-azul-profundo hover:text-terracota hover:bg-terracota/10",
+        ]}
       >
         Catálogo
       </a>
       {
         /* <a
         href="/membresias"
-        class="text-sm text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors px-3 py-1 rounded-full hover:bg-honey-bronze-500/10"
+        class="text-sm text-azul-profundo hover:text-terracota transition-colors px-3 py-1 rounded-full hover:bg-terracota/10"
       >
         Membresías
       </a> */
       }
       <a
         href="/sobre"
-        class="text-sm text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors px-3 py-1 rounded-full hover:bg-honey-bronze-500/10"
+        aria-current={isActive("/sobre") ? "page" : undefined}
+        class:list={[
+          "text-sm transition-colors px-3 py-1 rounded-full",
+          isActive("/sobre")
+            ? "text-terracota font-semibold bg-terracota/10"
+            : "text-azul-profundo hover:text-terracota hover:bg-terracota/10",
+        ]}
       >
         Sobre
       </a>
       <a
         href="/contacto"
-        class="text-sm text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors px-3 py-1 rounded-full hover:bg-honey-bronze-500/10"
+        aria-current={isActive("/contacto") ? "page" : undefined}
+        class:list={[
+          "text-sm transition-colors px-3 py-1 rounded-full",
+          isActive("/contacto")
+            ? "text-terracota font-semibold bg-terracota/10"
+            : "text-azul-profundo hover:text-terracota hover:bg-terracota/10",
+        ]}
       >
         Contacto
       </a>
 
-      <div class="w-px h-4 bg-honey-bronze-500/30 mx-2"></div>
+      <div class="w-px h-4 bg-borde-claro mx-2"></div>
 
       <a
         href="/carrito"
         id="cart-btn-desktop"
-        class="text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors p-2 rounded-full hover:bg-honey-bronze-500/10 relative"
+        aria-current={isActive("/carrito") ? "page" : undefined}
+        class:list={[
+          "transition-colors p-2 rounded-full relative",
+          isActive("/carrito")
+            ? "text-terracota bg-terracota/10"
+            : "text-azul-profundo hover:text-terracota hover:bg-terracota/10",
+        ]}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -70,7 +97,7 @@
         </svg>
         <span
           id="cart-count-desktop"
-          class="absolute -top-1 -right-1 bg-honey-bronze-500 text-midnight-violet-950 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden"
+          class="absolute -top-1 -right-1 bg-terracota text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden"
           >0</span
         >
       </a>
@@ -126,7 +153,7 @@
 
 <!-- Cabecera móvil (Marca) -->
 <div
-  class="md:hidden fixed top-0 left-0 right-0 z-40 bg-midnight-violet-950/80 backdrop-blur-md border-b border-honey-bronze-500/20 px-6 py-4 flex justify-center items-center shadow-lg"
+  class="md:hidden fixed top-0 left-0 right-0 z-40 bg-marfil/90 backdrop-blur-md border-b border-borde-claro px-6 py-4 flex justify-center items-center shadow-lg"
 >
   <a href="/" class="hover:opacity-80 transition-opacity">
     <img src="/images/logo-tapti.png" alt="Tapti" class="h-10 w-auto" />
@@ -135,12 +162,18 @@
 
 <!-- Barra de navegación móvil (inferior) -->
 <div
-  class="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-midnight-violet-950/90 backdrop-blur-md border border-honey-bronze-500/20 rounded-2xl p-4 shadow-2xl"
+  class="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-marfil/95 backdrop-blur-md border border-borde-claro rounded-2xl p-4 shadow-xl"
 >
   <div class="grid grid-cols-5 gap-1">
     <a
       href="/"
-      class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
+      aria-current={isActive("/") ? "page" : undefined}
+      class:list={[
+        "text-center py-2 transition-colors",
+        isActive("/")
+          ? "text-terracota font-semibold"
+          : "text-azul-profundo hover:text-terracota",
+      ]}
     >
       <div class="text-lg mb-1 flex justify-center">
         <svg
@@ -161,7 +194,13 @@
     </a>
     <a
       href="/catalogo"
-      class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
+      aria-current={isActive("/catalogo") ? "page" : undefined}
+      class:list={[
+        "text-center py-2 transition-colors",
+        isActive("/catalogo")
+          ? "text-terracota font-semibold"
+          : "text-azul-profundo hover:text-terracota",
+      ]}
     >
       <div class="text-lg mb-1">🌸</div>
       <span class="text-xs">Catálogo</span>
@@ -169,7 +208,7 @@
     {
       /* <a
       href="/membresias"
-      class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
+      class="text-center py-2 text-azul-profundo hover:text-terracota transition-colors"
     >
       <div class="text-lg mb-1">💎</div>
       <span class="text-xs">Membresías</span>
@@ -177,14 +216,26 @@
     }
     <a
       href="/sobre"
-      class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
+      aria-current={isActive("/sobre") ? "page" : undefined}
+      class:list={[
+        "text-center py-2 transition-colors",
+        isActive("/sobre")
+          ? "text-terracota font-semibold"
+          : "text-azul-profundo hover:text-terracota",
+      ]}
     >
       <div class="text-lg mb-1">🌿</div>
       <span class="text-xs">Sobre</span>
     </a>
     <a
       href="/contacto"
-      class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors"
+      aria-current={isActive("/contacto") ? "page" : undefined}
+      class:list={[
+        "text-center py-2 transition-colors",
+        isActive("/contacto")
+          ? "text-terracota font-semibold"
+          : "text-azul-profundo hover:text-terracota",
+      ]}
     >
       <div class="text-lg mb-1">📞</div>
       <span class="text-xs">Contacto</span>
@@ -192,7 +243,13 @@
     <a
       href="/carrito"
       id="cart-btn-mobile"
-      class="text-center py-2 text-cherry-blossom-100 hover:text-honey-bronze-400 transition-colors relative"
+      aria-current={isActive("/carrito") ? "page" : undefined}
+      class:list={[
+        "text-center py-2 transition-colors relative",
+        isActive("/carrito")
+          ? "text-terracota font-semibold"
+          : "text-azul-profundo hover:text-terracota",
+      ]}
     >
       <div class="text-lg mb-1 flex justify-center">
         <svg
@@ -216,7 +273,7 @@
       <span class="text-xs">Carrito</span>
       <span
         id="cart-count-mobile"
-        class="absolute top-1 right-2 bg-honey-bronze-500 text-midnight-violet-950 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden"
+        class="absolute top-1 right-2 bg-terracota text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden"
         >0</span
       >
     </a>
