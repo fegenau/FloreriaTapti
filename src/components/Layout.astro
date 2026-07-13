@@ -47,7 +47,7 @@ const {
   </head>
   <body
     class="min-h-screen text-grafito overflow-visible"
-    style="background-color: #8CB4D3;"
+    style="background-image: url('/603312.avif'); background-position: center; background-size: cover;"
   >
     {showEntrance && <EntranceAnimation />}
 
@@ -83,18 +83,16 @@ const {
       {
         !hideFooter && (
           <footer class="border-t border-borde-claro">
-            <div
-              class="max-w-6xl mx-auto px-4 py-8 text-sm flex flex-col gap-4 items-center justify-center text-center text-grafito"
-            >
+            <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex flex-col gap-4 items-center justify-center text-center text-grafito">
               <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
               <div class="flex gap-4">
-                <a href="/terminos-y-condiciones" class="hover:underline"
-                  >Términos y Condiciones</a
-                >
+                <a href="/terminos-y-condiciones" class="hover:underline">
+                  Términos y Condiciones
+                </a>
                 <span>|</span>
-                <a href="/politica-de-privacidad" class="hover:underline"
-                  >Política de Privacidad</a
-                >
+                <a href="/politica-de-privacidad" class="hover:underline">
+                  Política de Privacidad
+                </a>
               </div>
               <p class="text-xs text-grafito/60 max-w-md">
                 Solamente utilizamos los datos personales para la boleta
