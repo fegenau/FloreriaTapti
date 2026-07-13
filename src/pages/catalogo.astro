@@ -1,5 +1,6 @@
 ---
 import Layout from "../components/Layout.astro";
+import BoutiqueCard from "../components/BoutiqueCard.astro";
 import catalogData from "../data/catalog.json";
 import { slugify } from "../utils/slugify.js";
 
@@ -25,7 +26,16 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
 ---
 
 <Layout title="Catálogo | Tapti">
-  <div class="min-h-screen pt-24 pb-16">
+  <div class="max-w-7xl mx-auto px-4 py-12">
+    <BoutiqueCard
+      variant="services"
+      size="large"
+      className="!h-auto min-h-[70vh] p-8"
+    >
+
+    <h1 class="font-serif text-3xl md:text-4xl text-center text-azul-profundo mb-8">
+      Catálogo de Ramos
+    </h1>
 
     <!-- Top bar -->
     <div class="border-b border-borde-claro mb-6">
@@ -229,6 +239,7 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
         </p>
       </main>
     </div>
+    </BoutiqueCard>
   </div>
 </Layout>
 
