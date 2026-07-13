@@ -37,12 +37,12 @@ const related = products
     <div class="max-w-5xl mx-auto px-6">
 
       <!-- Breadcrumb -->
-      <nav class="flex items-center gap-1.5 text-xs text-grafito/50 mb-10">
+      <nav class="flex items-center gap-1.5 text-xs font-bold text-azul-profundo/55 mb-10">
         <a href="/" class="hover:text-terracota transition-colors">Inicio</a>
         <span>/</span>
         <a href="/catalogo" class="hover:text-terracota transition-colors">Catálogo</a>
         <span>/</span>
-        <span class="text-grafito/70">{product.category}</span>
+        <span class="text-azul-profundo/75">{product.category}</span>
         <span>/</span>
         <span class="text-azul-profundo">{product.name}</span>
       </nav>
@@ -79,7 +79,7 @@ const related = products
         </div>
 
         <!-- Right: Product info -->
-        <div class="flex flex-col">
+        <div class="flex flex-col text-azul-profundo/80 font-medium">
 
           <h1 class="font-serif text-3xl lg:text-4xl font-semibold text-azul-profundo mb-2 leading-snug">
             {product.name}
@@ -96,15 +96,15 @@ const related = products
           )}
 
           <!-- Description -->
-          <div class="text-sm text-grafito/80 leading-relaxed mb-8 space-y-4">
+          <div class="text-sm leading-relaxed mb-8 space-y-4">
             <p>{product.Description}</p>
 
             <!-- Tamaños y Varas -->
             {!product.isQuote && validSizes.length > 0 && (
               <div class="pt-2">
                 {validSizes.map(([size, details]) => (
-                  <p>
-                    <span class="text-azul-profundo capitalize">{size}</span>: {details.stems}
+                  <p class="font-medium">
+                    <span class="text-azul-profundo capitalize font-semibold">{size}</span>: {details.stems}
                   </p>
                 ))}
               </div>
@@ -112,10 +112,10 @@ const related = products
 
             <!-- Info Estática -->
             <div class="pt-2 space-y-2">
-              <p>
-                <span class="text-azul-profundo">Envoltorio:</span> Papel y cinta
+              <p class="font-medium">
+                <span class="text-azul-profundo font-semibold">Envoltorio:</span> Papel y cinta
               </p>
-              <p class="text-xs text-grafito/60">
+                <p class="text-xs text-azul-profundo/55 font-medium">
                 El diseño es referencial, puede cambiar según las flores de estación disponibles.
                 Sin embargo, el ramo mantendrá la misma categoría, color y esencia.
               </p>
@@ -125,7 +125,7 @@ const related = products
           <!-- Size selector -->
           {!product.isQuote && validSizes.length > 1 && (
             <div class="mb-8">
-              <p class="text-xs text-grafito/55 uppercase tracking-widest mb-3">Tamaño</p>
+              <p class="text-xs text-azul-profundo/55 uppercase tracking-widest mb-3 font-semibold">Tamaño</p>
               <div class="flex flex-wrap gap-2" id="size-selector">
                 {validSizes.map(([size, details]: [string, { total: number, stems?: string | number }], i: number) => (
                   <button
@@ -133,7 +133,7 @@ const related = products
                     class={`size-btn px-4 py-2 rounded-md border text-sm transition-all ${
                       i === 0
                         ? 'border-terracota bg-terracota/15 text-azul-profundo font-medium'
-                        : 'border-borde-claro text-grafito/60 hover:border-terracota hover:text-azul-profundo'
+                        : 'border-borde-claro text-azul-profundo/60 hover:border-terracota hover:text-azul-profundo font-medium'
                     }`}
                     data-size={size}
                     data-price={details.total}
@@ -177,7 +177,7 @@ const related = products
           <div class="mt-2">
             <div class="flex items-start gap-2.5 bg-marfil border border-borde-claro rounded-lg px-4 py-3">
               <span class="text-green-600 text-sm mt-0.5 flex-shrink-0">✓</span>
-              <span class="text-xs text-grafito/70 leading-relaxed">
+              <span class="text-xs text-azul-profundo/70 leading-relaxed">
                 ¿Tienes duda? Escríbenos al WhatsApp y te ayudaremos a resolverla.
               </span>
             </div>
@@ -204,7 +204,7 @@ const related = products
                       loading="lazy"
                     />
                   </div>
-                  <p class="text-sm text-grafito leading-snug">{p.name}</p>
+                  <p class="text-sm text-azul-profundo leading-snug font-medium">{p.name}</p>
                   {relPrice != null ? (
                     <p class="text-sm text-azul-profundo font-medium mt-0.5">${relPrice.toLocaleString('es-CL')}</p>
                   ) : (
