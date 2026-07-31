@@ -2,22 +2,14 @@
 import Layout from "../../components/Layout.astro";
 import ExperienceModal from "../../components/ExperienceModal.astro";
 import QuoteModal from "../../components/QuoteModal.astro";
-import catalogData from "../../data/catalog.json";
+import { getCatalogData, getStartingPrice } from "../../lib/catalog";
 import { slugify } from "../../utils/slugify.js";
 
 const { slug } = Astro.params;
-const products = catalogData.flowers as any[];
+const { flowers: products } = await getCatalogData();
 
 const product = products.find((p: any) => slugify(p.name) === slug);
 if (!product) return Astro.redirect('/catalogo');
-
-function getStartingPrice(p: any): number | null {
-  if (p.isQuote) return null;
-  const prices: number[] = Object.values(p.sizes as Record<string, any>)
-    .filter((s: any): s is { total: number } => s !== null)
-    .map((s: any) => s.total);
-  return prices.length > 0 ? Math.min(...prices) : null;
-}
 
 const startingPrice = getStartingPrice(product);
 const validSizes: [string, { total: number; stems?: string | number }][] = product.isQuote

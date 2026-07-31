@@ -4,6 +4,7 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
 import FloatingNav from "../components/FloatingNav.astro";
 import OccasionCard from "../components/OccasionCard.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
+import { getCatalogData } from "../lib/catalog";
 
 // Servicios principales
 const mainServices = [
@@ -35,7 +36,7 @@ const mainServices = [
   },
 ];
 
-import catalogData from "../data/catalog.json";
+const { flowers: catalogProducts } = await getCatalogData();
 
 const categoryShowcase = [
   {
@@ -70,7 +71,7 @@ const categoryShowcase = [
     description: "Regalos y experiencias para celebrar momentos especiales",
   },
 ].map((item) => {
-  const match = (catalogData.flowers as any[]).find(
+  const match = catalogProducts.find(
     (f) => f.category === item.category,
   );
   return {
