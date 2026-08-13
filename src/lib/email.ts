@@ -36,7 +36,10 @@ export const sendOrderNotification = async (info: OrderEmailInfo) => {
       }
 
       const itemsListHtml = parsedItems.length > 0 
-        ? '<ul>' + parsedItems.map(item => `<li>${item.quantity}x ${item.name || 'Producto'} - $${item.price}</li>`).join('') + '</ul>'
+        ? '<ul>' + parsedItems.map(item => {
+            const sizeText = item.size ? ` · Tamaño: ${item.size}` : '';
+            return `<li>${item.quantity}x ${item.name || 'Producto'}${sizeText} - $${item.price}</li>`;
+          }).join('') + '</ul>'
         : '<p>Ver detalles en la plataforma.</p>';
 
       htmlContent = `
