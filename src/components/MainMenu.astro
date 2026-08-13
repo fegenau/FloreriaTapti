@@ -1,0 +1,47 @@
+---
+import { supabase } from '../lib/supabase';
+
+// Obtener sesión
+const { data: { session } } = await supabase.auth.getSession();
+---
+
+{session && (
+  <nav class="bg-white shadow-lg border-b-4 border-rose-500">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <!-- Logo/Brand -->
+      <div class="flex items-center gap-2">
+        <a href="/" class="text-2xl font-bold text-grafito hover:text-rose-500 transition">
+          Tapti
+        </a>
+      </div>
+
+      <!-- Menú Principal -->
+      <div class="hidden md:flex items-center gap-8">
+        <a href="/catalogo" class="text-grafito hover:text-rose-500 transition font-medium">
+          Catálogo
+        </a>
+        <a href="/admin" class="text-grafito hover:text-rose-500 transition font-medium">
+          📊 Administración
+        </a>
+      </div>
+
+      <!-- Usuario y Logout -->
+      <div class="flex items-center gap-4">
+        <div class="hidden sm:block text-right">
+          <p class="text-sm text-grafito/60">Bienvenido</p>
+          <p class="text-sm font-medium text-grafito">{session.user.email}</p>
+        </div>
+        <div class="relative group">
+          <button class="w-10 h-10 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold hover:bg-rose-600 transition">
+            {session.user.email?.[0]?.toUpperCase() || 'U'}
+          </button>
+          <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+            <a href="/api/auth/logout" class="block px-4 py-2 text-grafito hover:bg-rose-50 rounded-lg text-sm">
+              Cerrar Sesión
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+)}

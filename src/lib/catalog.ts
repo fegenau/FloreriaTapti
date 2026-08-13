@@ -1,4 +1,6 @@
 import { supabase } from "./supabase";
+import catalogImageData from "../data/catalog.json";
+import { slugify } from "../utils/slugify.js";
 
 export type CatalogRow = {
   currency: string | null;
@@ -33,6 +35,106 @@ export type CatalogData = {
 };
 
 const DEFAULT_CATALOG_IMAGE = "images/Banner.jpg";
+const CATALOG_IMAGES_BASE_URL =
+  import.meta.env.PUBLIC_CATALOG_IMAGES_BASE_URL ||
+  "https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images";
+
+type CatalogImageEntry = {
+  name?: string;
+  image?: string[];
+};
+
+type CatalogImageData = {
+  flowers?: CatalogImageEntry[];
+};
+
+const catalogImageMap = new Map(
+  ((catalogImageData as CatalogImageData).flowers || [])
+    .filter((item) => typeof item.name === "string" && Array.isArray(item.image))
+    .map((item) => [slugify(item.name || ""), item.image || []]),
+);
+
+const resolvedUrlCache = new Map<string, string>();
+
+async function headOk(url: string): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, { method: "HEAD", signal: controller.signal });
+    clearTimeout(id);
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function resolveCatalogImageUrl(imagePath: string): Promise<string> {
+  if (!imagePath) return `/${DEFAULT_CATALOG_IMAGE}`;
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("/")) {
+    return imagePath;
+  }
+
+  // Try cached
+  if (resolvedUrlCache.has(imagePath)) return resolvedUrlCache.get(imagePath)!;
+
+  const candidates: string[] = [];
+
+  const orig = imagePath;
+  const stripped = orig.startsWith("images/") ? orig.slice("images/".length) : orig;
+
+  // Helper to attempt latin1->utf8 fix for mojibake
+  let maybeFixed = stripped;
+  try {
+    if (/[^\x00-\x7F]/.test(stripped)) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const Buffer = require("buffer").Buffer;
+      const fixed = Buffer.from(stripped, "latin1").toString("utf8");
+      if (fixed && fixed !== stripped) maybeFixed = fixed;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  candidates.push(stripped);
+  if (maybeFixed !== stripped) candidates.push(maybeFixed);
+  // also try original with images/ prefix
+  if (!orig.startsWith("images/")) { candidates.push(orig); }
+
+  for (const cand of candidates) {
+    const encoded = cand.split("/").map(encodeURIComponent).join("/");
+    const url = `${CATALOG_IMAGES_BASE_URL}/${encoded}`;
+    // quick check
+    if (await headOk(url)) {
+      resolvedUrlCache.set(imagePath, url);
+      return url;
+    }
+  }
+
+  // fallback to default local image
+  const fallback = `/${DEFAULT_CATALOG_IMAGE}`;
+  resolvedUrlCache.set(imagePath, fallback);
+  return fallback;
+}
+
+// Synchronous resolver used by components at render time. It constructs
+// the likely URL deterministically (strip leading 'images/' and encode
+// segments) but DOES NOT perform network checks. This avoids adding
+// blocking network calls in templates.
+export function resolveCatalogImageUrlSync(imagePath: string): string {
+  if (!imagePath) return `/${DEFAULT_CATALOG_IMAGE}`;
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("/")) {
+    return imagePath;
+  }
+
+  const orig = imagePath;
+  const stripped = orig.startsWith("images/") ? orig.slice("images/".length) : orig;
+  const encoded = stripped.split("/").map(encodeURIComponent).join("/");
+  return `${CATALOG_IMAGES_BASE_URL}/${encoded}`;
+}
+
+export async function resolveCatalogImagePaths(imagePaths: string[]): Promise<string[]> {
+  return Promise.all(imagePaths.map((imagePath) => resolveCatalogImageUrl(imagePath)));
+}
 
 function parseBoolean(value: string | boolean | null): boolean {
   if (typeof value === "boolean") return value;
@@ -42,6 +144,8 @@ function parseBoolean(value: string | boolean | null): boolean {
 }
 
 function normalizeCatalogRow(row: CatalogRow): CatalogProduct {
+  const imagePaths = catalogImageMap.get(slugify(row.name || "")) || [DEFAULT_CATALOG_IMAGE];
+
   return {
     currency: row.currency || "CLP",
     Description: row.Description || "",
@@ -58,7 +162,8 @@ function normalizeCatalogRow(row: CatalogRow): CatalogProduct {
         : typeof row.unit_price === "string"
           ? Number(row.unit_price)
           : null,
-    image: [DEFAULT_CATALOG_IMAGE],
+    // keep unresolved image paths here; they'll be resolved in getCatalogData
+    image: imagePaths,
   };
 }
 
@@ -88,6 +193,19 @@ export async function getCatalogData(): Promise<CatalogData> {
   }
 
   const flowers = (data || []).map((row) => normalizeCatalogRow(row as CatalogRow));
+
+  // Resolve image URLs (may perform HEAD checks and use cache)
+  await Promise.all(
+    flowers.map(async (f) => {
+      try {
+        // f.image currently holds raw image path strings
+        // @ts-ignore
+        f.image = await resolveCatalogImagePaths(f.image as string[]);
+      } catch (e) {
+        // leave as-is on error
+      }
+    }),
+  );
 
   return {
     currency: flowers[0]?.currency || "CLP",

@@ -1,0 +1,406 @@
+---
+import { supabase } from '../lib/supabase';
+
+interface Props {
+  isAdmin?: boolean;
+}
+
+const { isAdmin = true } = Astro.props;
+---
+
+<div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 px-4 py-12">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold text-grafito mb-2">Administración de Catálogo</h1>
+      <p class="text-grafito/60">Gestiona los productos de tu catálogo de flores</p>
+    </div>
+
+    <!-- Botones de Acción -->
+    <div class="mb-8 flex gap-4">
+      <button
+        id="btn-nuevo"
+        class="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
+      >
+        + Nuevo Producto
+      </button>
+    </div>
+
+    <!-- Tabla de Productos -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-grafito/10 border-b border-grafito/20">
+            <tr>
+              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Nombre</th>
+              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Categoría</th>
+              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Precio</th>
+              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Creado</th>
+              <th class="text-center px-6 py-4 text-sm font-semibold text-grafito">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="catalog-body">
+            <!-- Cargado dinámicamente -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Formulario -->
+<div id="modal-formulario" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+  <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
+      <h2 id="modal-titulo" class="text-2xl font-bold text-grafito">Nuevo Producto</h2>
+      <button id="btn-cerrar-modal" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <form id="form-producto" class="p-6 space-y-6">
+      <input type="hidden" id="producto-id" />
+
+      <!-- Nombre -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Nombre del Producto *
+        </label>
+        <input
+          type="text"
+          id="producto-nombre"
+          required
+          placeholder="Ej: Ramo de Rosas Rojas"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        />
+      </div>
+
+      <!-- Descripción -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Descripción
+        </label>
+        <textarea
+          id="producto-descripcion"
+          placeholder="Descripción del producto"
+          rows="4"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        />
+      </div>
+
+      <!-- Categoría -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Categoría *
+        </label>
+        <input
+          type="text"
+          id="producto-categoria"
+          required
+          placeholder="Ej: Colección General"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        />
+      </div>
+
+      <!-- Precio Unitario -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Precio Unitario (CLP)
+        </label>
+        <input
+          type="number"
+          id="producto-unit-price"
+          placeholder="Ej: 1000"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        />
+      </div>
+
+      <!-- Tipos de Flores -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Tipos de Flores (separados por coma)
+        </label>
+        <input
+          type="text"
+          id="producto-flower-type"
+          placeholder="Ej: Rosas, Lirios, Tulipanes"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        />
+      </div>
+
+      <!-- Tallas y Precios (JSON) -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Tallas y Precios (JSON)
+        </label>
+        <textarea
+          id="producto-sizes"
+          placeholder='{"Pequeño": {"total": 26000, "stems": "12 varas"}, "Mediano": {"total": 40000, "stems": "20 varas"}}'
+          rows="4"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none font-mono text-sm"
+        />
+      </div>
+
+      <!-- URLs de Imágenes -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          URLs de Imágenes (separadas por punto y coma)
+        </label>
+        <textarea
+          id="producto-images"
+          placeholder="images/foto1.avif; images/foto2.avif"
+          rows="2"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        />
+      </div>
+
+      <!-- Checkboxes -->
+      <div class="grid grid-cols-2 gap-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="producto-has-form" class="w-4 h-4" />
+          <span class="text-sm text-grafito">Tiene Formulario</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input type="checkbox" id="producto-is-quote" class="w-4 h-4" />
+          <span class="text-sm text-grafito">Requiere Cotización</span>
+        </label>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex gap-4 pt-4 border-t">
+        <button
+          type="submit"
+          class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+        >
+          Guardar Producto
+        </button>
+        <button
+          type="button"
+          id="btn-cancelar-modal"
+          class="flex-1 bg-gray-300 hover:bg-gray-400 text-grafito font-semibold py-2 px-4 rounded-lg transition"
+        >
+          Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+</div>
+  interface CatalogProduct {
+    id: string;
+    name: string;
+    category: string;
+    unit_price: number;
+    created_at: string;
+    [key: string]: any;
+  }
+
+  const modal = document.getElementById('modal-formulario');
+  const form = document.getElementById('form-producto') as HTMLFormElement;
+  const btnNuevo = document.getElementById('btn-nuevo');
+  const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+  const btnCancelarModal = document.getElementById('btn-cancelar-modal');
+  const catalogBody = document.getElementById('catalog-body');
+  const modalTitulo = document.getElementById('modal-titulo');
+  const productoIdInput = document.getElementById('producto-id') as HTMLInputElement;
+
+  // Cargar productos
+  async function cargarProductos() {
+    try {
+      const res = await fetch('/api/catalog');
+      const { data } = await res.json();
+
+      catalogBody!.innerHTML = data.map((producto: CatalogProduct) => `
+        <tr class="border-b border-gray-200 hover:bg-gray-50">
+          <td class="px-6 py-4 text-sm text-grafito">${producto.name}</td>
+          <td class="px-6 py-4 text-sm text-grafito/60">${producto.category}</td>
+          <td class="px-6 py-4 text-sm text-grafito">$${producto.unit_price?.toLocaleString('es-CL') || 'N/A'}</td>
+          <td class="px-6 py-4 text-sm text-grafito/60">${new Date(producto.created_at).toLocaleDateString('es-CL')}</td>
+          <td class="px-6 py-4 text-center">
+            <button class="btn-editar text-blue-500 hover:text-blue-700 mr-4" data-id="${producto.id}">
+              Editar
+            </button>
+            <button class="btn-eliminar text-red-500 hover:text-red-700" data-id="${producto.id}">
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Asignar eventos a botones de edición y eliminación
+      document.querySelectorAll('.btn-editar').forEach(btn => {
+        btn.addEventListener('click', () => abrirFormulario(btn.getAttribute('data-id')));
+      });
+
+      document.querySelectorAll('.btn-eliminar').forEach(btn => {
+        btn.addEventListener('click', () => eliminarProducto(btn.getAttribute('data-id')));
+      });
+    } catch (error) {
+      console.error('Error al cargar productos:', error);
+      alert('Error al cargar los productos');
+    }
+  }
+
+  // Abrir formulario para editar
+  async function abrirFormulario(id?: string | null) {
+    if (id) {
+      // Cargar datos del producto
+      try {
+        const res = await fetch(`/api/catalog`);
+        const { data } = await res.json();
+        const producto = data.find((p: CatalogProduct) => p.id === id);
+
+        if (producto) {
+          modalTitulo!.textContent = 'Editar Producto';
+          productoIdInput.value = id;
+          (document.getElementById('producto-nombre') as HTMLInputElement).value = producto.name;
+          (document.getElementById('producto-descripcion') as HTMLTextAreaElement).value = producto.Description || '';
+          (document.getElementById('producto-categoria') as HTMLInputElement).value = producto.category;
+          (document.getElementById('producto-unit-price') as HTMLInputElement).value = producto.unit_price || '';
+          (document.getElementById('producto-flower-type') as HTMLInputElement).value = (producto.flowerType || []).join(', ');
+          (document.getElementById('producto-sizes') as HTMLTextAreaElement).value = JSON.stringify(producto.sizes || {}, null, 2);
+          (document.getElementById('producto-images') as HTMLTextAreaElement).value = '';
+          (document.getElementById('producto-has-form') as HTMLInputElement).checked = producto.hasForm === true || producto.hasForm === 'true' || producto.hasForm === '1';
+          (document.getElementById('producto-is-quote') as HTMLInputElement).checked = producto.isQuote === true || producto.isQuote === 'true' || producto.isQuote === '1';
+        }
+      } catch (error) {
+        console.error('Error al cargar producto:', error);
+      }
+    } else {
+      // Nuevo producto
+      modalTitulo!.textContent = 'Nuevo Producto';
+      productoIdInput.value = '';
+      form.reset();
+    }
+
+    modal!.classList.remove('hidden');
+  }
+
+  // Cerrar modal
+  function cerrarModal() {
+    modal!.classList.add('hidden');
+    form.reset();
+  }
+
+  // Guardar producto
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const id = productoIdInput.value;
+    const nombre = (document.getElementById('producto-nombre') as HTMLInputElement).value;
+    const descripcion = (document.getElementById('producto-descripcion') as HTMLTextAreaElement).value;
+    const categoria = (document.getElementById('producto-categoria') as HTMLInputElement).value;
+    const unitPrice = parseInt((document.getElementById('producto-unit-price') as HTMLInputElement).value) || null;
+    const flowerType = (document.getElementById('producto-flower-type') as HTMLInputElement).value
+      .split(',')
+      .map(f => f.trim())
+      .filter(Boolean);
+    const sizesJson = (document.getElementById('producto-sizes') as HTMLTextAreaElement).value;
+    const images = (document.getElementById('producto-images') as HTMLTextAreaElement).value
+      .split(';')
+      .map(img => img.trim())
+      .filter(Boolean);
+    const hasForm = (document.getElementById('producto-has-form') as HTMLInputElement).checked;
+    const isQuote = (document.getElementById('producto-is-quote') as HTMLInputElement).checked;
+
+    let sizes = {};
+    try {
+      if (sizesJson.trim()) {
+        sizes = JSON.parse(sizesJson);
+      }
+    } catch (error) {
+      alert('Error en formato JSON de tallas y precios');
+      return;
+    }
+
+    const payload = {
+      name: nombre,
+      description: descripcion,
+      category: categoria,
+      flower_type: flowerType,
+      unit_price: unitPrice,
+      currency: 'CLP',
+      sizes,
+      images,
+      has_form: hasForm,
+      is_quote: isQuote,
+    };
+
+    try {
+      let res;
+      if (id) {
+        // Actualizar
+        res = await fetch(`/api/catalog/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      } else {
+        // Crear
+        res = await fetch('/api/catalog', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      const result = await res.json();
+
+      if (res.ok) {
+        alert(result.message);
+        cerrarModal();
+        cargarProductos();
+      } else {
+        alert('Error: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error al guardar producto:', error);
+      alert('Error al guardar el producto');
+    }
+  });
+
+  // Eliminar producto
+  async function eliminarProducto(id: string | null) {
+    if (!id || !confirm('¿Estás seguro de que deseas eliminar este producto?')) return;
+
+    try {
+      const res = await fetch(`/api/catalog/${id}`, { method: 'DELETE' });
+      const result = await res.json();
+
+      if (res.ok) {
+        alert(result.message);
+        cargarProductos();
+      } else {
+        alert('Error: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error al eliminar producto:', error);
+      alert('Error al eliminar el producto');
+    }
+  }
+
+  // Event Listeners
+  btnNuevo!.addEventListener('click', () => abrirFormulario());
+  btnCerrarModal!.addEventListener('click', cerrarModal);
+  btnCancelarModal!.addEventListener('click', cerrarModal);
+
+  // Cargar productos al iniciar
+  cargarProductos();
+</script>
+
+<style>
+  #modal-formulario:not(.hidden) {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+</style>

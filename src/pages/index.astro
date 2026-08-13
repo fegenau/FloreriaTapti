@@ -4,14 +4,14 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
 import FloatingNav from "../components/FloatingNav.astro";
 import OccasionCard from "../components/OccasionCard.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
-import { getCatalogData } from "../lib/catalog";
+import { getCatalogData, resolveCatalogImageUrlSync } from "../lib/catalog";
 
 // Servicios principales
 const mainServices = [
   {
     title: "Ramos Personalizados",
     description: "Diseños únicos adaptados a tus gustos y ocasión especial",
-    image: "/images/Flores/Armando.png",
+    image: resolveCatalogImageUrlSync("/Flores/Armando.png"),
     url: "/contacto",
   },
   {
@@ -19,19 +19,19 @@ const mainServices = [
     description:
       "Bodas, cumpleaños y celebraciones con arreglos florales únicos",
     image:
-      "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=500&fit=crop&crop=center",
+      "https://.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=500&fit=crop&crop=center",
     url: "/contacto",
   },
   {
     title: "Experiencia Tapti",
     description: "Esto es más que un regalo, es una experiencia completa",
-    image: "/images/Flores/Experiencia Tapti/Experiencia Tapti.avif",
+    image: resolveCatalogImageUrlSync("/Flores/Experiencia Tapti/Experiencia Tapti.avif"),
     url: "/catalogo",
   },
   {
     title: "Suscripciones Mensuales",
     description: "Esto es más que un regalo, es una experiencia completa",
-    image: "/images/Flores/Jardin secreto/JardinSecreto1.avif",
+    image: resolveCatalogImageUrlSync("/Flores/Jardin secreto/JardinSecreto1.avif"),
     url: "/suscripciones",
   },
 ];
@@ -48,7 +48,7 @@ const categoryShowcase = [
     title: "Ramos Deluxe",
     category: "Ramos Deluxe",
     description: "Nuestra selección premium de ramos exclusivos",
-    image: "images/Flores/Bouquet Alquimia/BouquetAlquimia.avif",
+    image: resolveCatalogImageUrlSync("/Flores/Bouquet Alquimia/BouquetAlquimia.avif"),
   },
   {
     title: "Condolencias",
@@ -76,31 +76,29 @@ const categoryShowcase = [
   );
   return {
     ...item,
-    image: item.image ?? match?.image?.[0] ?? "/images/Banner.jpg",
+    image: item.image ?? match?.image?.[0] ?? "//Banner.jpg",
   };
 });
 
 const specialOccasions = [
   {
     title: "Rosas",
-    image:
-      "/images/Flores/Rosas rojas/Rosas rojas.avif",
+    image: resolveCatalogImageUrlSync("/Flores/Rosas rojas/Rosas rojas.avif"),
     url: "/catalogo?flor=Rosas",
   },
   {
     title: "Girasoles",
-    image:
-      "/images/Flores/Girasoles clasico/Ramo girasoles clásico.webp",
+    image: resolveCatalogImageUrlSync("/Flores/Girasoles clasico/Ramo girasoles clásico.webp"),
     url: "/catalogo?flor=Girasoles",
   },
   {
     title: "Lilium",
-    image: "/images/Flores/Condolencias.jpeg",
+    image: resolveCatalogImageUrlSync("/Flores/Condolencias.jpeg"),
     url: "/catalogo?flor=Lilium",
   },
   {
     title: "Tulipanes",
-    image: "/images/Flores/Tulipanes/Tulipanes.jpeg",
+    image: resolveCatalogImageUrlSync("/Flores/Tulipanes/Tulipanes.jpeg"),
     url: "/catalogo?flor=Tulipanes",
   },
 ];
@@ -118,7 +116,7 @@ const specialOccasions = [
     <BoutiqueCard
       variant="hero"
       size="hero"
-      background="/images/Banner.jpg"
+      background="//Banner.jpg"
       className="md-4 md:mx-6"
     >
       <div class="max-w-4xl pl-8 md:pl-16">
@@ -273,7 +271,7 @@ const specialOccasions = [
     <InstagramFeed username="tapti_regalo" />
 
     <!-- Card de Membresías - Ancho ajustado y centrado (Oculto temporalmente) -->
-    <div class="flex justify-center px-4 md:px-6 hidden">
+    <div class="justify-center px-4 md:px-6 hidden">
       <div class="w-full max-w-5xl">
         <BoutiqueCard
           variant="services"

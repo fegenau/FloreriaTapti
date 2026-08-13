@@ -1,0 +1,144 @@
+---
+import { supabase } from '../lib/supabase';
+
+interface Props {
+  redirectTo?: string;
+}
+
+const { redirectTo = '/' } = Astro.props;
+
+let errorMessage = '';
+let isLoading = false;
+
+// Obtener sesión del servidor si existe
+const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+---
+
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-pink-50 px-4">
+  <div class="w-full max-w-md">
+    <div class="bg-white rounded-lg shadow-xl p-8">
+      <!-- Header -->
+      <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-grafito mb-2">Bienvenido a Tapti</h1>
+        <p class="text-gray-600">Inicia sesión para continuar</p>
+      </div>
+
+      <!-- Form -->
+      <form id="loginForm" class="space-y-6" method="POST" action="/api/auth/login">
+        <!-- Email Field -->
+        <div>
+          <label for="email" class="block text-sm font-medium text-grafito mb-2">
+            Correo electrónico
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            required
+            placeholder="tu@email.com"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition"
+          />
+        </div>
+
+        <!-- Password Field -->
+        <div>
+          <label for="password" class="block text-sm font-medium text-grafito mb-2">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            placeholder="Mínimo 6 caracteres"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition"
+          />
+        </div>
+
+        <!-- Remember Me -->
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            id="rememberMe"
+            name="rememberMe"
+            class="w-4 h-4 text-rose-500 border-gray-300 rounded focus:ring-rose-500"
+          />
+          <label for="rememberMe" class="ml-2 text-sm text-gray-600">
+            Recuérdame
+          </label>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 ease-in-out transform hover:scale-105"
+        >
+          Iniciar sesión
+        </button>
+      </form>
+
+      <!-- Sign Up Link -->
+      <div class="mt-6 text-center">
+        <p class="text-gray-600">
+          ¿No tienes cuenta?
+          <a href="/signup" class="text-rose-500 hover:text-rose-600 font-semibold">
+            Regístrate aquí
+          </a>
+        </p>
+      </div>
+
+      <!-- Forgot Password Link -->
+      <div class="mt-4 text-center">
+        <a href="/forgot-password" class="text-gray-600 hover:text-rose-500 text-sm">
+          ¿Olvidaste tu contraseña?
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const form = document.getElementById('loginForm') as HTMLFormElement;
+  const errorMessage = document.getElementById('errorMessage');
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const formData = new FormData(form);
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    try {
+      // Limpiar mensaje de error previo
+      if (errorMessage) {
+        errorMessage.classList.add('hidden');
+      }
+
+      // Llamar al API endpoint
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Error al iniciar sesión');
+      }
+
+      // Login exitoso - redirigir
+      window.location.href = data.redirectTo || '/';
+    } catch (error) {
+      if (errorMessage) {
+        errorMessage.textContent = error instanceof Error ? error.message : 'Ocurrió un error';
+        errorMessage.classList.remove('hidden');
+      }
+    }
+  });
+</script>

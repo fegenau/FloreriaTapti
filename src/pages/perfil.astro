@@ -1,0 +1,101 @@
+---
+import Layout from "../components/Layout.astro";
+import { supabase } from "../lib/supabase";
+
+// Verificar sesión
+const { data: { session } } = await supabase.auth.getSession();
+
+// Redirigir si no está autenticado
+if (!session) {
+  return Astro.redirect('/login');
+}
+
+// Obtener datos del perfil
+const { data: profile } = await supabase
+  .from('profiles')
+  .select('*')
+  .eq('id', session.user.id)
+  .single();
+---
+
+<Layout title="Mi Perfil | Tapti">
+  <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 px-4 py-12">
+    <div class="max-w-2xl mx-auto">
+      <!-- Header -->
+      <div class="mb-8">
+        <a href="/dashboard" class="text-rose-500 hover:text-rose-600 mb-4 inline-flex items-center gap-2">
+          ← Volver al Dashboard
+        </a>
+        <h1 class="text-4xl font-bold text-grafito">Mi Perfil</h1>
+      </div>
+
+      <!-- Tarjeta de Perfil -->
+      <div class="bg-white rounded-lg shadow-lg p-8">
+        <div class="flex items-center gap-6 mb-8">
+          <div class="w-20 h-20 bg-rose-500 text-white rounded-full flex items-center justify-center text-3xl font-bold">
+            {session.user.email?.[0]?.toUpperCase() || 'U'}
+          </div>
+          <div>
+            <h2 class="text-2xl font-bold text-grafito">{session.user.email}</h2>
+            <p class="text-gray-600">Usuario de Tapti Flores y Regalos</p>
+          </div>
+        </div>
+
+        <!-- Información de Cuenta -->
+        <div class="space-y-6 border-t border-gray-200 pt-6">
+          <div>
+            <h3 class="text-sm font-semibold text-grafito/60 uppercase tracking-wide mb-2">Email</h3>
+            <p class="text-lg text-grafito">{session.user.email}</p>
+          </div>
+
+          <div>
+            <h3 class="text-sm font-semibold text-grafito/60 uppercase tracking-wide mb-2">ID de Usuario</h3>
+            <p class="text-lg text-grafito font-mono text-sm">{session.user.id}</p>
+          </div>
+
+          {profile && (
+            <>
+              <div>
+                <h3 class="text-sm font-semibold text-grafito/60 uppercase tracking-wide mb-2">Fecha de Registro</h3>
+                <p class="text-lg text-grafito">
+                  {new Date(profile.created_at).toLocaleDateString('es-CL', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </p>
+              </div>
+            </>
+          )}
+        </div>
+
+        <!-- Acciones -->
+        <div class="border-t border-gray-200 pt-6 mt-8 flex gap-4">
+          <a
+            href="/dashboard"
+            class="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-lg transition text-center"
+          >
+            Ir al Dashboard
+          </a>
+          <a
+            href="/api/auth/logout"
+            class="flex-1 bg-gray-300 hover:bg-gray-400 text-grafito font-semibold py-2 px-4 rounded-lg transition text-center"
+          >
+            Cerrar Sesión
+          </a>
+        </div>
+      </div>
+
+      <!-- Información de Seguridad -->
+      <div class="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <h3 class="font-semibold text-blue-900 mb-2">🔒 Información de Seguridad</h3>
+        <p class="text-sm text-blue-800">
+          Tu contraseña se almacena de forma segura encriptada en nuestra base de datos. 
+          Nunca la compartimos con terceros.
+        </p>
+      </div>
+    </div>
+  </div>
+</Layout>

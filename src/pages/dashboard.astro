@@ -1,0 +1,91 @@
+---
+import Layout from "../components/Layout.astro";
+import { supabase } from "../lib/supabase";
+
+// Verificar sesión
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+// Redirigir si no está autenticado
+if (!session) {
+  return Astro.redirect("/login");
+}
+---
+
+<div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 px-4 py-12">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-12 text-center">
+      <h1 class="text-4xl font-bold text-grafito mb-4">
+        Bienvenido, {session.user.email?.split("@")[0]}
+      </h1>
+      <p class="text-gray-600 text-lg">Selecciona una opción para continuar</p>
+    </div>
+
+    <!-- Grid de Opciones -->
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- Opción 1: Ver Catálogo -->
+      <div class="group">
+        <a
+          href="/catalogo"
+          class="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all p-8 text-center group-hover:transform group-hover:scale-105"
+        >
+          <div class="text-5xl mb-4">🌹</div>
+          <h2 class="text-2xl font-bold text-grafito mb-2">Ver Catálogo</h2>
+          <p class="text-gray-600">Explora todos los productos disponibles</p>
+        </a>
+      </div>
+
+      <!-- Opción 2: Administración de Catálogo -->
+      <div class="group">
+        <a
+          href="/admin"
+          class="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all p-8 text-center group-hover:transform group-hover:scale-105"
+        >
+          <div class="text-5xl mb-4">📊</div>
+          <h2 class="text-2xl font-bold text-grafito mb-2">Administración</h2>
+          <p class="text-gray-600">Gestiona productos, crea, edita o elimina</p>
+        </a>
+      </div>
+
+      <!-- Opción 3: Perfil -->
+      <div class="group">
+        <a
+          href="/perfil"
+          class="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all p-8 text-center group-hover:transform group-hover:scale-105"
+        >
+          <div class="text-5xl mb-4">👤</div>
+          <h2 class="text-2xl font-bold text-grafito mb-2">Mi Perfil</h2>
+          <p class="text-gray-600">Ver y editar mi información</p>
+        </a>
+      </div>
+    </div>
+
+    <!-- Información de Usuario -->
+    <div class="mt-12 bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+      <h3 class="text-xl font-bold text-grafito mb-4">Información de Cuenta</h3>
+      <div class="space-y-2 text-gray-700">
+        <p>
+          <span class="font-semibold">Email:</span>
+          {session.user.email}
+        </p>
+        <p>
+          <span class="font-semibold">ID de Usuario:</span>
+          {session.user.id}
+        </p>
+        <p>
+          <span class="font-semibold">Sesión Activa:</span> Sí
+        </p>
+      </div>
+      <div class="mt-6">
+        <a
+          href="/api/auth/logout"
+          class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+        >
+          Cerrar Sesión
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
