@@ -34,10 +34,11 @@ export type CatalogData = {
   flowers: CatalogProduct[];
 };
 
-const DEFAULT_CATALOG_IMAGE = "images/Banner.jpg";
+const DEFAULT_CATALOG_IMAGE = "https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Banner.avif";
 const CATALOG_IMAGES_BASE_URL =
   import.meta.env.PUBLIC_CATALOG_IMAGES_BASE_URL ||
-  "https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images";
+  "https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/";
+
 
 type CatalogImageEntry = {
   name?: string;
@@ -56,6 +57,29 @@ const catalogImageMap = new Map(
 
 const resolvedUrlCache = new Map<string, string>();
 
+function isLocalPublicAssetPath(imagePath: string): boolean {
+  return /^\/(?:images|assets|fonts|favicon|_astro|_app|uploads)\//i.test(imagePath);
+}
+
+function normalizeStorageImagePath(imagePath: string): string {
+  if (!imagePath) return "";
+
+  let normalized = imagePath.trim().replace(/\\/g, "/");
+
+  try {
+    normalized = decodeURIComponent(normalized);
+  } catch {
+    // keep the raw value if it is already url-encoded/incompatible
+  }
+
+  normalized = normalized.replace(/^\/+/, "");
+  normalized = normalized.replace(/(^|\/)PAGINA(?:%20| )WEB(?:%20| )?(?:\(\s*FOTOS\s*\)|\s*FOTOS)\s*\/?/gi, "$1");
+  normalized = normalized.replace(/^images\//i, "");
+  normalized = normalized.replace(/^\/+/, "");
+
+  return normalized;
+}
+
 async function headOk(url: string): Promise<boolean> {
   try {
     const controller = new AbortController();
@@ -69,8 +93,11 @@ async function headOk(url: string): Promise<boolean> {
 }
 
 export async function resolveCatalogImageUrl(imagePath: string): Promise<string> {
-  if (!imagePath) return `/${DEFAULT_CATALOG_IMAGE}`;
-  if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("/")) {
+  if (!imagePath) return `${DEFAULT_CATALOG_IMAGE}`;
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+  if (isLocalPublicAssetPath(imagePath)) {
     return imagePath;
   }
 
@@ -80,7 +107,7 @@ export async function resolveCatalogImageUrl(imagePath: string): Promise<string>
   const candidates: string[] = [];
 
   const orig = imagePath;
-  const stripped = orig.startsWith("images/") ? orig.slice("images/".length) : orig;
+  const stripped = normalizeStorageImagePath(orig);
 
   // Helper to attempt latin1->utf8 fix for mojibake
   let maybeFixed = stripped;
@@ -110,8 +137,8 @@ export async function resolveCatalogImageUrl(imagePath: string): Promise<string>
     }
   }
 
-  // fallback to default local image
-  const fallback = `/${DEFAULT_CATALOG_IMAGE}`;
+  // fallback to default image
+  const fallback = DEFAULT_CATALOG_IMAGE;
   resolvedUrlCache.set(imagePath, fallback);
   return fallback;
 }
@@ -121,13 +148,16 @@ export async function resolveCatalogImageUrl(imagePath: string): Promise<string>
 // segments) but DOES NOT perform network checks. This avoids adding
 // blocking network calls in templates.
 export function resolveCatalogImageUrlSync(imagePath: string): string {
-  if (!imagePath) return `/${DEFAULT_CATALOG_IMAGE}`;
-  if (imagePath.startsWith("http://") || imagePath.startsWith("https://") || imagePath.startsWith("/")) {
+  if (!imagePath) return DEFAULT_CATALOG_IMAGE;
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+  if (isLocalPublicAssetPath(imagePath)) {
     return imagePath;
   }
 
   const orig = imagePath;
-  const stripped = orig.startsWith("images/") ? orig.slice("images/".length) : orig;
+  const stripped = normalizeStorageImagePath(orig);
   const encoded = stripped.split("/").map(encodeURIComponent).join("/");
   return `${CATALOG_IMAGES_BASE_URL}/${encoded}`;
 }

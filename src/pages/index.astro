@@ -11,27 +11,26 @@ const mainServices = [
   {
     title: "Ramos Personalizados",
     description: "Diseños únicos adaptados a tus gustos y ocasión especial",
-    image: resolveCatalogImageUrlSync("/Flores/Armando.png"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Armando.png"),
     url: "/contacto",
   },
   {
     title: "Eventos Especiales",
     description:
       "Bodas, cumpleaños y celebraciones con arreglos florales únicos",
-    image:
-      "https://.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=500&fit=crop&crop=center",
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Box%20elixir/Box%20elixir%203.avif"),
     url: "/contacto",
   },
   {
     title: "Experiencia Tapti",
     description: "Esto es más que un regalo, es una experiencia completa",
-    image: resolveCatalogImageUrlSync("/Flores/Experiencia Tapti/Experiencia Tapti.avif"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Experiencia%20Tapti/Experiencia%20Tapti%202.avif"),
     url: "/catalogo",
   },
   {
     title: "Suscripciones Mensuales",
     description: "Esto es más que un regalo, es una experiencia completa",
-    image: resolveCatalogImageUrlSync("/Flores/Jardin secreto/JardinSecreto1.avif"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Suscripcion.avif"),
     url: "/suscripciones",
   },
 ];
@@ -48,17 +47,19 @@ const categoryShowcase = [
     title: "Ramos Deluxe",
     category: "Ramos Deluxe",
     description: "Nuestra selección premium de ramos exclusivos",
-    image: resolveCatalogImageUrlSync("/Flores/Bouquet Alquimia/BouquetAlquimia.avif"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Bouquet%20Alquimia/BouquetAlquimia.avif"),
   },
   {
     title: "Condolencias",
     category: "Condolencias",
     description: "Arreglos para acompañar en momentos difíciles",
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Condolencias.jpeg"),
   },
   {
     title: "Nacimientos",
     category: "Nacimientos",
     description: "Canastos y detalles para dar la bienvenida al mundo",
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Canastos/canasto_as.avif"),
   },
   {
     title: "Arreglos Florales",
@@ -69,6 +70,7 @@ const categoryShowcase = [
     title: "Aniversarios",
     category: "Aniversarios",
     description: "Regalos y experiencias para celebrar momentos especiales",
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Experiencia%20Tapti/Experiencia%20Tapti.avif"),
   },
 ].map((item) => {
   const match = catalogProducts.find(
@@ -76,29 +78,29 @@ const categoryShowcase = [
   );
   return {
     ...item,
-    image: item.image ?? match?.image?.[0] ?? "//Banner.jpg",
+    image: item.image ?? match?.image?.[0] ?? "https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Banner.avif",
   };
 });
 
 const specialOccasions = [
   {
     title: "Rosas",
-    image: resolveCatalogImageUrlSync("/Flores/Rosas rojas/Rosas rojas.avif"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Rosas%20rojas/Rosas%20rojas.avif"),
     url: "/catalogo?flor=Rosas",
   },
   {
     title: "Girasoles",
-    image: resolveCatalogImageUrlSync("/Flores/Girasoles clasico/Ramo girasoles clásico.webp"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Girasoles%20clasico/Girasoles%20clasico.avif"),
     url: "/catalogo?flor=Girasoles",
   },
   {
     title: "Lilium",
-    image: resolveCatalogImageUrlSync("/Flores/Condolencias.jpeg"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Lilium%20oriental/Lilium%20oriental.avif"),
     url: "/catalogo?flor=Lilium",
   },
   {
     title: "Tulipanes",
-    image: resolveCatalogImageUrlSync("/Flores/Tulipanes/Tulipanes.jpeg"),
+    image: resolveCatalogImageUrlSync("https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Tulipan/Tulipan.avif"),
     url: "/catalogo?flor=Tulipanes",
   },
 ];
@@ -116,7 +118,7 @@ const specialOccasions = [
     <BoutiqueCard
       variant="hero"
       size="hero"
-      background="//Banner.jpg"
+      background="https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Banner.avif"
       className="md-4 md:mx-6"
     >
       <div class="max-w-4xl pl-8 md:pl-16">
