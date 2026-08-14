@@ -2,22 +2,14 @@
 import Layout from "../../components/Layout.astro";
 import ExperienceModal from "../../components/ExperienceModal.astro";
 import QuoteModal from "../../components/QuoteModal.astro";
-import catalogData from "../../data/catalog.json";
+import { getCatalogData, getStartingPrice, resolveCatalogImageUrlSync } from "../../lib/catalog";
 import { slugify } from "../../utils/slugify.js";
 
 const { slug } = Astro.params;
-const products = catalogData.flowers as any[];
+const { flowers: products } = await getCatalogData();
 
 const product = products.find((p: any) => slugify(p.name) === slug);
 if (!product) return Astro.redirect('/catalogo');
-
-function getStartingPrice(p: any): number | null {
-  if (p.isQuote) return null;
-  const prices: number[] = Object.values(p.sizes as Record<string, any>)
-    .filter((s: any): s is { total: number } => s !== null)
-    .map((s: any) => s.total);
-  return prices.length > 0 ? Math.min(...prices) : null;
-}
 
 const startingPrice = getStartingPrice(product);
 const validSizes: [string, { total: number; stems?: string | number }][] = product.isQuote
@@ -56,7 +48,7 @@ const related = products
           <div class="aspect-square overflow-hidden rounded-lg bg-marfil border border-borde-claro mb-3">
             <img
               id="main-image"
-              src={`/${product.image[0]}`}
+              src={resolveCatalogImageUrlSync(product.image[0])}
               alt={product.name}
               class="w-full h-full object-cover transition-opacity duration-300"
             />
@@ -67,10 +59,10 @@ const related = products
               {product.image.map((img: string, i: number) => (
                 <button
                   class={`thumbnail-btn w-16 h-16 overflow-hidden rounded-md border-2 transition-all flex-shrink-0 ${i === 0 ? 'border-terracota' : 'border-transparent hover:border-borde-claro'}`}
-                  data-src={`/${img}`}
+                  data-src={resolveCatalogImageUrlSync(img)}
                   type="button"
                 >
-                  <img src={`/${img}`} alt={`${product.name} ${i + 1}`}
+                  <img src={resolveCatalogImageUrlSync(img)} alt={`${product.name} ${i + 1}`}
                     class="w-full h-full object-cover" />
                 </button>
               ))}
@@ -198,7 +190,7 @@ const related = products
                 <a href={`/producto/${slugify(p.name)}`} class="group block">
                   <div class="aspect-square overflow-hidden rounded-sm bg-marfil border border-borde-claro mb-2.5">
                     <img
-                      src={`/${p.image[0]}`}
+                      src={resolveCatalogImageUrlSync(p.image[0])}
                       alt={p.name}
                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"

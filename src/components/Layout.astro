@@ -1,6 +1,7 @@
 ---
 import EntranceAnimation from "./EntranceAnimation.astro";
 import FloatingNav from "./FloatingNav.astro";
+import MainMenu from "./MainMenu.astro";
 import FloatingWhatsApp from "./FloatingWhatsApp.astro";
 import AccessoriesModal from "./AccessoriesModal.astro";
 import { ViewTransitions } from "astro:transitions";
@@ -72,6 +73,7 @@ const {
         });
       </script>
       <FloatingNav />
+      <MainMenu />
       <main
         class:list={[
           hideHeader ? "min-h-screen" : "min-h-[70vh]",

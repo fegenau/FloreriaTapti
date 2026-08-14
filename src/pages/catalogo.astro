@@ -1,20 +1,12 @@
 ---
 import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
-import catalogData from "../data/catalog.json";
+import { getCatalogData, getStartingPrice, resolveCatalogImageUrlSync } from "../lib/catalog";
 import { slugify } from "../utils/slugify.js";
 
-const products = catalogData.flowers as any[];
+const { flowers: products } = await getCatalogData();
 const categories = [...new Set([...products.map((p: any) => p.category).filter(Boolean), "Condolencias"])] as string[];
 const flowerTypes = [...new Set(products.flatMap((p: any) => p.flowerType || []))] as string[];
-
-function getStartingPrice(product: any): number | null {
-  if (product.isQuote) return null;
-  const prices: number[] = Object.values(product.sizes as Record<string, any>)
-    .filter((s): s is { total: number } => s !== null)
-    .map((s: any) => s.total);
-  return prices.length > 0 ? Math.min(...prices) : null;
-}
 
 const maxCatalogPrice = products.reduce((max: number, p: any) => {
   if (p.isQuote) return max;
@@ -194,19 +186,19 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
                   class="relative aspect-square overflow-hidden rounded-sm bg-marfil border border-borde-claro group/carousel"
                   data-images={JSON.stringify(
                     product.image.length > 1
-                      ? product.image
-                      : [product.image[0], product.image[0]]
+                      ? product.image.map((img: string) => resolveCatalogImageUrlSync(img))
+                      : [resolveCatalogImageUrlSync(product.image[0]), resolveCatalogImageUrlSync(product.image[0])]
                   )}
                 >
                   <div class="carousel-track flex h-full transition-transform duration-700 ease-in-out">
                     <img
-                      src={product.image[0]}
+                      src={resolveCatalogImageUrlSync(product.image[0])}
                       alt={product.name}
                       class="w-full h-full object-cover flex-shrink-0"
                       loading="lazy"
                     />
                     <img
-                      src={product.image[1] || product.image[0]}
+                      src={resolveCatalogImageUrlSync(product.image[1] || product.image[0])}
                       alt={`${product.name} 2`}
                       class="w-full h-full object-cover flex-shrink-0"
                       loading="lazy"

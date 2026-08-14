@@ -1,0 +1,140 @@
+---
+import LayoutAdmin from "../components/LayoutAdmin.astro";
+import { supabase } from "../lib/supabase";
+
+const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+if (!session) {
+  return Astro.redirect("/login");
+}
+
+const { data: catalogProducts, error: catalogError } = await supabase
+  .from("catalog")
+  .select("name, category, unit_price, created_at")
+  .order("created_at", { ascending: false })
+  .limit(5);
+
+const totalProductos = Number(catalogProducts?.length) || 0;
+---
+
+<LayoutAdmin>
+  <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 px-4 py-12">
+    <div class="max-w-6xl mx-auto">
+      <div class="mb-12 text-center">
+        <h1 class="text-4xl font-bold text-grafito mb-4">
+          Bienvenido, {session.user.email?.split("@")[0]}
+        </h1>
+        <p class="text-gray-600 text-lg">Selecciona una opción para continuar</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="group">
+          <a
+            href="/catalogo"
+            class="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all p-8 text-center group-hover:transform group-hover:scale-105"
+          >
+            <div class="text-5xl mb-4">🌹</div>
+            <h2 class="text-2xl font-bold text-grafito mb-2">Ver Catálogo</h2>
+            <p class="text-gray-600">Explora todos los productos disponibles</p>
+          </a>
+        </div>
+
+        <div class="group">
+          <a
+            href="/admin"
+            class="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all p-8 text-center group-hover:transform group-hover:scale-105"
+          >
+            <div class="text-5xl mb-4">📊</div>
+            <h2 class="text-2xl font-bold text-grafito mb-2">Administración</h2>
+            <p class="text-gray-600">Gestiona productos, crea, edita o elimina</p>
+          </a>
+        </div>
+
+        <div class="group">
+          <a
+            href="/perfil"
+            class="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all p-8 text-center group-hover:transform group-hover:scale-105"
+          >
+            <div class="text-5xl mb-4">👤</div>
+            <h2 class="text-2xl font-bold text-grafito mb-2">Mi Perfil</h2>
+            <p class="text-gray-600">Ver y editar mi información</p>
+          </a>
+        </div>
+      </div>
+
+      <div class="mt-10 grid md:grid-cols-2 gap-6">
+        <!-- <div class="bg-white rounded-lg shadow p-6">
+          <p class="text-sm text-gray-500">Productos en catálogo</p>
+          <p class="mt-3 text-3xl font-bold text-grafito">{totalProductos}</p>
+        </div> -->
+        <div class="bg-white rounded-lg shadow p-6">
+          <p class="text-sm text-gray-500">Usuario</p>
+          <p class="mt-3 text-lg font-semibold text-grafito">{session.user.email}</p>
+        </div>
+        <div class="bg-white rounded-lg shadow p-6">
+          <p class="text-sm text-gray-500">Estado</p>
+          <p class="mt-3 text-lg font-semibold text-emerald-600">Sesión activa</p>
+        </div>
+      </div>
+
+      <!-- <div class="mt-10 bg-white rounded-lg shadow-lg p-8">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-xl font-bold text-grafito">Últimos productos</h3>
+          <a href="/admin" class="text-rose-500 hover:text-rose-600 font-semibold">Ir a administración</a>
+        </div>
+
+        {catalogError ? (
+          <p class="text-red-600">No pudimos cargar los productos desde la base de datos: {catalogError.message}</p>
+        ) : (
+          <div class="space-y-3">
+            {catalogProducts && catalogProducts.length > 0 ? (
+              catalogProducts.map((producto) => (
+                <div class="flex items-center justify-between border-b border-gray-200 pb-3 last:border-none last:pb-0">
+                  <div>
+                    <p class="font-semibold text-grafito">{producto.name}</p>
+                    <p class="text-sm text-gray-500">{producto.category}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-medium text-grafito">
+                      {producto.unit_price != null ? `$${Number(producto.unit_price).toLocaleString('es-CL')}` : 'Sin precio'}
+                    </p>
+                    <p class="text-xs text-gray-400">{new Date(producto.created_at).toLocaleDateString('es-CL')}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p class="text-gray-500">No hay productos en la tabla catalog.</p>
+            )}
+          </div>
+        )}
+      </div> -->
+
+      <div class="mt-12 bg-white rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+        <h3 class="text-xl font-bold text-grafito mb-4">Información de Cuenta</h3>
+        <div class="space-y-2 text-gray-700">
+          <p>
+            <span class="font-semibold">Email:</span>
+            {session.user.email}
+          </p>
+          <p>
+            <span class="font-semibold">ID de Usuario:</span>
+            {session.user.id}
+          </p>
+          <p>
+            <span class="font-semibold">Sesión Activa:</span> Sí
+          </p>
+        </div>
+        <div class="mt-6">
+          <a
+            href="/api/auth/logout"
+            class="inline-block bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-6 rounded-lg transition"
+          >
+            Cerrar Sesión
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</LayoutAdmin>
