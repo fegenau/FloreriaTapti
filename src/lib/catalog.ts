@@ -34,10 +34,13 @@ export type CatalogData = {
   flowers: CatalogProduct[];
 };
 
-const DEFAULT_CATALOG_IMAGE = "https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/Banner.avif";
 const CATALOG_IMAGES_BASE_URL =
   import.meta.env.PUBLIC_CATALOG_IMAGES_BASE_URL ||
-  "https://hmpeohszbimivcyguwte.supabase.co/storage/v1/object/public/catalog-images/Flores/";
+  (import.meta.env.SUPABASE_URL
+    ? `${import.meta.env.SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/catalog-images/Flores/`
+    : "");
+
+const DEFAULT_CATALOG_IMAGE = `${CATALOG_IMAGES_BASE_URL || ""}Banner.avif`;
 
 
 type CatalogImageEntry = {
