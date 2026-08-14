@@ -34,11 +34,20 @@ export type CatalogData = {
   flowers: CatalogProduct[];
 };
 
-const CATALOG_IMAGES_BASE_URL =
-  import.meta.env.PUBLIC_CATALOG_IMAGES_BASE_URL ||
-  (import.meta.env.SUPABASE_URL
-    ? `${import.meta.env.SUPABASE_URL.replace(/\/$/, "")}/storage/v1/object/public/catalog-images/Flores/`
-    : "");
+const CATALOG_IMAGES_BASE_URL = (() => {
+  const configuredBase =
+    import.meta.env.PUBLIC_CATALOG_IMAGES_BASE_URL ||
+    import.meta.env.NEXT_PUBLIC_SUPABASE_URL ||
+    import.meta.env.SUPABASE_URL ||
+    "";
+
+  if (!configuredBase) return "";
+
+  const normalizedBase = configuredBase.replace(/\/+$/, "");
+  const isAlreadyCatalogFolder = /\/storage\/v1\/object\/public\/catalog-images\/Flores$/i.test(normalizedBase);
+
+  return `${isAlreadyCatalogFolder ? normalizedBase : `${normalizedBase}/storage/v1/object/public/catalog-images/Flores`}/`;
+})();
 
 const DEFAULT_CATALOG_IMAGE = `${CATALOG_IMAGES_BASE_URL || ""}Banner.avif`;
 
@@ -132,7 +141,7 @@ export async function resolveCatalogImageUrl(imagePath: string): Promise<string>
 
   for (const cand of candidates) {
     const encoded = cand.split("/").map(encodeURIComponent).join("/");
-    const url = `${CATALOG_IMAGES_BASE_URL}/${encoded}`;
+    const url = `${CATALOG_IMAGES_BASE_URL}${encoded}`;
     // quick check
     if (await headOk(url)) {
       resolvedUrlCache.set(imagePath, url);
@@ -162,7 +171,7 @@ export function resolveCatalogImageUrlSync(imagePath: string): string {
   const orig = imagePath;
   const stripped = normalizeStorageImagePath(orig);
   const encoded = stripped.split("/").map(encodeURIComponent).join("/");
-  return `${CATALOG_IMAGES_BASE_URL}/${encoded}`;
+  return `${CATALOG_IMAGES_BASE_URL}${encoded}`;
 }
 
 export async function resolveCatalogImagePaths(imagePaths: string[]): Promise<string[]> {
