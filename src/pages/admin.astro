@@ -1,5 +1,5 @@
 ---
-import Layout from "../components/Layout.astro";
+import LayoutAdmin from "../components/LayoutAdmin.astro";
 import AdminCatalog from "../components/AdminCatalog.astro";
 import { supabase } from "../lib/supabase";
 
@@ -12,7 +12,7 @@ if (!session) {
 }
 ---
 
-<Layout title="Administración de Catálogo | Tapti">
+<LayoutAdmin title="Administración de Catálogo | Tapti">
   <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
     <!-- Header -->
     <div class="border-b border-gray-200 bg-white shadow-sm">
@@ -43,4 +43,4 @@ if (!session) {
       <AdminCatalog isAdmin={true} />
     </div>
   </div>
-</Layout>
+</LayoutAdmin>

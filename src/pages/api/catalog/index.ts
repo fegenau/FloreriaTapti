@@ -1,13 +1,13 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 
-// GET - Listar todos los productos del catálogo
+
 export const GET: APIRoute = async ({ request }) => {
   try {
     const { data, error } = await supabase
       .from('catalog')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('name', { ascending: false });
 
     if (error) {
       return new Response(
@@ -16,8 +16,13 @@ export const GET: APIRoute = async ({ request }) => {
       );
     }
 
+    const normalizedData = (data || []).map((row) => ({
+      ...row,
+      id: row.id ?? row.name,
+    }));
+
     return new Response(
-      JSON.stringify({ data }),
+      JSON.stringify({ data: normalizedData }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {

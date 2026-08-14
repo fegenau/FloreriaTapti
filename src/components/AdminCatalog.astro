@@ -12,6 +12,7 @@ const { isAdmin = true } = Astro.props;
   <div class="max-w-6xl mx-auto">
     <!-- Header -->
     <div class="mb-8">
+      <h4 class="text-lg font-semibold text-grafito"><a href="/dashboard"> &larr; Atras </a></h4>
       <h1 class="text-3xl font-bold text-grafito mb-2">Administración de Catálogo</h1>
       <p class="text-grafito/60">Gestiona los productos de tu catálogo de flores</p>
     </div>
@@ -144,8 +145,8 @@ const { isAdmin = true } = Astro.props;
       </div>
 
       <!-- URLs de Imágenes -->
-      <div>
-        <label class="block text-sm font-medium text-grafito mb-2">
+      <!-- <div> -->
+        <!-- <label class="block text-sm font-medium text-grafito mb-2">
           URLs de Imágenes (separadas por punto y coma)
         </label>
         <textarea
@@ -154,10 +155,10 @@ const { isAdmin = true } = Astro.props;
           rows="2"
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
         />
-      </div>
+      </div> -->
 
       <!-- Checkboxes -->
-      <div class="grid grid-cols-2 gap-4">
+      <!-- <div class="grid grid-cols-2 gap-4">
         <label class="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" id="producto-has-form" class="w-4 h-4" />
           <span class="text-sm text-grafito">Tiene Formulario</span>
@@ -166,7 +167,7 @@ const { isAdmin = true } = Astro.props;
           <input type="checkbox" id="producto-is-quote" class="w-4 h-4" />
           <span class="text-sm text-grafito">Requiere Cotización</span>
         </label>
-      </div>
+      </div> -->
 
       <!-- Botones -->
       <div class="flex gap-4 pt-4 border-t">
@@ -206,29 +207,36 @@ const { isAdmin = true } = Astro.props;
   const catalogBody = document.getElementById('catalog-body');
   const modalTitulo = document.getElementById('modal-titulo');
   const productoIdInput = document.getElementById('producto-id') as HTMLInputElement;
+  let catalogProducts: CatalogProduct[] = [];
+
+  const getField = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
 
   // Cargar productos
   async function cargarProductos() {
     try {
       const res = await fetch('/api/catalog');
       const { data } = await res.json();
+      catalogProducts = Array.isArray(data) ? data : [];
 
-      catalogBody!.innerHTML = data.map((producto: CatalogProduct) => `
+      catalogBody!.innerHTML = catalogProducts.map((producto: CatalogProduct) => {
+        const productKey = String(producto.id ?? producto.name ?? '');
+        return `
         <tr class="border-b border-gray-200 hover:bg-gray-50">
           <td class="px-6 py-4 text-sm text-grafito">${producto.name}</td>
           <td class="px-6 py-4 text-sm text-grafito/60">${producto.category}</td>
           <td class="px-6 py-4 text-sm text-grafito">$${producto.unit_price?.toLocaleString('es-CL') || 'N/A'}</td>
           <td class="px-6 py-4 text-sm text-grafito/60">${new Date(producto.created_at).toLocaleDateString('es-CL')}</td>
           <td class="px-6 py-4 text-center">
-            <button class="btn-editar text-blue-500 hover:text-blue-700 mr-4" data-id="${producto.id}">
+            <button class="btn-editar text-blue-500 hover:text-blue-700 mr-4" data-id="${productKey}">
               Editar
             </button>
-            <button class="btn-eliminar text-red-500 hover:text-red-700" data-id="${producto.id}">
+            <button class="btn-eliminar text-red-500 hover:text-red-700" data-id="${productKey}">
               Eliminar
             </button>
           </td>
         </tr>
-      `).join('');
+      `;
+      }).join('');
 
       // Asignar eventos a botones de edición y eliminación
       document.querySelectorAll('.btn-editar').forEach(btn => {
@@ -246,36 +254,44 @@ const { isAdmin = true } = Astro.props;
 
   // Abrir formulario para editar
   async function abrirFormulario(id?: string | null) {
-    if (id) {
-      // Cargar datos del producto
+    const productId = String(id ?? '').trim();
+
+    if (productId && productId !== 'null' && productId !== 'undefined') {
       try {
-        const res = await fetch(`/api/catalog`);
-        const { data } = await res.json();
-        const producto = data.find((p: CatalogProduct) => p.id === id);
+        const producto = catalogProducts.find((p: CatalogProduct) => String(p.id ?? p.name) === productId)
+          || (await fetch('/api/catalog')
+            .then((res) => res.json())
+            .then(({ data }) => Array.isArray(data) ? data.find((p: CatalogProduct) => String(p.id ?? p.name) === productId) : null));
 
         if (producto) {
+          const nombreInput = getField<HTMLInputElement>('producto-nombre');
+          const descripcionInput = getField<HTMLTextAreaElement>('producto-descripcion');
+          const categoriaInput = getField<HTMLInputElement>('producto-categoria');
+          const precioInput = getField<HTMLInputElement>('producto-unit-price');
+          const flowerTypeInput = getField<HTMLInputElement>('producto-flower-type');
+          const sizesInput = getField<HTMLTextAreaElement>('producto-sizes');
+
           modalTitulo!.textContent = 'Editar Producto';
-          productoIdInput.value = id;
-          (document.getElementById('producto-nombre') as HTMLInputElement).value = producto.name;
-          (document.getElementById('producto-descripcion') as HTMLTextAreaElement).value = producto.Description || '';
-          (document.getElementById('producto-categoria') as HTMLInputElement).value = producto.category;
-          (document.getElementById('producto-unit-price') as HTMLInputElement).value = producto.unit_price || '';
-          (document.getElementById('producto-flower-type') as HTMLInputElement).value = (producto.flowerType || []).join(', ');
-          (document.getElementById('producto-sizes') as HTMLTextAreaElement).value = JSON.stringify(producto.sizes || {}, null, 2);
-          (document.getElementById('producto-images') as HTMLTextAreaElement).value = '';
-          (document.getElementById('producto-has-form') as HTMLInputElement).checked = producto.hasForm === true || producto.hasForm === 'true' || producto.hasForm === '1';
-          (document.getElementById('producto-is-quote') as HTMLInputElement).checked = producto.isQuote === true || producto.isQuote === 'true' || producto.isQuote === '1';
+          productoIdInput.value = productId;
+
+          if (nombreInput) nombreInput.value = producto.name || '';
+          if (descripcionInput) descripcionInput.value = producto.Description || producto.description || '';
+          if (categoriaInput) categoriaInput.value = producto.category || '';
+          if (precioInput) precioInput.value = producto.unit_price != null ? String(producto.unit_price) : '';
+          if (flowerTypeInput) flowerTypeInput.value = Array.isArray(producto.flowerType) ? producto.flowerType.join(', ') : '';
+          if (sizesInput) sizesInput.value = producto.sizes ? JSON.stringify(producto.sizes, null, 2) : '';
+
+          modal!.classList.remove('hidden');
+          return;
         }
       } catch (error) {
         console.error('Error al cargar producto:', error);
       }
-    } else {
-      // Nuevo producto
-      modalTitulo!.textContent = 'Nuevo Producto';
-      productoIdInput.value = '';
-      form.reset();
     }
 
+    modalTitulo!.textContent = 'Nuevo Producto';
+    productoIdInput.value = '';
+    form.reset();
     modal!.classList.remove('hidden');
   }
 
@@ -290,21 +306,25 @@ const { isAdmin = true } = Astro.props;
     e.preventDefault();
 
     const id = productoIdInput.value;
-    const nombre = (document.getElementById('producto-nombre') as HTMLInputElement).value;
-    const descripcion = (document.getElementById('producto-descripcion') as HTMLTextAreaElement).value;
-    const categoria = (document.getElementById('producto-categoria') as HTMLInputElement).value;
-    const unitPrice = parseInt((document.getElementById('producto-unit-price') as HTMLInputElement).value) || null;
-    const flowerType = (document.getElementById('producto-flower-type') as HTMLInputElement).value
+    const nombreInput = getField<HTMLInputElement>('producto-nombre');
+    const descripcionInput = getField<HTMLTextAreaElement>('producto-descripcion');
+    const categoriaInput = getField<HTMLInputElement>('producto-categoria');
+    const precioInput = getField<HTMLInputElement>('producto-unit-price');
+    const flowerTypeInput = getField<HTMLInputElement>('producto-flower-type');
+    const sizesInput = getField<HTMLTextAreaElement>('producto-sizes');
+
+    const nombre = nombreInput?.value ?? '';
+    const descripcion = descripcionInput?.value ?? '';
+    const categoria = categoriaInput?.value ?? '';
+    const unitPrice = precioInput ? parseInt(precioInput.value) || null : null;
+    const flowerType = (flowerTypeInput?.value ?? '')
       .split(',')
       .map(f => f.trim())
       .filter(Boolean);
-    const sizesJson = (document.getElementById('producto-sizes') as HTMLTextAreaElement).value;
-    const images = (document.getElementById('producto-images') as HTMLTextAreaElement).value
-      .split(';')
-      .map(img => img.trim())
-      .filter(Boolean);
-    const hasForm = (document.getElementById('producto-has-form') as HTMLInputElement).checked;
-    const isQuote = (document.getElementById('producto-is-quote') as HTMLInputElement).checked;
+    const sizesJson = sizesInput?.value ?? '';
+    const images: string[] = [];
+    const hasForm = false;
+    const isQuote = false;
 
     let sizes = {};
     try {

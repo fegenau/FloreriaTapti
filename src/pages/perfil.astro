@@ -1,5 +1,5 @@
 ---
-import Layout from "../components/Layout.astro";
+import LayoutAdmin from "../components/LayoutAdmin.astro";
 import { supabase } from "../lib/supabase";
 
 // Verificar sesión
@@ -18,7 +18,7 @@ const { data: profile } = await supabase
   .single();
 ---
 
-<Layout title="Mi Perfil | Tapti">
+<LayoutAdmin title="Mi Perfil | Tapti">
   <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 px-4 py-12">
     <div class="max-w-2xl mx-auto">
       <!-- Header -->
@@ -98,4 +98,4 @@ const { data: profile } = await supabase
       </div>
     </div>
   </div>
-</Layout>
+</LayoutAdmin>

@@ -36,7 +36,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       price_range 
     } = body;
 
-    const { data, error } = await supabase
+    let updateQuery = supabase
       .from('catalog')
       .update({
         ...(name && { name }),
@@ -50,8 +50,31 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
         ...(is_quote !== undefined && { isQuote: is_quote }),
         ...(price_range !== undefined && { price_range }),
       })
-      .eq('id', id)
       .select();
+
+    let { data, error } = await updateQuery.eq('id', id);
+
+    if ((!data || data.length === 0) && name) {
+      const fallback = await supabase
+        .from('catalog')
+        .update({
+          ...(name && { name }),
+          ...(description !== undefined && { Description: description }),
+          ...(category && { category }),
+          ...(flower_type && { flowerType: flower_type }),
+          ...(unit_price !== undefined && { unit_price }),
+          ...(currency && { currency }),
+          ...(sizes && { sizes }),
+          ...(has_form !== undefined && { hasForm: has_form }),
+          ...(is_quote !== undefined && { isQuote: is_quote }),
+          ...(price_range !== undefined && { price_range }),
+        })
+        .eq('name', id)
+        .select();
+
+      data = fallback.data;
+      error = fallback.error;
+    }
 
     if (error) {
       return new Response(
@@ -60,7 +83,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       );
     }
 
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
       return new Response(
         JSON.stringify({ message: 'Producto no encontrado' }),
         { status: 404, headers: { 'Content-Type': 'application/json' } }
@@ -100,14 +123,15 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
       );
     }
 
-    const { error } = await supabase
-      .from('catalog')
-      .delete()
-      .eq('id', id);
+    let result = await supabase.from('catalog').delete().eq('id', id);
 
-    if (error) {
+    if (result.error && result.error.code === 'PGRST116') {
+      result = await supabase.from('catalog').delete().eq('name', id);
+    }
+
+    if (result.error) {
       return new Response(
-        JSON.stringify({ message: 'Error al eliminar producto', error: error.message }),
+        JSON.stringify({ message: 'Error al eliminar producto', error: result.error.message }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }

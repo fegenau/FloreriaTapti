@@ -20,7 +20,7 @@ const { data: { session }, error: sessionError } = await supabase.auth.getSessio
       <!-- Header -->
       <div class="text-center mb-8">
         <h1 class="text-3xl font-bold text-grafito mb-2">Bienvenido a Tapti</h1>
-        <p class="text-gray-600">Inicia sesión para continuar</p>
+        <p class="text-gray-600">Inicia sesion para continuar</p>
       </div>
 
       <!-- Form -->
@@ -28,7 +28,7 @@ const { data: { session }, error: sessionError } = await supabase.auth.getSessio
         <!-- Email Field -->
         <div>
           <label for="email" class="block text-sm font-medium text-grafito mb-2">
-            Correo electrónico
+            Correo electronico
           </label>
           <input
             type="email"
@@ -43,30 +43,19 @@ const { data: { session }, error: sessionError } = await supabase.auth.getSessio
         <!-- Password Field -->
         <div>
           <label for="password" class="block text-sm font-medium text-grafito mb-2">
-            Contraseña
+            Password
           </label>
           <input
             type="password"
             id="password"
             name="password"
             required
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Minimo 6 caracteres"
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none transition"
           />
         </div>
 
         <!-- Remember Me -->
-        <div class="flex items-center">
-          <input
-            type="checkbox"
-            id="rememberMe"
-            name="rememberMe"
-            class="w-4 h-4 text-rose-500 border-gray-300 rounded focus:ring-rose-500"
-          />
-          <label for="rememberMe" class="ml-2 text-sm text-gray-600">
-            Recuérdame
-          </label>
-        </div>
 
         <!-- Error Message -->
         <div id="errorMessage" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
@@ -76,7 +65,7 @@ const { data: { session }, error: sessionError } = await supabase.auth.getSessio
           type="submit"
           class="w-full bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-lg transition duration-200 ease-in-out transform hover:scale-105"
         >
-          Iniciar sesión
+          Iniciar sesion
         </button>
       </form>
 
@@ -85,17 +74,12 @@ const { data: { session }, error: sessionError } = await supabase.auth.getSessio
         <p class="text-gray-600">
           ¿No tienes cuenta?
           <a href="/signup" class="text-rose-500 hover:text-rose-600 font-semibold">
-            Regístrate aquí
+            Registrate aqui
           </a>
         </p>
       </div>
 
       <!-- Forgot Password Link -->
-      <div class="mt-4 text-center">
-        <a href="/forgot-password" class="text-gray-600 hover:text-rose-500 text-sm">
-          ¿Olvidaste tu contraseña?
-        </a>
-      </div>
     </div>
   </div>
 </div>

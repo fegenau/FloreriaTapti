@@ -44,10 +44,13 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
-    // Guardar tokens en cookies (opcional, pero recomendado)
+    // Guardar tokens en cookies. En localhost, secure=true hace que el navegador ignore la cookie,
+    // por lo que la sesión no queda persistida y el admin no puede validar el token.
+    const isSecureCookie = import.meta.env.PROD;
+
     cookies.set('sb-access-token', data.session.access_token, {
       httpOnly: true,
-      secure: true,
+      secure: isSecureCookie,
       sameSite: 'lax',
       maxAge: data.session.expires_in,
       path: '/',
@@ -56,9 +59,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (data.session.refresh_token) {
       cookies.set('sb-refresh-token', data.session.refresh_token, {
         httpOnly: true,
-        secure: true,
+        secure: isSecureCookie,
         sameSite: 'lax',
-        maxAge: 60 * 60 * 24 * 365, // 1 año
+        maxAge: 60 * 60 * 24 * 365,
         path: '/',
       });
     }
