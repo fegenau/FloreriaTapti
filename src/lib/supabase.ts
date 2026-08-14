@@ -6,6 +6,7 @@ const supabaseUrl =
   import.meta.env.NEXT_PUBLIC_SUPABASE_URL ||
   import.meta.env.EXPO_PUBLIC_SUPABASE_URL ||
   "";
+  
 
 const supabaseKey =
   import.meta.env.SUPABASE_ANON_KEY ||
