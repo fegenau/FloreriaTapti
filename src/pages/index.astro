@@ -4,22 +4,9 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
 import FloatingNav from "../components/FloatingNav.astro";
 import OccasionCard from "../components/OccasionCard.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
-import { getCatalogData, resolveCatalogImageUrlSync } from "../lib/catalog";
+import { getCatalogData, resolveCatalogImageUrlSync, CATALOG_IMAGES_BASE_URL } from "../lib/catalog";
 
-const catalogImageBase = (() => {
-  const configuredBase =
-    import.meta.env.PUBLIC_CATALOG_IMAGES_BASE_URL ||
-    import.meta.env.NEXT_PUBLIC_SUPABASE_URL ||
-    import.meta.env.SUPABASE_URL ||
-    "";
-
-  if (!configuredBase) return "";
-
-  const normalizedBase = configuredBase.replace(/\/+$/, "");
-  const isAlreadyCatalogFolder = /\/storage\/v1\/object\/public\/catalog-images\/Flores$/i.test(normalizedBase);
-
-  return `${isAlreadyCatalogFolder ? normalizedBase : `${normalizedBase}/storage/v1/object/public/catalog-images/Flores`}/`;
-})();
+const catalogImageBase = CATALOG_IMAGES_BASE_URL;
 
 // Servicios principales
 const mainServices = [
