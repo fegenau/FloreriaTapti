@@ -34,11 +34,13 @@ export type CatalogData = {
   flowers: CatalogProduct[];
 };
 
-const CATALOG_IMAGES_BASE_URL = (() => {
+export const CATALOG_IMAGES_BASE_URL = (() => {
   const configuredBase =
     import.meta.env.PUBLIC_CATALOG_IMAGES_BASE_URL ||
-    import.meta.env.NEXT_PUBLIC_SUPABASE_URL ||
     import.meta.env.SUPABASE_URL ||
+    import.meta.env.PUBLIC_SUPABASE_URL ||
+    import.meta.env.NEXT_PUBLIC_SUPABASE_URL ||
+    import.meta.env.EXPO_PUBLIC_SUPABASE_URL ||
     "";
 
   if (!configuredBase) return "";
