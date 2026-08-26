@@ -31,9 +31,10 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       currency, 
       sizes, 
       images, 
-      has_form, 
-      is_quote, 
-      price_range 
+      has_form,
+      is_quote,
+      price_range,
+      is_available,
     } = body;
 
     let updateQuery = supabase
@@ -46,9 +47,11 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
         ...(unit_price !== undefined && { unit_price }),
         ...(currency && { currency }),
         ...(sizes && { sizes }),
+        ...(images !== undefined && { images: Array.isArray(images) ? images : [] }),
         ...(has_form !== undefined && { hasForm: has_form }),
         ...(is_quote !== undefined && { isQuote: is_quote }),
         ...(price_range !== undefined && { price_range }),
+        ...(is_available !== undefined && { isAvailable: is_available }),
       })
       .select();
 
@@ -65,9 +68,11 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
           ...(unit_price !== undefined && { unit_price }),
           ...(currency && { currency }),
           ...(sizes && { sizes }),
+          ...(images !== undefined && { images: Array.isArray(images) ? images : [] }),
           ...(has_form !== undefined && { hasForm: has_form }),
           ...(is_quote !== undefined && { isQuote: is_quote }),
           ...(price_range !== undefined && { price_range }),
+          ...(is_available !== undefined && { isAvailable: is_available }),
         })
         .eq('name', id)
         .select();

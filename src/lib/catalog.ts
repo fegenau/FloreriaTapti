@@ -13,6 +13,8 @@ export type CatalogRow = {
   price_range: string | null;
   sizes: Record<string, { total: number; stems?: string | number } | null> | null;
   unit_price: number | string | null;
+  images?: string[] | null;
+  isAvailable?: boolean | null;
 };
 
 export type CatalogProduct = {
@@ -27,6 +29,7 @@ export type CatalogProduct = {
   sizes: Record<string, { total: number; stems?: string | number } | null>;
   unit_price: number | null;
   image: string[];
+  isAvailable: boolean;
 };
 
 export type CatalogData = {
@@ -70,6 +73,14 @@ const catalogImageMap = new Map(
 );
 
 const resolvedUrlCache = new Map<string, string>();
+
+// Imágenes definidas en el mapeo estático (catalog.json) para productos que aún
+// no tienen imágenes guardadas en la columna `images` de la base de datos.
+export function getLegacyImagePaths(name: string): string[] {
+  const rawPaths = catalogImageMap.get(slugify(name || ""));
+  if (!rawPaths || rawPaths.length === 0) return [];
+  return rawPaths.map(normalizeStorageImagePath).filter(Boolean);
+}
 
 function isLocalPublicAssetPath(imagePath: string): boolean {
   return /^\/(?:images|assets|fonts|favicon|_astro|_app|uploads)\//i.test(imagePath);
@@ -188,7 +199,8 @@ function parseBoolean(value: string | boolean | null): boolean {
 }
 
 function normalizeCatalogRow(row: CatalogRow): CatalogProduct {
-  const imagePaths = catalogImageMap.get(slugify(row.name || "")) || [DEFAULT_CATALOG_IMAGE];
+  const dbImages = Array.isArray(row.images) && row.images.length > 0 ? row.images : null;
+  const imagePaths = dbImages || catalogImageMap.get(slugify(row.name || "")) || [DEFAULT_CATALOG_IMAGE];
 
   return {
     currency: row.currency || "CLP",
@@ -208,6 +220,7 @@ function normalizeCatalogRow(row: CatalogRow): CatalogProduct {
           : null,
     // keep unresolved image paths here; they'll be resolved in getCatalogData
     image: imagePaths,
+    isAvailable: row.isAvailable !== false,
   };
 }
 
@@ -224,7 +237,7 @@ export function getStartingPrice(product: Pick<CatalogProduct, "isQuote" | "size
 export async function getCatalogData(): Promise<CatalogData> {
   const { data, error } = await supabase
     .from("catalog")
-    .select("currency, Description, category, flowerType, hasForm, isQuote, name, price_range, sizes, unit_price")
+    .select("currency, Description, category, flowerType, hasForm, isQuote, name, price_range, sizes, unit_price, images, isAvailable")
     .order("category", { ascending: true })
     .order("name", { ascending: true });
 
@@ -236,7 +249,9 @@ export async function getCatalogData(): Promise<CatalogData> {
     };
   }
 
-  const flowers = (data || []).map((row) => normalizeCatalogRow(row as CatalogRow));
+  const flowers = (data || [])
+    .map((row) => normalizeCatalogRow(row as CatalogRow))
+    .filter((product) => product.isAvailable);
 
   // Resolve image URLs (may perform HEAD checks and use cache)
   await Promise.all(

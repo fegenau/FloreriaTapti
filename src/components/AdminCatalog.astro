@@ -1,5 +1,6 @@
 ---
 import { supabase } from '../lib/supabase';
+import { CATALOG_IMAGES_BASE_URL } from '../lib/catalog';
 
 interface Props {
   isAdmin?: boolean;
@@ -36,7 +37,7 @@ const { isAdmin = true } = Astro.props;
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Nombre</th>
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Categoría</th>
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Precio</th>
-              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Creado</th>
+              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Estado</th>
               <th class="text-center px-6 py-4 text-sm font-semibold text-grafito">Acciones</th>
             </tr>
           </thead>
@@ -131,6 +132,21 @@ const { isAdmin = true } = Astro.props;
         />
       </div>
 
+      <!-- Estado -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Estado
+        </label>
+        <select
+          id="producto-disponible"
+          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        >
+          <option value="true" selected>Disponible</option>
+          <option value="false">No Disponible</option>
+        </select>
+        <p class="text-xs text-grafito/50 mt-1">Los productos "No Disponible" no se muestran en el catálogo público.</p>
+      </div>
+
       <!-- Tallas y Precios (JSON) -->
       <div>
         <label class="block text-sm font-medium text-grafito mb-2">
@@ -144,18 +160,27 @@ const { isAdmin = true } = Astro.props;
         />
       </div>
 
-      <!-- URLs de Imágenes -->
-      <!-- <div> -->
-        <!-- <label class="block text-sm font-medium text-grafito mb-2">
-          URLs de Imágenes (separadas por punto y coma)
+      <!-- Imágenes -->
+      <div>
+        <label class="block text-sm font-medium text-grafito mb-2">
+          Imágenes del Producto
         </label>
-        <textarea
-          id="producto-images"
-          placeholder="images/foto1.avif; images/foto2.avif"
-          rows="2"
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        <div id="imagenes-preview" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3"></div>
+        <label
+          for="producto-imagenes-input"
+          class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg text-sm text-grafito/70 cursor-pointer hover:border-rose-400 hover:text-rose-500 transition"
+        >
+          <span id="imagenes-upload-label">+ Agregar imágenes</span>
+        </label>
+        <input
+          type="file"
+          id="producto-imagenes-input"
+          accept="image/jpeg,image/png,image/webp,image/avif"
+          multiple
+          class="hidden"
         />
-      </div> -->
+        <p class="text-xs text-grafito/50 mt-1">JPG, PNG, WEBP o AVIF. Máximo 5MB por imagen.</p>
+      </div>
 
       <!-- Checkboxes -->
       <!-- <div class="grid grid-cols-2 gap-4">
@@ -189,13 +214,20 @@ const { isAdmin = true } = Astro.props;
   </div>
 </div>
 
+<script is:inline define:vars={{ catalogImagesBaseUrl: CATALOG_IMAGES_BASE_URL }}>
+  window.__CATALOG_IMAGES_BASE_URL__ = catalogImagesBaseUrl;
+</script>
+
 <script>
+  const catalogImagesBaseUrl: string = (window as any).__CATALOG_IMAGES_BASE_URL__ || '';
+
   interface CatalogProduct {
     id: string;
     name: string;
     category: string;
     unit_price: number;
     created_at: string;
+    images?: string[];
     [key: string]: any;
   }
 
@@ -207,9 +239,79 @@ const { isAdmin = true } = Astro.props;
   const catalogBody = document.getElementById('catalog-body');
   const modalTitulo = document.getElementById('modal-titulo');
   const productoIdInput = document.getElementById('producto-id') as HTMLInputElement;
+  const imagenesInput = document.getElementById('producto-imagenes-input') as HTMLInputElement;
+  const imagenesPreview = document.getElementById('imagenes-preview') as HTMLDivElement;
+  const imagenesUploadLabel = document.getElementById('imagenes-upload-label') as HTMLSpanElement;
+  const disponibleSelect = document.getElementById('producto-disponible') as HTMLSelectElement;
   let catalogProducts: CatalogProduct[] = [];
+  let currentImages: string[] = [];
 
   const getField = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
+
+  function imageUrl(relativePath: string): string {
+    return `${catalogImagesBaseUrl}${relativePath.split('/').map(encodeURIComponent).join('/')}`;
+  }
+
+  function renderImagenesPreview() {
+    imagenesPreview.innerHTML = currentImages.map((path, index) => `
+      <div class="relative group">
+        <img src="${imageUrl(path)}" class="w-full h-20 object-cover rounded-lg border border-gray-200" />
+        <button
+          type="button"
+          class="btn-quitar-imagen absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow hover:bg-red-600"
+          data-index="${index}"
+          title="Quitar imagen"
+        >×</button>
+      </div>
+    `).join('');
+
+    imagenesPreview.querySelectorAll('.btn-quitar-imagen').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const index = Number(btn.getAttribute('data-index'));
+        currentImages.splice(index, 1);
+        renderImagenesPreview();
+      });
+    });
+  }
+
+  async function subirImagenes(files: FileList) {
+    const nombreInput = getField<HTMLInputElement>('producto-nombre');
+    const productName = nombreInput?.value || 'producto';
+
+    imagenesUploadLabel.textContent = 'Subiendo...';
+    imagenesInput.disabled = true;
+
+    try {
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('productName', productName);
+
+        const res = await fetch('/api/catalog/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await res.json();
+
+        if (res.ok) {
+          currentImages.push(result.path);
+          renderImagenesPreview();
+        } else {
+          alert(`Error al subir ${file.name}: ${result.message}`);
+        }
+      }
+    } finally {
+      imagenesUploadLabel.textContent = '+ Agregar imágenes';
+      imagenesInput.disabled = false;
+      imagenesInput.value = '';
+    }
+  }
+
+  imagenesInput.addEventListener('change', () => {
+    if (imagenesInput.files && imagenesInput.files.length > 0) {
+      subirImagenes(imagenesInput.files);
+    }
+  });
 
   // Cargar productos
   async function cargarProductos() {
@@ -220,12 +322,17 @@ const { isAdmin = true } = Astro.props;
 
       catalogBody!.innerHTML = catalogProducts.map((producto: CatalogProduct) => {
         const productKey = String(producto.id ?? producto.name ?? '');
+        const disponible = producto.isAvailable !== false;
         return `
         <tr class="border-b border-gray-200 hover:bg-gray-50">
           <td class="px-6 py-4 text-sm text-grafito">${producto.name}</td>
           <td class="px-6 py-4 text-sm text-grafito/60">${producto.category}</td>
           <td class="px-6 py-4 text-sm text-grafito">$${producto.unit_price?.toLocaleString('es-CL') || 'N/A'}</td>
-          <td class="px-6 py-4 text-sm text-grafito/60">${new Date(producto.created_at).toLocaleDateString('es-CL')}</td>
+          <td class="px-6 py-4 text-sm">
+            <span class="px-2 py-1 rounded-full text-xs font-semibold ${disponible ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}">
+              ${disponible ? 'Disponible' : 'No Disponible'}
+            </span>
+          </td>
           <td class="px-6 py-4 text-center">
             <button class="btn-editar text-blue-500 hover:text-blue-700 mr-4" data-id="${productKey}">
               Editar
@@ -280,6 +387,23 @@ const { isAdmin = true } = Astro.props;
           if (precioInput) precioInput.value = producto.unit_price != null ? String(producto.unit_price) : '';
           if (flowerTypeInput) flowerTypeInput.value = Array.isArray(producto.flowerType) ? producto.flowerType.join(', ') : '';
           if (sizesInput) sizesInput.value = producto.sizes ? JSON.stringify(producto.sizes, null, 2) : '';
+          disponibleSelect.value = producto.isAvailable === false ? 'false' : 'true';
+
+          currentImages = Array.isArray(producto.images) ? [...producto.images] : [];
+
+          if (currentImages.length === 0 && producto.name) {
+            try {
+              const legacyRes = await fetch(`/api/catalog/legacy-images?name=${encodeURIComponent(producto.name)}`);
+              const legacyResult = await legacyRes.json();
+              if (legacyRes.ok && Array.isArray(legacyResult.images)) {
+                currentImages = legacyResult.images;
+              }
+            } catch (error) {
+              console.error('Error al cargar imágenes existentes:', error);
+            }
+          }
+
+          renderImagenesPreview();
 
           modal!.classList.remove('hidden');
           return;
@@ -292,6 +416,8 @@ const { isAdmin = true } = Astro.props;
     modalTitulo!.textContent = 'Nuevo Producto';
     productoIdInput.value = '';
     form.reset();
+    currentImages = [];
+    renderImagenesPreview();
     modal!.classList.remove('hidden');
   }
 
@@ -299,6 +425,8 @@ const { isAdmin = true } = Astro.props;
   function cerrarModal() {
     modal!.classList.add('hidden');
     form.reset();
+    currentImages = [];
+    renderImagenesPreview();
   }
 
   // Guardar producto
@@ -322,7 +450,8 @@ const { isAdmin = true } = Astro.props;
       .map(f => f.trim())
       .filter(Boolean);
     const sizesJson = sizesInput?.value ?? '';
-    const images: string[] = [];
+    const images: string[] = [...currentImages];
+    const isAvailable = disponibleSelect.value !== 'false';
     const hasForm = false;
     const isQuote = false;
 
@@ -347,6 +476,7 @@ const { isAdmin = true } = Astro.props;
       images,
       has_form: hasForm,
       is_quote: isQuote,
+      is_available: isAvailable,
     };
 
     try {
