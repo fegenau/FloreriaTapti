@@ -56,9 +56,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       currency, 
       sizes, 
       images, 
-      has_form, 
-      is_quote, 
-      price_range 
+      has_form,
+      is_quote,
+      price_range,
+      is_available,
     } = body;
 
     // Validar campos requeridos
@@ -80,9 +81,11 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           unit_price: unit_price || null,
           currency: currency || 'CLP',
           sizes: sizes || {},
+          images: Array.isArray(images) ? images : [],
           hasForm: has_form || false,
           isQuote: is_quote || false,
           price_range: price_range || null,
+          isAvailable: is_available !== false,
         },
       ])
       .select();

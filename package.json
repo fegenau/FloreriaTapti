@@ -14,6 +14,7 @@
     "@nanostores/persistent": "^1.2.0",
     "@supabase/supabase-js": "^2.89.0",
     "astro": "^5.16.6",
+    "aws4fetch": "^1.0.20",
     "bcrypt": "^6.0.0",
     "clsx": "^2.1.1",
     "nanostores": "^1.1.0",
