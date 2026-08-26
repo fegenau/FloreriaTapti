@@ -1,6 +1,13 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
 
+async function verifyAuth(cookies: import('astro').AstroCookies): Promise<boolean> {
+  const token = cookies.get('sb-access-token')?.value;
+  if (!token) return false;
+
+  const { data, error } = await supabase.auth.getUser(token);
+  return !error && !!data.user;
+}
 
 export const GET: APIRoute = async ({ request }) => {
   try {
@@ -38,8 +45,7 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     // Verificar que el usuario esté autenticado
-    const token = cookies.get('sb-access-token')?.value;
-    if (!token) {
+    if (!(await verifyAuth(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
