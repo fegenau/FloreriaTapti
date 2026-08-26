@@ -3,7 +3,6 @@ import LayoutAdmin from "../components/LayoutAdmin.astro";
 import AdminCatalog from "../components/AdminCatalog.astro";
 import { supabase } from "../lib/supabase";
 
-
 // Verificar sesión
 const { data: { session } } = await supabase.auth.getSession();
 
