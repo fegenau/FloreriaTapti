@@ -26,6 +26,12 @@ const { isAdmin = true } = Astro.props;
       >
         + Nuevo Producto
       </button>
+      <button
+        id="btn-categorias"
+        class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-2 px-6 rounded-lg transition duration-200"
+      >
+        Gestionar Categorías
+      </button>
     </div>
 
     <!-- Tabla de Productos -->
@@ -36,7 +42,6 @@ const { isAdmin = true } = Astro.props;
             <tr>
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Nombre</th>
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Categoría</th>
-              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Precio</th>
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Estado</th>
               <th class="text-center px-6 py-4 text-sm font-semibold text-grafito">Acciones</th>
             </tr>
@@ -97,13 +102,16 @@ const { isAdmin = true } = Astro.props;
         <label class="block text-sm font-medium text-grafito mb-2">
           Categoría *
         </label>
-        <input
-          type="text"
+        <select
           id="producto-categoria"
           required
-          placeholder="Ej: Colección General"
           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
-        />
+        >
+          <option value="" disabled selected>Selecciona una categoría</option>
+        </select>
+        <p class="text-xs text-grafito/50 mt-1">
+          ¿No existe la categoría que necesitas? Usa "Gestionar Categorías" para crearla.
+        </p>
       </div>
 
       <!-- Precio Unitario -->
@@ -165,7 +173,8 @@ const { isAdmin = true } = Astro.props;
         <label class="block text-sm font-medium text-grafito mb-2">
           Imágenes del Producto
         </label>
-        <div id="imagenes-preview" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-3"></div>
+        <div id="imagenes-preview" class="grid grid-cols-3 sm:grid-cols-4 gap-3 mb-1"></div>
+        <p class="text-xs text-grafito/50 mb-3">Arrastra una imagen o usa las flechas para reordenar. La primera es la imagen principal del catálogo.</p>
         <label
           for="producto-imagenes-input"
           class="inline-flex items-center gap-2 px-4 py-2 border border-dashed border-gray-300 rounded-lg text-sm text-grafito/70 cursor-pointer hover:border-rose-400 hover:text-rose-500 transition"
@@ -214,6 +223,42 @@ const { isAdmin = true } = Astro.props;
   </div>
 </div>
 
+<!-- Modal de Gestión de Categorías -->
+<div id="modal-categorias" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+  <div class="bg-white rounded-lg shadow-xl max-w-lg w-full max-h-[85vh] overflow-y-auto">
+    <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
+      <h2 class="text-2xl font-bold text-grafito">Gestionar Categorías</h2>
+      <button id="btn-cerrar-modal-categorias" class="text-gray-400 hover:text-gray-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6">
+      <form id="form-nueva-categoria" class="flex gap-2 mb-6">
+        <input
+          type="text"
+          id="nueva-categoria-nombre"
+          required
+          placeholder="Nombre de la nueva categoría"
+          class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+        />
+        <button
+          type="submit"
+          class="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-4 rounded-lg transition"
+        >
+          Agregar
+        </button>
+      </form>
+
+      <ul id="lista-categorias" class="divide-y divide-gray-200">
+        <!-- Cargado dinámicamente -->
+      </ul>
+    </div>
+  </div>
+</div>
+
 <script is:inline define:vars={{ catalogImagesBaseUrl: CATALOG_IMAGES_BASE_URL }}>
   window.__CATALOG_IMAGES_BASE_URL__ = catalogImagesBaseUrl;
 </script>
@@ -231,6 +276,11 @@ const { isAdmin = true } = Astro.props;
     [key: string]: any;
   }
 
+  interface Category {
+    id: string;
+    name: string;
+  }
+
   const modal = document.getElementById('modal-formulario');
   const form = document.getElementById('form-producto') as HTMLFormElement;
   const btnNuevo = document.getElementById('btn-nuevo');
@@ -243,8 +293,16 @@ const { isAdmin = true } = Astro.props;
   const imagenesPreview = document.getElementById('imagenes-preview') as HTMLDivElement;
   const imagenesUploadLabel = document.getElementById('imagenes-upload-label') as HTMLSpanElement;
   const disponibleSelect = document.getElementById('producto-disponible') as HTMLSelectElement;
+  const categoriaSelect = document.getElementById('producto-categoria') as HTMLSelectElement;
+  const modalCategorias = document.getElementById('modal-categorias');
+  const btnCategorias = document.getElementById('btn-categorias');
+  const btnCerrarModalCategorias = document.getElementById('btn-cerrar-modal-categorias');
+  const formNuevaCategoria = document.getElementById('form-nueva-categoria') as HTMLFormElement;
+  const nuevaCategoriaNombreInput = document.getElementById('nueva-categoria-nombre') as HTMLInputElement;
+  const listaCategorias = document.getElementById('lista-categorias') as HTMLUListElement;
   let catalogProducts: CatalogProduct[] = [];
   let currentImages: string[] = [];
+  let categories: Category[] = [];
 
   const getField = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
 
@@ -252,16 +310,46 @@ const { isAdmin = true } = Astro.props;
     return `${catalogImagesBaseUrl}${relativePath.split('/').map(encodeURIComponent).join('/')}`;
   }
 
+  function moverImagen(origen: number, destino: number) {
+    if (destino < 0 || destino >= currentImages.length) return;
+    const [imagen] = currentImages.splice(origen, 1);
+    currentImages.splice(destino, 0, imagen);
+    renderImagenesPreview();
+  }
+
   function renderImagenesPreview() {
     imagenesPreview.innerHTML = currentImages.map((path, index) => `
-      <div class="relative group">
-        <img src="${imageUrl(path)}" class="w-full h-20 object-cover rounded-lg border border-gray-200" />
+      <div
+        class="relative group cursor-move"
+        draggable="true"
+        data-index="${index}"
+      >
+        <img src="${imageUrl(path)}" class="w-full h-20 object-cover rounded-lg border border-gray-200 pointer-events-none" />
+        ${index === 0 ? '<span class="absolute top-1 left-1 bg-rose-500 text-white text-[10px] px-1.5 py-0.5 rounded pointer-events-none">Principal</span>' : ''}
         <button
           type="button"
           class="btn-quitar-imagen absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs shadow hover:bg-red-600"
           data-index="${index}"
           title="Quitar imagen"
         >×</button>
+        <div class="absolute inset-x-0 bottom-1 flex justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <button
+            type="button"
+            class="btn-mover-imagen bg-white/90 border border-gray-300 rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed"
+            data-index="${index}"
+            data-direccion="-1"
+            title="Mover a la izquierda"
+            ${index === 0 ? 'disabled' : ''}
+          >←</button>
+          <button
+            type="button"
+            class="btn-mover-imagen bg-white/90 border border-gray-300 rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow hover:bg-white disabled:opacity-30 disabled:cursor-not-allowed"
+            data-index="${index}"
+            data-direccion="1"
+            title="Mover a la derecha"
+            ${index === currentImages.length - 1 ? 'disabled' : ''}
+          >→</button>
+        </div>
       </div>
     `).join('');
 
@@ -270,6 +358,36 @@ const { isAdmin = true } = Astro.props;
         const index = Number(btn.getAttribute('data-index'));
         currentImages.splice(index, 1);
         renderImagenesPreview();
+      });
+    });
+
+    imagenesPreview.querySelectorAll('.btn-mover-imagen').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const index = Number(btn.getAttribute('data-index'));
+        const direccion = Number(btn.getAttribute('data-direccion'));
+        moverImagen(index, index + direccion);
+      });
+    });
+
+    let dragIndex: number | null = null;
+
+    imagenesPreview.querySelectorAll<HTMLDivElement>('[draggable="true"]').forEach((item) => {
+      item.addEventListener('dragstart', () => {
+        dragIndex = Number(item.dataset.index);
+        item.classList.add('opacity-40');
+      });
+      item.addEventListener('dragend', () => {
+        item.classList.remove('opacity-40');
+        dragIndex = null;
+      });
+      item.addEventListener('dragover', (e) => {
+        e.preventDefault();
+      });
+      item.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const destino = Number(item.dataset.index);
+        if (dragIndex === null || dragIndex === destino) return;
+        moverImagen(dragIndex, destino);
       });
     });
   }
@@ -327,7 +445,6 @@ const { isAdmin = true } = Astro.props;
         <tr class="border-b border-gray-200 hover:bg-gray-50">
           <td class="px-6 py-4 text-sm text-grafito">${producto.name}</td>
           <td class="px-6 py-4 text-sm text-grafito/60">${producto.category}</td>
-          <td class="px-6 py-4 text-sm text-grafito">$${producto.unit_price?.toLocaleString('es-CL') || 'N/A'}</td>
           <td class="px-6 py-4 text-sm">
             <span class="px-2 py-1 rounded-full text-xs font-semibold ${disponible ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}">
               ${disponible ? 'Disponible' : 'No Disponible'}
@@ -373,7 +490,6 @@ const { isAdmin = true } = Astro.props;
         if (producto) {
           const nombreInput = getField<HTMLInputElement>('producto-nombre');
           const descripcionInput = getField<HTMLTextAreaElement>('producto-descripcion');
-          const categoriaInput = getField<HTMLInputElement>('producto-categoria');
           const precioInput = getField<HTMLInputElement>('producto-unit-price');
           const flowerTypeInput = getField<HTMLInputElement>('producto-flower-type');
           const sizesInput = getField<HTMLTextAreaElement>('producto-sizes');
@@ -383,7 +499,7 @@ const { isAdmin = true } = Astro.props;
 
           if (nombreInput) nombreInput.value = producto.name || '';
           if (descripcionInput) descripcionInput.value = producto.Description || producto.description || '';
-          if (categoriaInput) categoriaInput.value = producto.category || '';
+          await cargarCategorias(producto.category || undefined);
           if (precioInput) precioInput.value = producto.unit_price != null ? String(producto.unit_price) : '';
           if (flowerTypeInput) flowerTypeInput.value = Array.isArray(producto.flowerType) ? producto.flowerType.join(', ') : '';
           if (sizesInput) sizesInput.value = producto.sizes ? JSON.stringify(producto.sizes, null, 2) : '';
@@ -416,6 +532,7 @@ const { isAdmin = true } = Astro.props;
     modalTitulo!.textContent = 'Nuevo Producto';
     productoIdInput.value = '';
     form.reset();
+    await cargarCategorias();
     currentImages = [];
     renderImagenesPreview();
     modal!.classList.remove('hidden');
@@ -532,13 +649,150 @@ const { isAdmin = true } = Astro.props;
     }
   }
 
+  // Cargar categorías y poblar el <select> del formulario de producto
+  async function cargarCategorias(selectedValue?: string) {
+    try {
+      const res = await fetch('/api/categories');
+      const { data } = await res.json();
+      categories = Array.isArray(data) ? data : [];
+
+      const options = categories.map((cat) => `<option value="${cat.name}">${cat.name}</option>`);
+
+      // Si el producto tiene una categoría que ya no está en la tabla (dato legado), la agregamos igual
+      if (selectedValue && !categories.some((cat) => cat.name === selectedValue)) {
+        options.push(`<option value="${selectedValue}">${selectedValue} (no listada)</option>`);
+      }
+
+      categoriaSelect.innerHTML = `<option value="" disabled>Selecciona una categoría</option>${options.join('')}`;
+      categoriaSelect.value = selectedValue || '';
+    } catch (error) {
+      console.error('Error al cargar categorías:', error);
+    }
+  }
+
+  function renderListaCategorias() {
+    if (categories.length === 0) {
+      listaCategorias.innerHTML = `<li class="py-4 text-sm text-grafito/50 text-center">Aún no hay categorías creadas.</li>`;
+      return;
+    }
+
+    listaCategorias.innerHTML = categories.map((cat) => `
+      <li class="py-3 flex items-center justify-between gap-3" data-id="${cat.id}">
+        <span class="text-sm text-grafito flex-1 truncate">${cat.name}</span>
+        <div class="flex gap-3 shrink-0">
+          <button type="button" class="btn-editar-categoria text-blue-500 hover:text-blue-700 text-sm" data-id="${cat.id}" data-nombre="${cat.name}">
+            Editar
+          </button>
+          <button type="button" class="btn-eliminar-categoria text-red-500 hover:text-red-700 text-sm" data-id="${cat.id}">
+            Eliminar
+          </button>
+        </div>
+      </li>
+    `).join('');
+
+    listaCategorias.querySelectorAll('.btn-editar-categoria').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const id = btn.getAttribute('data-id')!;
+        const nombreActual = btn.getAttribute('data-nombre') || '';
+        editarCategoria(id, nombreActual);
+      });
+    });
+
+    listaCategorias.querySelectorAll('.btn-eliminar-categoria').forEach((btn) => {
+      btn.addEventListener('click', () => eliminarCategoria(btn.getAttribute('data-id')!));
+    });
+  }
+
+  async function abrirModalCategorias() {
+    await cargarCategorias(categoriaSelect.value || undefined);
+    renderListaCategorias();
+    modalCategorias!.classList.remove('hidden');
+  }
+
+  function cerrarModalCategorias() {
+    modalCategorias!.classList.add('hidden');
+    formNuevaCategoria.reset();
+  }
+
+  formNuevaCategoria.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = nuevaCategoriaNombreInput.value.trim();
+    if (!name) return;
+
+    try {
+      const res = await fetch('/api/categories', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+        formNuevaCategoria.reset();
+        await cargarCategorias(categoriaSelect.value || undefined);
+        renderListaCategorias();
+      } else {
+        alert('Error: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error al crear categoría:', error);
+      alert('Error al crear la categoría');
+    }
+  });
+
+  async function editarCategoria(id: string, nombreActual: string) {
+    const nuevoNombre = prompt('Nuevo nombre de la categoría:', nombreActual)?.trim();
+    if (!nuevoNombre || nuevoNombre === nombreActual) return;
+
+    try {
+      const res = await fetch(`/api/categories/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: nuevoNombre }),
+      });
+      const result = await res.json();
+
+      if (res.ok) {
+        await cargarCategorias(categoriaSelect.value || undefined);
+        renderListaCategorias();
+      } else {
+        alert('Error: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error al editar categoría:', error);
+      alert('Error al editar la categoría');
+    }
+  }
+
+  async function eliminarCategoria(id: string) {
+    if (!confirm('¿Estás seguro de que deseas eliminar esta categoría?')) return;
+
+    try {
+      const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+      const result = await res.json();
+
+      if (res.ok) {
+        await cargarCategorias(categoriaSelect.value || undefined);
+        renderListaCategorias();
+      } else {
+        alert('Error: ' + result.message);
+      }
+    } catch (error) {
+      console.error('Error al eliminar categoría:', error);
+      alert('Error al eliminar la categoría');
+    }
+  }
+
   // Event Listeners
   btnNuevo!.addEventListener('click', () => abrirFormulario());
   btnCerrarModal!.addEventListener('click', cerrarModal);
   btnCancelarModal!.addEventListener('click', cerrarModal);
+  btnCategorias!.addEventListener('click', abrirModalCategorias);
+  btnCerrarModalCategorias!.addEventListener('click', cerrarModalCategorias);
 
-  // Cargar productos al iniciar
+  // Cargar productos y categorías al iniciar
   cargarProductos();
+  cargarCategorias();
 </script>
 
 <style>

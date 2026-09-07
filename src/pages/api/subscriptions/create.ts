@@ -66,7 +66,7 @@ export const POST: APIRoute = async ({ request }) => {
     const protocol = host?.includes('localhost') ? 'http' : 'https';
     const returnUrl = `${protocol}://${host}/api/webpay/return?orderId=${order.id}`;
 
-    const username = `user-${order.id}`;
+    const username = `user-${String(order.id).replace(/-/g, '')}`;
     const { token, url_webpay } = await startOneclick(username, email, returnUrl);
 
     await supabase
