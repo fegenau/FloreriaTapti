@@ -1,13 +1,6 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
-
-async function verifyAuth(cookies: import('astro').AstroCookies): Promise<boolean> {
-  const token = cookies.get('sb-access-token')?.value;
-  if (!token) return false;
-
-  const { data, error } = await supabase.auth.getUser(token);
-  return !error && !!data.user;
-}
+import { verifyAdmin } from '../../../lib/auth';
 
 const PAID_STATUSES = ['paid', 'shipped'];
 // Estados que se consideran "vendido" para el conteo de ramos por defecto.
@@ -39,7 +32,7 @@ function dateKey(date: Date): string {
 
 export const GET: APIRoute = async ({ url, cookies }) => {
   try {
-    if (!(await verifyAuth(cookies))) {
+    if (!(await verifyAdmin(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }

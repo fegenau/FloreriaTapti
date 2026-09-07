@@ -1,18 +1,11 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
-
-async function verifyAuth(cookies: import('astro').AstroCookies): Promise<boolean> {
-  const token = cookies.get('sb-access-token')?.value;
-  if (!token) return false;
-
-  const { data, error } = await supabase.auth.getUser(token);
-  return !error && !!data.user;
-}
+import { verifyAdmin } from '../../../lib/auth';
 
 // PUT - Renombrar categoría (y actualizar los productos que la usan)
 export const PUT: APIRoute = async ({ request, params, cookies }) => {
   try {
-    if (!(await verifyAuth(cookies))) {
+    if (!(await verifyAdmin(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
@@ -95,7 +88,7 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
 // DELETE - Eliminar categoría (bloqueado si hay productos usándola)
 export const DELETE: APIRoute = async ({ params, cookies }) => {
   try {
-    if (!(await verifyAuth(cookies))) {
+    if (!(await verifyAdmin(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }

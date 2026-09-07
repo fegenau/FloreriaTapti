@@ -257,6 +257,15 @@
   let ultimoResumen: ReportSummary | null = null;
   let paginaActual = 0;
 
+  function escapeHtml(value: unknown): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function statusLabel(status: string): string {
     return STATUS_LABELS[status] || status;
   }
@@ -333,7 +342,7 @@
 
     lista.innerHTML = topCommunes.map(({ commune, count }) => `
       <li class="flex items-center justify-between">
-        <span class="text-grafito/70">${commune}</span>
+        <span class="text-grafito/70">${escapeHtml(commune)}</span>
         <span class="font-semibold text-grafito">${count}</span>
       </li>
     `).join('');
@@ -349,8 +358,8 @@
 
     body.innerHTML = productSales.map((p) => `
       <tr class="border-b border-gray-200 hover:bg-gray-50">
-        <td class="px-6 py-3 text-sm text-grafito">${p.name}</td>
-        <td class="px-6 py-3 text-sm text-grafito/60">${p.size}</td>
+        <td class="px-6 py-3 text-sm text-grafito">${escapeHtml(p.name)}</td>
+        <td class="px-6 py-3 text-sm text-grafito/60">${escapeHtml(p.size)}</td>
         <td class="px-6 py-3 text-sm text-right text-grafito font-semibold">${p.quantity}</td>
         <td class="px-6 py-3 text-sm text-right text-grafito">${currencyFmt.format(p.revenue)}</td>
       </tr>
@@ -376,14 +385,14 @@
 
     body.innerHTML = pagina.map((order) => `
       <tr class="border-b border-gray-200 hover:bg-gray-50">
-        <td class="px-6 py-3 text-sm text-grafito">${order.customer_name}</td>
-        <td class="px-6 py-3 text-sm text-grafito/60">${order.shipping_commune || '-'}</td>
+        <td class="px-6 py-3 text-sm text-grafito">${escapeHtml(order.customer_name)}</td>
+        <td class="px-6 py-3 text-sm text-grafito/60">${escapeHtml(order.shipping_commune) || '-'}</td>
         <td class="px-6 py-3 text-sm">
           <span class="px-2 py-1 rounded-full text-xs font-semibold bg-grafito/10 text-grafito">
-            ${statusLabel(order.status)}
+            ${escapeHtml(statusLabel(order.status))}
           </span>
         </td>
-        <td class="px-6 py-3 text-sm text-grafito/70 max-w-xs truncate" title="${itemsResumen(order.items)}">${itemsResumen(order.items)}</td>
+        <td class="px-6 py-3 text-sm text-grafito/70 max-w-xs truncate" title="${escapeHtml(itemsResumen(order.items))}">${escapeHtml(itemsResumen(order.items))}</td>
         <td class="px-6 py-3 text-sm text-right text-grafito">${currencyFmt.format(Number(order.total_amount) || 0)}</td>
         <td class="px-6 py-3 text-sm text-right text-grafito/60">${new Date(order.created_at).toLocaleDateString('es-CL')}</td>
       </tr>

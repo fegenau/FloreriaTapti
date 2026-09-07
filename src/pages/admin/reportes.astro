@@ -2,12 +2,13 @@
 import LayoutAdmin from "../../components/LayoutAdmin.astro";
 import AdminReports from "../../components/AdminReports.astro";
 import { supabase } from "../../lib/supabase";
+import { isAdminEmail } from "../../lib/auth";
 
 // Verificar sesión
 const { data: { session } } = await supabase.auth.getSession();
 
-// Redirigir si no está autenticado
-if (!session) {
+// Redirigir si no está autenticado o no es administrador
+if (!session || !isAdminEmail(session.user.email)) {
   return Astro.redirect('/login');
 }
 ---
