@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { createAuthClient } from '../../../lib/supabase';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   // Solo aceptar POST
@@ -23,7 +23,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     }
 
     // Iniciar sesión con Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await createAuthClient().auth.signInWithPassword({
       email: email.trim(),
       password,
     });

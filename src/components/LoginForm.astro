@@ -1,6 +1,4 @@
 ---
-import { supabase } from '../lib/supabase';
-
 interface Props {
   redirectTo?: string;
 }
@@ -9,9 +7,6 @@ const { redirectTo = '/' } = Astro.props;
 
 let errorMessage = '';
 let isLoading = false;
-
-// Obtener sesión del servidor si existe
-const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 ---
 
 <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-rose-50 to-pink-50 px-4">

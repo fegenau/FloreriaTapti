@@ -1,11 +1,10 @@
 ---
-import { supabase } from '../lib/supabase';
+import { getAuthUser } from '../lib/auth';
 
-// Obtener sesión
-const { data: { session } } = await supabase.auth.getSession();
+const user = await getAuthUser(Astro.cookies);
 ---
 
-{session && (
+{user && (
   <nav class="bg-white shadow-lg border-b-4 border-rose-500">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <!-- Logo/Brand -->
@@ -29,11 +28,11 @@ const { data: { session } } = await supabase.auth.getSession();
       <div class="flex items-center gap-4">
         <div class="hidden sm:block text-right">
           <p class="text-sm text-grafito/60">Bienvenido</p>
-          <p class="text-sm font-medium text-grafito">{session.user.email}</p>
+          <p class="text-sm font-medium text-grafito">{user.email}</p>
         </div>
         <div class="relative group">
           <button class="w-10 h-10 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold hover:bg-rose-600 transition">
-            {session.user.email?.[0]?.toUpperCase() || 'U'}
+            {user.email?.[0]?.toUpperCase() || 'U'}
           </button>
           <div class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
             <a href="/api/auth/logout" class="block px-4 py-2 text-grafito hover:bg-rose-50 rounded-lg text-sm">
