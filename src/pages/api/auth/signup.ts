@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import bcrypt from 'bcrypt';
-import { supabase } from '../../../lib/supabase';
+import { supabase, createAuthClient } from '../../../lib/supabase';
 
 export const POST: APIRoute = async ({ request }) => {
   try {
@@ -31,7 +31,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     // Registrar usuario en Supabase
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await createAuthClient().auth.signUp({
       email: email.trim(),
       password,
       options: {

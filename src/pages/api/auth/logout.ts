@@ -1,10 +1,10 @@
 import type { APIRoute } from 'astro';
-import { supabase } from '../../../lib/supabase';
+import { createAuthClient } from '../../../lib/supabase';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     // Cerrar sesión en Supabase
-    const { error } = await supabase.auth.signOut();
+    const { error } = await createAuthClient().auth.signOut();
 
     if (error) {
       console.error('Error al cerrar sesión:', error);
@@ -33,7 +33,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 export const GET: APIRoute = async ({ cookies, redirect }) => {
   try {
     // Cerrar sesión en Supabase
-    await supabase.auth.signOut();
+    await createAuthClient().auth.signOut();
 
     // Limpiar cookies
     cookies.delete('sb-access-token', { path: '/' });

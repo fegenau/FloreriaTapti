@@ -5,7 +5,7 @@ import MainMenu from "./MainMenu.astro";
 import FloatingWhatsApp from "./FloatingWhatsApp.astro";
 import AccessoriesModal from "./AccessoriesModal.astro";
 import { ViewTransitions } from "astro:transitions";
-import { supabase } from "../lib/supabase";
+import { getAuthUser } from "../lib/auth";
 
 interface Props {
   title?: string;
@@ -25,8 +25,8 @@ const {
 
 // MainMenu muestra una barra de administración cuando hay sesión activa;
 // FloatingNav necesita saberlo para no dibujarse flotando encima de esa barra.
-const { data: { session } } = await supabase.auth.getSession();
-const hasAdminBar = Boolean(session);
+const user = await getAuthUser(Astro.cookies);
+const hasAdminBar = Boolean(user);
 ---
 
 <html lang="es" class="h-full">

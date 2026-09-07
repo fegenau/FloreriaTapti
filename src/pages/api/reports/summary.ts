@@ -30,6 +30,21 @@ function dateKey(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+// La columna "items" de "orders" se guarda como JSON serializado (string) en vez
+// de JSONB, así que hay que parsearla antes de poder iterarla.
+function parseItems(items: unknown): OrderItem[] {
+  if (Array.isArray(items)) return items;
+  if (typeof items === 'string' && items.trim()) {
+    try {
+      const parsed = JSON.parse(items);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+}
+
 export const GET: APIRoute = async ({ url, cookies }) => {
   try {
     if (!(await verifyAdmin(cookies))) {
@@ -146,7 +161,7 @@ export const GET: APIRoute = async ({ url, cookies }) => {
     // Conteo de ramos/tamaños vendidos a partir de la columna "items" (sin incluir imágenes).
     const productSalesMap = new Map<string, { name: string; size: string; quantity: number; revenue: number }>();
     for (const o of filteredOrders) {
-      const items = Array.isArray(o.items) ? o.items : [];
+      const items = parseItems(o.items);
       for (const item of items) {
         const name = (item.name || 'Producto sin nombre').toString();
         const size = (item.size || 'Único').toString();
@@ -170,7 +185,7 @@ export const GET: APIRoute = async ({ url, cookies }) => {
       total_amount: o.total_amount,
       shipping_commune: o.shipping_commune,
       created_at: o.created_at,
-      items: (Array.isArray(o.items) ? o.items : []).map((item) => ({
+      items: parseItems(o.items).map((item) => ({
         name: item.name,
         size: item.size,
         quantity: item.quantity,
