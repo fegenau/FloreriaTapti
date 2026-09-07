@@ -1,12 +1,23 @@
 ---
 // Navegación flotante moderna para reemplazar el navbar tradicional
+interface Props {
+  // Cuando hay sesión de administrador activa, MainMenu ya dibuja una barra
+  // fija con la marca y el usuario: esta nav se ancla debajo de ella en vez
+  // de flotar encima (lo que bloqueaba los botones de esa barra).
+  hasAdminBar?: boolean;
+}
+
+const { hasAdminBar = false } = Astro.props;
 const currentPath = Astro.url.pathname;
 const isActive = (href: string) =>
   href === "/" ? currentPath === "/" : currentPath.startsWith(href);
 ---
 
 <nav
-  class="fixed top-6 left-1/2 -translate-x-1/2 z-40 backdrop-blur-md rounded-full px-6 py-3 shadow-lg hidden md:block border border-borde-claro"
+  class:list={[
+    "z-40 backdrop-blur-md rounded-full px-6 py-3 shadow-lg hidden md:block border border-borde-claro w-fit",
+    hasAdminBar ? "relative mt-4 mx-auto" : "fixed top-6 left-1/2 -translate-x-1/2",
+  ]}
   style="background-color: #FAF7F2;"
 >
   <div class="flex items-center space-x-6">
@@ -151,9 +162,12 @@ const isActive = (href: string) =>
   });
 </script>
 
-<!-- Cabecera móvil (Marca) -->
+<!-- Cabecera móvil (Marca): oculta cuando MainMenu ya muestra la marca (sesión activa) -->
 <div
-  class="md:hidden fixed top-0 left-0 right-0 z-40 bg-marfil/90 backdrop-blur-md border-b border-borde-claro px-6 py-4 flex justify-center items-center shadow-lg"
+  class:list={[
+    "md:hidden fixed top-0 left-0 right-0 z-40 bg-marfil/90 backdrop-blur-md border-b border-borde-claro px-6 py-4 flex justify-center items-center shadow-lg",
+    hasAdminBar && "hidden",
+  ]}
 >
   <a href="/" class="hover:opacity-80 transition-opacity">
     <img src="/images/logo-tapti.png" alt="Tapti" class="h-10 w-auto" />

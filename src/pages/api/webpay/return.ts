@@ -71,7 +71,7 @@ const processRequest = async (request: Request, redirect: any) => {
 
         const amount = order.total_amount;
         const buyOrder = `CHARGE-INIT-${orderIdParam}-${Date.now()}`; 
-        const username = `user-${orderIdParam}`;
+        const username = `user-${String(orderIdParam).replace(/-/g, '')}`;
 
         const authResponse = await authorizeOneclick(username, tbkUser, buyOrder, amount);
         const detail = authResponse.details[0];

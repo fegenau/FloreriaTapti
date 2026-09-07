@@ -1,8 +1,8 @@
 ---
-import LayoutAdmin from "../components/LayoutAdmin.astro";
-import AdminCatalog from "../components/AdminCatalog.astro";
-import { supabase } from "../lib/supabase";
-import { isAdminEmail } from "../lib/auth";
+import LayoutAdmin from "../../components/LayoutAdmin.astro";
+import AdminReports from "../../components/AdminReports.astro";
+import { supabase } from "../../lib/supabase";
+import { isAdminEmail } from "../../lib/auth";
 
 // Verificar sesión
 const { data: { session } } = await supabase.auth.getSession();
@@ -13,7 +13,7 @@ if (!session || !isAdminEmail(session.user.email)) {
 }
 ---
 
-<LayoutAdmin title="Administración de Catálogo | Tapti">
+<LayoutAdmin title="Reportes | Tapti">
   <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
     <!-- Header -->
     <div class="border-b border-gray-200 bg-white shadow-sm">
@@ -24,13 +24,7 @@ if (!session || !isAdminEmail(session.user.email)) {
         </div>
         <div class="flex gap-4">
           <a
-            href="/admin/reportes"
-            class="px-4 py-2 text-gray-700 hover:text-rose-500 transition"
-          >
-            Reportes
-          </a>
-          <a
-            href="/catalogo"
+            href="../../admin.astro"
             class="px-4 py-2 text-gray-700 hover:text-rose-500 transition"
           >
             Ver Catálogo
@@ -47,7 +41,7 @@ if (!session || !isAdminEmail(session.user.email)) {
 
     <!-- Contenido -->
     <div class="max-w-6xl mx-auto px-4 py-8">
-      <AdminCatalog isAdmin={true} />
+      <AdminReports />
     </div>
   </div>
 </LayoutAdmin>

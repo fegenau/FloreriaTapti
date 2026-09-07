@@ -1,12 +1,13 @@
 ---
 import LayoutAdmin from "../components/LayoutAdmin.astro";
 import { supabase } from "../lib/supabase";
+import { isAdminEmail } from "../lib/auth";
 
 const {
   data: { session },
 } = await supabase.auth.getSession();
 
-if (!session) {
+if (!session || !isAdminEmail(session.user.email)) {
   return Astro.redirect("/login");
 }
 
@@ -29,7 +30,7 @@ const totalProductos = Number(catalogProducts?.length) || 0;
         <p class="text-gray-600 text-lg">Selecciona una opción para continuar</p>
       </div>
 
-      <div class="grid md:grid-cols-3 gap-8">
+      <div class="grid md:grid-cols-4 gap-8">
         <div class="group">
           <a
             href="/catalogo"
@@ -49,6 +50,17 @@ const totalProductos = Number(catalogProducts?.length) || 0;
             <div class="text-5xl mb-4">📊</div>
             <h2 class="text-2xl font-bold text-grafito mb-2">Administración</h2>
             <p class="text-gray-600">Gestiona productos, crea, edita o elimina</p>
+          </a>
+        </div>
+
+        <div class="group">
+          <a
+            href="/admin/reportes"
+            class="block bg-white rounded-lg shadow-lg hover:shadow-xl transition-all p-8 text-center group-hover:transform group-hover:scale-105"
+          >
+            <div class="text-5xl mb-4">📈</div>
+            <h2 class="text-2xl font-bold text-grafito mb-2">Reportes</h2>
+            <p class="text-gray-600">Ventas, pedidos y suscripciones</p>
           </a>
         </div>
 

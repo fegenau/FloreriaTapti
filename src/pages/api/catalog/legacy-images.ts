@@ -1,12 +1,12 @@
 import type { APIRoute } from 'astro';
 import { getLegacyImagePaths } from '../../../lib/catalog';
+import { verifyAdmin } from '../../../lib/auth';
 
 // GET - Imágenes del mapeo estático (catalog.json) para un producto, usadas como
 // punto de partida al editar productos que aún no tienen `images` en la base de datos.
 export const GET: APIRoute = async ({ url, cookies }) => {
   try {
-    const token = cookies.get('sb-access-token')?.value;
-    if (!token) {
+    if (!(await verifyAdmin(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }

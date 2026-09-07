@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import { supabase } from '../../../lib/supabase';
-
+import { verifyAdmin } from '../../../lib/auth';
 
 export const GET: APIRoute = async ({ request }) => {
   try {
@@ -38,8 +38,7 @@ export const GET: APIRoute = async ({ request }) => {
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     // Verificar que el usuario esté autenticado
-    const token = cookies.get('sb-access-token')?.value;
-    if (!token) {
+    if (!(await verifyAdmin(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }

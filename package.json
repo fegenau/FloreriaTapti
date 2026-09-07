@@ -17,6 +17,8 @@
     "aws4fetch": "^1.0.20",
     "bcrypt": "^6.0.0",
     "clsx": "^2.1.1",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "nanostores": "^1.1.0",
     "resend": "^6.9.3",
     "supabase": "^2.81.3",

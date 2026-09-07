@@ -1,7 +1,7 @@
 import type { APIRoute } from 'astro';
 import { AwsClient } from 'aws4fetch';
-import { supabase } from '../../../lib/supabase';
 import { slugify } from '../../../utils/slugify.js';
+import { verifyAdmin } from '../../../lib/auth';
 
 const S3_ENDPOINT = (import.meta.env.SUPABASE_S3_ENDPOINT || '').replace(/\/+$/, '');
 const S3_REGION = import.meta.env.SUPABASE_S3_REGION || 'us-west-2';
@@ -26,18 +26,18 @@ function objectUrl(storagePath: string): string {
   return `${S3_ENDPOINT}/${BUCKET}/${encodedPath}`;
 }
 
-async function verifyAuth(cookies: import('astro').AstroCookies): Promise<boolean> {
-  const token = cookies.get('sb-access-token')?.value;
-  if (!token) return false;
-
-  const { data, error } = await supabase.auth.getUser(token);
-  return !error && !!data.user;
+// Solo letras/números/guiones por segmento, sin ".." ni segmentos vacíos: evita que
+// ?path= salga del prefijo "Flores/" o inyecte segmentos "." /".." en la key de S3.
+function isSafeRelativePath(path: string): boolean {
+  if (!path || path.includes('\\')) return false;
+  const segments = path.split('/');
+  return segments.every((segment) => /^[a-zA-Z0-9._-]+$/.test(segment) && segment !== '.' && segment !== '..');
 }
 
 // POST - Subir una imagen a Supabase Storage (bucket catalog-images/Flores) vía protocolo S3
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    if (!(await verifyAuth(cookies))) {
+    if (!(await verifyAdmin(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
@@ -118,7 +118,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 // DELETE - Eliminar una imagen del bucket (?path=slug/archivo.ext)
 export const DELETE: APIRoute = async ({ request, cookies }) => {
   try {
-    if (!(await verifyAuth(cookies))) {
+    if (!(await verifyAdmin(cookies))) {
       return new Response(
         JSON.stringify({ message: 'No autenticado' }),
         { status: 401, headers: { 'Content-Type': 'application/json' } }
@@ -127,9 +127,9 @@ export const DELETE: APIRoute = async ({ request, cookies }) => {
 
     const url = new URL(request.url);
     const relativePath = url.searchParams.get('path');
-    if (!relativePath) {
+    if (!relativePath || !isSafeRelativePath(relativePath)) {
       return new Response(
-        JSON.stringify({ message: 'Ruta de imagen requerida' }),
+        JSON.stringify({ message: 'Ruta de imagen inválida' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
