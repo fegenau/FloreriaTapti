@@ -22,15 +22,15 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
     }
 
     const body = await request.json();
-    const { 
-      name, 
-      description, 
-      category, 
-      flower_type, 
-      unit_price, 
-      currency, 
-      sizes, 
-      images, 
+    const {
+      name,
+      description,
+      category_ids,
+      flower_type,
+      unit_price,
+      currency,
+      sizes,
+      images,
       has_form,
       is_quote,
       price_range,
@@ -42,7 +42,6 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       .update({
         ...(name && { name }),
         ...(description !== undefined && { Description: description }),
-        ...(category && { category }),
         ...(flower_type && { flowerType: flower_type }),
         ...(unit_price !== undefined && { unit_price }),
         ...(currency && { currency }),
@@ -63,7 +62,6 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
         .update({
           ...(name && { name }),
           ...(description !== undefined && { Description: description }),
-          ...(category && { category }),
           ...(flower_type && { flowerType: flower_type }),
           ...(unit_price !== undefined && { unit_price }),
           ...(currency && { currency }),
@@ -95,8 +93,37 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       );
     }
 
+    const updated = data[0];
+
+    if (Array.isArray(category_ids)) {
+      const { error: deleteLinksError } = await supabase
+        .from('catalog_categories')
+        .delete()
+        .eq('catalog_id', updated.id);
+
+      if (deleteLinksError) {
+        return new Response(
+          JSON.stringify({ message: 'Error al actualizar categorías del producto', error: deleteLinksError.message }),
+          { status: 500, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+
+      if (category_ids.length > 0) {
+        const { error: linkError } = await supabase
+          .from('catalog_categories')
+          .insert(category_ids.map((categoryId: string) => ({ catalog_id: updated.id, category_id: categoryId })));
+
+        if (linkError) {
+          return new Response(
+            JSON.stringify({ message: 'Error al actualizar categorías del producto', error: linkError.message }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+      }
+    }
+
     return new Response(
-      JSON.stringify({ message: 'Producto actualizado exitosamente', data: data[0] }),
+      JSON.stringify({ message: 'Producto actualizado exitosamente', data: updated }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {

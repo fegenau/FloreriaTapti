@@ -5,7 +5,7 @@ import { slugify } from "../utils/slugify.js";
 export type CatalogRow = {
   currency: string | null;
   Description: string | null;
-  category: string | null;
+  catalog_categories: { categories: { id: string; name: string } | null }[] | null;
   flowerType: string[] | null;
   hasForm: string | boolean | null;
   isQuote: string | boolean | null;
@@ -20,7 +20,7 @@ export type CatalogRow = {
 export type CatalogProduct = {
   currency: string;
   Description: string;
-  category: string;
+  categories: string[];
   flowerType: string[];
   hasForm: boolean;
   isQuote: boolean;
@@ -202,10 +202,14 @@ function normalizeCatalogRow(row: CatalogRow): CatalogProduct {
   const dbImages = Array.isArray(row.images) && row.images.length > 0 ? row.images : null;
   const imagePaths = dbImages || catalogImageMap.get(slugify(row.name || "")) || [DEFAULT_CATALOG_IMAGE];
 
+  const categories = (row.catalog_categories || [])
+    .map((cc) => cc.categories?.name)
+    .filter((name): name is string => Boolean(name));
+
   return {
     currency: row.currency || "CLP",
     Description: row.Description || "",
-    category: row.category || "Sin categoría",
+    categories: categories.length > 0 ? categories : ["Sin categoría"],
     flowerType: Array.isArray(row.flowerType) ? row.flowerType : [],
     hasForm: parseBoolean(row.hasForm),
     isQuote: parseBoolean(row.isQuote),
@@ -237,8 +241,7 @@ export function getStartingPrice(product: Pick<CatalogProduct, "isQuote" | "size
 export async function getCatalogData(): Promise<CatalogData> {
   const { data, error } = await supabase
     .from("catalog")
-    .select("currency, Description, category, flowerType, hasForm, isQuote, name, price_range, sizes, unit_price, images, isAvailable")
-    .order("category", { ascending: true })
+    .select("currency, Description, flowerType, hasForm, isQuote, name, price_range, sizes, unit_price, images, isAvailable, catalog_categories(categories(id, name))")
     .order("name", { ascending: true });
 
   if (error) {

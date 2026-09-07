@@ -6,7 +6,7 @@ export const GET: APIRoute = async ({ request }) => {
   try {
     const { data, error } = await supabase
       .from('catalog')
-      .select('*')
+      .select('*, catalog_categories(category_id, categories(id, name))')
       .order('name', { ascending: false });
 
     if (error) {
@@ -16,9 +16,12 @@ export const GET: APIRoute = async ({ request }) => {
       );
     }
 
-    const normalizedData = (data || []).map((row) => ({
+    const normalizedData = (data || []).map(({ catalog_categories, ...row }) => ({
       ...row,
       id: row.id ?? row.name,
+      categories: (catalog_categories || [])
+        .map((cc: any) => cc.categories)
+        .filter(Boolean),
     }));
 
     return new Response(
@@ -46,15 +49,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     }
 
     const body = await request.json();
-    const { 
-      name, 
-      description, 
-      category, 
-      flower_type, 
-      unit_price, 
-      currency, 
-      sizes, 
-      images, 
+    const {
+      name,
+      description,
+      category_ids,
+      flower_type,
+      unit_price,
+      currency,
+      sizes,
+      images,
       has_form,
       is_quote,
       price_range,
@@ -62,9 +65,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     } = body;
 
     // Validar campos requeridos
-    if (!name || !category) {
+    if (!name || !Array.isArray(category_ids) || category_ids.length === 0) {
       return new Response(
-        JSON.stringify({ message: 'Nombre y categoría son requeridos' }),
+        JSON.stringify({ message: 'Nombre y al menos una categoría son requeridos' }),
         { status: 400, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -75,7 +78,6 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         {
           name,
           Description: description,
-          category,
           flowerType: flower_type || [],
           unit_price: unit_price || null,
           currency: currency || 'CLP',
@@ -96,8 +98,22 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       );
     }
 
+    const created = data[0];
+
+    const { error: linkError } = await supabase
+      .from('catalog_categories')
+      .insert(category_ids.map((categoryId: string) => ({ catalog_id: created.id, category_id: categoryId })));
+
+    if (linkError) {
+      await supabase.from('catalog').delete().eq('id', created.id);
+      return new Response(
+        JSON.stringify({ message: 'Error al asociar categorías al producto', error: linkError.message }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ message: 'Producto creado exitosamente', data: data[0] }),
+      JSON.stringify({ message: 'Producto creado exitosamente', data: created }),
       { status: 201, headers: { 'Content-Type': 'application/json' } }
     );
   } catch (error) {

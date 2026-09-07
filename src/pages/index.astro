@@ -76,7 +76,7 @@ const categoryShowcase = [
   },
 ].map((item) => {
   const match = catalogProducts.find(
-    (f) => f.category === item.category,
+    (f) => f.categories.includes(item.category),
   );
   return {
     ...item,

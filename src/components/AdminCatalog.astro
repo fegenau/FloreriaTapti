@@ -41,7 +41,7 @@ const { isAdmin = true } = Astro.props;
           <thead class="bg-grafito/10 border-b border-grafito/20">
             <tr>
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Nombre</th>
-              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Categoría</th>
+              <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Categorías</th>
               <th class="text-left px-6 py-4 text-sm font-semibold text-grafito">Estado</th>
               <th class="text-center px-6 py-4 text-sm font-semibold text-grafito">Acciones</th>
             </tr>
@@ -97,20 +97,16 @@ const { isAdmin = true } = Astro.props;
         />
       </div>
 
-      <!-- Categoría -->
+      <!-- Categorías -->
       <div>
         <label class="block text-sm font-medium text-grafito mb-2">
-          Categoría *
+          Categorías *
         </label>
-        <select
-          id="producto-categoria"
-          required
-          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
-        >
-          <option value="" disabled selected>Selecciona una categoría</option>
-        </select>
+        <div id="producto-categorias" class="grid grid-cols-2 gap-2 border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto">
+          <!-- Cargado dinámicamente -->
+        </div>
         <p class="text-xs text-grafito/50 mt-1">
-          ¿No existe la categoría que necesitas? Usa "Gestionar Categorías" para crearla.
+          Selecciona una o más. ¿No existe la categoría que necesitas? Usa "Gestionar Categorías" para crearla.
         </p>
       </div>
 
@@ -269,7 +265,7 @@ const { isAdmin = true } = Astro.props;
   interface CatalogProduct {
     id: string;
     name: string;
-    category: string;
+    categories: Category[];
     unit_price: number;
     created_at: string;
     images?: string[];
@@ -293,7 +289,7 @@ const { isAdmin = true } = Astro.props;
   const imagenesPreview = document.getElementById('imagenes-preview') as HTMLDivElement;
   const imagenesUploadLabel = document.getElementById('imagenes-upload-label') as HTMLSpanElement;
   const disponibleSelect = document.getElementById('producto-disponible') as HTMLSelectElement;
-  const categoriaSelect = document.getElementById('producto-categoria') as HTMLSelectElement;
+  const categoriasContainer = document.getElementById('producto-categorias') as HTMLDivElement;
   const modalCategorias = document.getElementById('modal-categorias');
   const btnCategorias = document.getElementById('btn-categorias');
   const btnCerrarModalCategorias = document.getElementById('btn-cerrar-modal-categorias');
@@ -444,7 +440,7 @@ const { isAdmin = true } = Astro.props;
         return `
         <tr class="border-b border-gray-200 hover:bg-gray-50">
           <td class="px-6 py-4 text-sm text-grafito">${producto.name}</td>
-          <td class="px-6 py-4 text-sm text-grafito/60">${producto.category}</td>
+          <td class="px-6 py-4 text-sm text-grafito/60">${(producto.categories || []).map((c) => c.name).join(', ')}</td>
           <td class="px-6 py-4 text-sm">
             <span class="px-2 py-1 rounded-full text-xs font-semibold ${disponible ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}">
               ${disponible ? 'Disponible' : 'No Disponible'}
@@ -499,7 +495,7 @@ const { isAdmin = true } = Astro.props;
 
           if (nombreInput) nombreInput.value = producto.name || '';
           if (descripcionInput) descripcionInput.value = producto.Description || producto.description || '';
-          await cargarCategorias(producto.category || undefined);
+          await cargarCategorias((producto.categories || []).map((c) => c.id));
           if (precioInput) precioInput.value = producto.unit_price != null ? String(producto.unit_price) : '';
           if (flowerTypeInput) flowerTypeInput.value = Array.isArray(producto.flowerType) ? producto.flowerType.join(', ') : '';
           if (sizesInput) sizesInput.value = producto.sizes ? JSON.stringify(producto.sizes, null, 2) : '';
@@ -553,14 +549,21 @@ const { isAdmin = true } = Astro.props;
     const id = productoIdInput.value;
     const nombreInput = getField<HTMLInputElement>('producto-nombre');
     const descripcionInput = getField<HTMLTextAreaElement>('producto-descripcion');
-    const categoriaInput = getField<HTMLInputElement>('producto-categoria');
     const precioInput = getField<HTMLInputElement>('producto-unit-price');
     const flowerTypeInput = getField<HTMLInputElement>('producto-flower-type');
     const sizesInput = getField<HTMLTextAreaElement>('producto-sizes');
 
     const nombre = nombreInput?.value ?? '';
     const descripcion = descripcionInput?.value ?? '';
-    const categoria = categoriaInput?.value ?? '';
+    const categoryIds = Array.from(
+      categoriasContainer.querySelectorAll<HTMLInputElement>('.categoria-checkbox:checked')
+    ).map((cb) => cb.value);
+
+    if (categoryIds.length === 0) {
+      alert('Selecciona al menos una categoría');
+      return;
+    }
+
     const unitPrice = precioInput ? parseInt(precioInput.value) || null : null;
     const flowerType = (flowerTypeInput?.value ?? '')
       .split(',')
@@ -585,7 +588,7 @@ const { isAdmin = true } = Astro.props;
     const payload = {
       name: nombre,
       description: descripcion,
-      category: categoria,
+      category_ids: categoryIds,
       flower_type: flowerType,
       unit_price: unitPrice,
       currency: 'CLP',
@@ -649,22 +652,24 @@ const { isAdmin = true } = Astro.props;
     }
   }
 
-  // Cargar categorías y poblar el <select> del formulario de producto
-  async function cargarCategorias(selectedValue?: string) {
+  // Cargar categorías y poblar los checkboxes del formulario de producto
+  async function cargarCategorias(selectedIds: string[] = []) {
     try {
       const res = await fetch('/api/categories');
       const { data } = await res.json();
       categories = Array.isArray(data) ? data : [];
 
-      const options = categories.map((cat) => `<option value="${cat.name}">${cat.name}</option>`);
-
-      // Si el producto tiene una categoría que ya no está en la tabla (dato legado), la agregamos igual
-      if (selectedValue && !categories.some((cat) => cat.name === selectedValue)) {
-        options.push(`<option value="${selectedValue}">${selectedValue} (no listada)</option>`);
-      }
-
-      categoriaSelect.innerHTML = `<option value="" disabled>Selecciona una categoría</option>${options.join('')}`;
-      categoriaSelect.value = selectedValue || '';
+      categoriasContainer.innerHTML = categories.map((cat) => `
+        <label class="flex items-center gap-2 text-sm text-grafito cursor-pointer">
+          <input
+            type="checkbox"
+            class="categoria-checkbox w-4 h-4"
+            value="${cat.id}"
+            ${selectedIds.includes(cat.id) ? 'checked' : ''}
+          />
+          ${cat.name}
+        </label>
+      `).join('') || `<p class="text-sm text-grafito/50 col-span-2">Aún no hay categorías creadas.</p>`;
     } catch (error) {
       console.error('Error al cargar categorías:', error);
     }
@@ -704,7 +709,7 @@ const { isAdmin = true } = Astro.props;
   }
 
   async function abrirModalCategorias() {
-    await cargarCategorias(categoriaSelect.value || undefined);
+    await cargarCategorias(Array.from(categoriasContainer.querySelectorAll<HTMLInputElement>('.categoria-checkbox:checked')).map((cb) => cb.value));
     renderListaCategorias();
     modalCategorias!.classList.remove('hidden');
   }
@@ -729,7 +734,7 @@ const { isAdmin = true } = Astro.props;
 
       if (res.ok) {
         formNuevaCategoria.reset();
-        await cargarCategorias(categoriaSelect.value || undefined);
+        await cargarCategorias(Array.from(categoriasContainer.querySelectorAll<HTMLInputElement>('.categoria-checkbox:checked')).map((cb) => cb.value));
         renderListaCategorias();
       } else {
         alert('Error: ' + result.message);
@@ -753,7 +758,7 @@ const { isAdmin = true } = Astro.props;
       const result = await res.json();
 
       if (res.ok) {
-        await cargarCategorias(categoriaSelect.value || undefined);
+        await cargarCategorias(Array.from(categoriasContainer.querySelectorAll<HTMLInputElement>('.categoria-checkbox:checked')).map((cb) => cb.value));
         renderListaCategorias();
       } else {
         alert('Error: ' + result.message);
@@ -772,7 +777,7 @@ const { isAdmin = true } = Astro.props;
       const result = await res.json();
 
       if (res.ok) {
-        await cargarCategorias(categoriaSelect.value || undefined);
+        await cargarCategorias(Array.from(categoriasContainer.querySelectorAll<HTMLInputElement>('.categoria-checkbox:checked')).map((cb) => cb.value));
         renderListaCategorias();
       } else {
         alert('Error: ' + result.message);
