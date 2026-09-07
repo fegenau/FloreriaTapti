@@ -58,20 +58,6 @@ export const PUT: APIRoute = async ({ request, params, cookies }) => {
       );
     }
 
-    if (existing.name !== name) {
-      const { error: cascadeError } = await supabase
-        .from('catalog')
-        .update({ category: name })
-        .eq('category', existing.name);
-
-      if (cascadeError) {
-        return new Response(
-          JSON.stringify({ message: 'Categoría renombrada, pero no se pudieron actualizar los productos asociados', error: cascadeError.message }),
-          { status: 500, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
     return new Response(
       JSON.stringify({ message: 'Categoría actualizada exitosamente', data: data[0] }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -117,9 +103,9 @@ export const DELETE: APIRoute = async ({ params, cookies }) => {
     }
 
     const { count, error: countError } = await supabase
-      .from('catalog')
-      .select('id', { count: 'exact', head: true })
-      .eq('category', existing.name);
+      .from('catalog_categories')
+      .select('catalog_id', { count: 'exact', head: true })
+      .eq('category_id', id);
 
     if (countError) {
       return new Response(

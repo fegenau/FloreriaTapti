@@ -5,7 +5,7 @@ import { getCatalogData, getStartingPrice, resolveCatalogImageUrlSync } from "..
 import { slugify } from "../utils/slugify.js";
 
 const { flowers: products } = await getCatalogData();
-const categories = [...new Set([...products.map((p: any) => p.category).filter(Boolean), "Condolencias"])] as string[];
+const categories = [...new Set([...products.flatMap((p: any) => p.categories || []), "Condolencias"])] as string[];
 const flowerTypes = [...new Set(products.flatMap((p: any) => p.flowerType || []))] as string[];
 
 const maxCatalogPrice = products.reduce((max: number, p: any) => {
@@ -176,7 +176,7 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
               <a
                 href={`/producto/${slug}`}
                 class="catalog-item group block"
-                data-category={product.category || ''}
+                data-category={(product.categories || []).join('|')}
                 data-flower={(product.flowerType || []).join(',')}
                 data-price={startingPrice ?? 0}
                 data-name={product.name.toLowerCase()}
@@ -322,12 +322,12 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
 
       let visible = 0;
       grid?.querySelectorAll<HTMLElement>('.catalog-item').forEach(item => {
-        const cat = item.dataset.category || '';
+        const cats = (item.dataset.category || '').split('|').filter(Boolean);
         const flowers = (item.dataset.flower || '').split(',').filter(Boolean);
         const price = parseInt(item.dataset.price || '0');
         const isQuote = price === 0;
 
-        const catOk = selectedCats.length === 0 || selectedCats.includes(cat);
+        const catOk = selectedCats.length === 0 || selectedCats.some(c => cats.includes(c));
         const flowerOk = selectedFlowers.length === 0 || flowers.some(f => selectedFlowers.includes(f));
         const priceOk = isQuote || (price >= lo && price <= hi);
 

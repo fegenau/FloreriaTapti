@@ -20,7 +20,7 @@ const validSizes: [string, { total: number; stems?: string | number }][] = produ
 
 // Productos relacionados de la misma categoría
 const related = products
-  .filter((p: any) => p.category === product.category && slugify(p.name) !== slug)
+  .filter((p: any) => p.categories.some((c: string) => product.categories.includes(c)) && slugify(p.name) !== slug)
   .slice(0, 4);
 ---
 
@@ -34,7 +34,7 @@ const related = products
         <span>/</span>
         <a href="/catalogo" class="hover:text-terracota transition-colors">Catálogo</a>
         <span>/</span>
-        <span class="text-azul-profundo/75">{product.category}</span>
+        <span class="text-azul-profundo/75">{product.categories.join(', ')}</span>
         <span>/</span>
         <span class="text-azul-profundo">{product.name}</span>
       </nav>
