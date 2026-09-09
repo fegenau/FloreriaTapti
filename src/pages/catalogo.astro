@@ -31,7 +31,7 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
 
     <!-- Top bar -->
     <div class="border-b border-borde-claro mb-6">
-      <div class="max-w-screen-xl mx-auto px-6 py-3 flex items-center relative">
+      <div class="max-w-screen-xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-y-2 relative">
 
         <!-- Filter toggle -->
         <button id="toggle-sidebar"
@@ -50,14 +50,14 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
           </svg>
         </button>
 
-        <!-- Product count (centrado) -->
+        <!-- Product count (centrado en desktop, en su propia línea en mobile) -->
         <span id="product-count"
-          class="absolute left-1/2 -translate-x-1/2 text-sm text-grafito/60 pointer-events-none">
+          class="order-3 w-full text-center md:order-none md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 text-sm text-grafito/60 pointer-events-none">
           {products.length} productos
         </span>
 
         <!-- Sort -->
-        <div class="ml-auto relative">
+        <div class="relative">
           <button id="sort-toggle"
             class="flex items-center gap-1 text-sm text-grafito/70 hover:text-azul-profundo transition-colors">
             <span id="sort-label">Más vendidos</span>
