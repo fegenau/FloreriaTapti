@@ -35,7 +35,7 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-300 mb-2">Mensaje o Inquietud</label>
-          <textarea name="message" required rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-terracota outline-none transition-colors resize-none" placeholder="Cuéntanos qué necesitas..."></textarea>
+          <textarea id="contact-message" name="message" required rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-terracota outline-none transition-colors resize-none" placeholder="Cuéntanos qué necesitas..."></textarea>
         </div>
         <div class="text-center mt-8">
           <button type="submit" class="w-full md:w-auto px-12 bg-terracota hover:bg-terracota-hover text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(217,122,106,0.3)] transition-all duration-300 transform hover:-translate-y-0.5">
@@ -50,6 +50,12 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
 <script>
   document.addEventListener("astro:page-load", () => {
     const contactForm = document.getElementById("contact-form") as HTMLFormElement;
+    const messageField = document.getElementById("contact-message") as HTMLTextAreaElement;
+    const prefilledMsg = new URLSearchParams(window.location.search).get("msg");
+    if (prefilledMsg && messageField) {
+      messageField.value = prefilledMsg;
+    }
+
     if (contactForm) {
       contactForm.addEventListener("submit", async (e) => {
         e.preventDefault();

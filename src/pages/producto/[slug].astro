@@ -1,7 +1,6 @@
 ---
 import Layout from "../../components/Layout.astro";
 import ExperienceModal from "../../components/ExperienceModal.astro";
-import QuoteModal from "../../components/QuoteModal.astro";
 import { getCatalogData, getStartingPrice, resolveCatalogImageUrlSync } from "../../lib/catalog";
 import { slugify } from "../../utils/slugify.js";
 
@@ -107,7 +106,7 @@ const related = products
               <p class="font-medium">
                 <span class="text-azul-profundo font-semibold">Envoltorio:</span> Papel y cinta
               </p>
-                <p class="text-xs text-azul-profundo/55 font-medium">
+                <p class="text-xs text-azul-profundo font-medium">
                 El diseño es referencial, puede cambiar según las flores de estación disponibles.
                 Sin embargo, el ramo mantendrá la misma categoría, color y esencia.
               </p>
@@ -139,14 +138,12 @@ const related = products
 
           <!-- CTA button -->
           {product.isQuote ? (
-            <button
-              id="quote-btn"
-              type="button"
-              data-product-name={product.name}
-              class="w-full py-3.5 bg-terracota hover:bg-terracota-hover text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4"
+            <a
+              href={`/contacto?msg=${encodeURIComponent('Quiero armar mi ramo de novia con ustedes. Pónganse en contacto conmigo lo más pronto posible.')}`}
+              class="w-full py-3.5 bg-terracota hover:bg-terracota-hover text-white font-semibold rounded-lg transition-colors uppercase tracking-wider text-sm mb-4 text-center"
             >
               Solicitar Cotización
-            </button>
+            </a>
           ) : product.hasForm ? (
             <button
               id="experience-btn"
@@ -220,7 +217,6 @@ const related = products
   ></div>
 
   <ExperienceModal />
-  <QuoteModal />
 </Layout>
 
 <script>
@@ -311,12 +307,6 @@ const related = products
         cartBtn.classList.remove('bg-green-700');
         cartBtn.classList.add('bg-terracota', 'hover:bg-terracota-hover');
       }, 2000);
-    });
-
-    // --- Quote modal ---
-    document.getElementById('quote-btn')?.addEventListener('click', () => {
-      const productName = (document.getElementById('quote-btn') as HTMLElement)?.dataset.productName || product.name;
-      window.dispatchEvent(new CustomEvent('open-quote-modal', { detail: { productName } }));
     });
 
     // --- Experience modal ---
