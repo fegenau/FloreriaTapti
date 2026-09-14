@@ -456,7 +456,7 @@ const accessories = catalog.accessories || [];
       removeCartItem,
       addCartItem,
     } from "../store/cartStore";
-    import { resolveCatalogImageUrl } from "../lib/catalog";
+    import { resolveCatalogImageUrlSync } from "../lib/catalogImage";
 
     document.addEventListener("astro:page-load", () => {
       const cartEmpty = document.getElementById("cart-empty");
