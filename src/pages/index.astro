@@ -29,12 +29,12 @@ const mainServices = [
     image: resolveCatalogImageUrlSync(`${catalogImageBase}Experiencia%20Tapti/Experiencia%20Tapti%202.avif`),
     url: "/catalogo",
   },
-  {
-    title: "Suscripciones Mensuales",
-    description: "Esto es más que un regalo, es una experiencia completa",
-    image: resolveCatalogImageUrlSync(`${catalogImageBase}Suscripcion.avif`),
-    url: "/suscripciones",
-  },
+  // {
+  //   title: "Suscripciones Mensuales",
+  //   description: "Esto es más que un regalo, es una experiencia completa",
+  //   image: resolveCatalogImageUrlSync(`${catalogImageBase}Suscripcion.avif`),
+  //   url: "/suscripciones",
+  // },
 ];
 
 const { flowers: catalogProducts } = await getCatalogData();
@@ -238,7 +238,7 @@ const specialOccasions = [
         >
           Nuestros Servicios
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {
             mainServices.map((service) => (
               <BoutiqueCard
