@@ -1,9 +1,11 @@
 ---
 import EntranceAnimation from "./EntranceAnimation.astro";
 import FloatingNav from "./FloatingNav.astro";
+import MainMenu from "./MainMenu.astro";
 import FloatingWhatsApp from "./FloatingWhatsApp.astro";
 import AccessoriesModal from "./AccessoriesModal.astro";
 import { ViewTransitions } from "astro:transitions";
+import { getAuthUser } from "../lib/auth";
 
 interface Props {
   title?: string;
@@ -20,6 +22,11 @@ const {
   showEntrance = false,
   hideWhatsApp = false,
 } = Astro.props;
+
+// MainMenu muestra una barra de administración cuando hay sesión activa;
+// FloatingNav necesita saberlo para no dibujarse flotando encima de esa barra.
+const user = await getAuthUser(Astro.cookies);
+const hasAdminBar = Boolean(user);
 ---
 
 <html lang="es" class="h-full">
@@ -46,8 +53,8 @@ const {
     ></script>
   </head>
   <body
-    class="min-h-screen text-white overflow-visible"
-    style="background-color: #0B1220;"
+    class="min-h-screen text-grafito overflow-visible"
+    style="background-image: url('/603312.avif'); background-position: center; background-size: cover;"
   >
     {showEntrance && <EntranceAnimation />}
 
@@ -71,15 +78,35 @@ const {
           }
         });
       </script>
-      <FloatingNav />
-      <main class={hideHeader ? "min-h-screen" : "min-h-[70vh]"}>
+      <MainMenu />
+      <FloatingNav hasAdminBar={hasAdminBar} />
+      <main
+        class:list={[
+          hideHeader ? "min-h-screen" : "min-h-[70vh]",
+          hasAdminBar ? "pt-4 md:pt-6" : "pt-25 md:pt-32",
+        ]}
+      >
         <slot />
       </main>
       {
         !hideFooter && (
-          <footer class="border-t border-white/10">
-            <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex items-center justify-center">
+          <footer class="border-t border-borde-claro">
+            <div class="max-w-6xl mx-auto px-4 py-8 text-sm flex flex-col gap-4 items-center justify-center text-center text-grafito">
               <p>© {new Date().getFullYear()} Tapti Flores y Regalos</p>
+              <div class="flex gap-4">
+                <a href="/terminos-y-condiciones" class="hover:underline">
+                  Términos y Condiciones
+                </a>
+                <span>|</span>
+                <a href="/politica-de-privacidad" class="hover:underline">
+                  Política de Privacidad
+                </a>
+              </div>
+              <p class="text-xs text-grafito/60 max-w-md">
+                Solamente utilizamos los datos personales para la boleta
+                generada y/o para la utilización de conversaciones con el mismo
+                vía WhatsApp.
+              </p>
             </div>
           </footer>
         )
@@ -88,8 +115,8 @@ const {
 
     <style>
       body {
-        background-color: #0b1220;
-        color: #f8fafc;
+        background-color: #8cb4d3;
+        color: #444444;
       }
 
       @keyframes gentle-fade {

@@ -7,4 +7,7 @@ export default defineConfig({
   adapter: netlify(),
   integrations: [tailwind()],
   server: { port: 4321 },
+  redirects: {
+    '/membresias': '/suscripciones',
+  },
 });

@@ -1,0 +1,540 @@
+---
+---
+
+<div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50 px-4 py-12">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h4 class="text-lg font-semibold text-grafito"><a href="/dashboard"> &larr; Atras </a></h4>
+        <h1 class="text-3xl font-bold text-grafito mb-2">Reportes</h1>
+        <p class="text-grafito/60">Resumen financiero de ventas, pedidos y suscripciones</p>
+      </div>
+      <button
+        id="btn-exportar-pdf"
+        class="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-6 rounded-lg transition duration-200"
+      >
+        Descargar reporte PDF
+      </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-white rounded-lg shadow p-6 mb-8">
+      <div class="flex flex-wrap items-end gap-4">
+        <div>
+          <label class="block text-xs font-semibold text-grafito/60 mb-1">Rango</label>
+          <select
+            id="reportes-rango"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none bg-white"
+          >
+            <option value="7">Últimos 7 días</option>
+            <option value="30" selected>Últimos 30 días</option>
+            <option value="90">Últimos 90 días</option>
+            <option value="month">Este mes</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </div>
+
+        <div id="rango-personalizado" class="hidden gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-grafito/60 mb-1">Desde</label>
+            <input
+              type="date"
+              id="reportes-desde"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-grafito/60 mb-1">Hasta</label>
+            <input
+              type="date"
+              id="reportes-hasta"
+              class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-grafito/60 mb-1">Estado de la compra</label>
+          <select
+            id="reportes-estado"
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-500 focus:border-transparent outline-none bg-white"
+          >
+            <option value="sold" selected>Vendidos (pagado + enviado)</option>
+            <option value="all">Todos los estados</option>
+            <option value="paid">Pagado</option>
+            <option value="shipped">Enviado</option>
+            <option value="pending_payment">Pago pendiente</option>
+            <option value="pending">Pendiente</option>
+            <option value="draft">Borrador</option>
+            <option value="failed">Fallido</option>
+          </select>
+        </div>
+
+        <button
+          id="btn-aplicar-filtros"
+          class="bg-grafito text-white font-semibold py-2 px-6 rounded-lg hover:bg-grafito/90 transition"
+        >
+          Aplicar filtros
+        </button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-sm text-gray-500">Ingresos confirmados</p>
+        <p id="kpi-ingresos" class="mt-2 text-2xl font-bold text-grafito">$0</p>
+        <p class="text-xs text-gray-400 mt-1">Pedidos pagados o enviados</p>
+      </div>
+      <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-sm text-gray-500">Valor pedidos filtrados</p>
+        <p id="kpi-valor-filtrado" class="mt-2 text-2xl font-bold text-grafito">$0</p>
+        <p class="text-xs text-gray-400 mt-1"><span id="kpi-pedidos">0</span> pedidos en el filtro actual</p>
+      </div>
+      <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-sm text-gray-500">Ticket promedio</p>
+        <p id="kpi-ticket" class="mt-2 text-2xl font-bold text-grafito">$0</p>
+      </div>
+      <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-sm text-gray-500">Suscripciones activas</p>
+        <p id="kpi-suscripciones" class="mt-2 text-2xl font-bold text-grafito">0</p>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6 mb-8">
+      <!-- Gráfico de ingresos diarios -->
+      <div class="lg:col-span-2 bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-bold text-grafito mb-4">Ingresos confirmados por día</h3>
+        <div id="grafico-ingresos" class="flex items-end gap-1 h-48 overflow-x-auto"></div>
+      </div>
+
+      <!-- Pedidos por estado -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-bold text-grafito mb-4">Pedidos por estado</h3>
+        <ul id="lista-estados" class="space-y-3"></ul>
+      </div>
+    </div>
+
+    <!-- Ramos / productos vendidos -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+      <div class="p-6 pb-0 flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-grafito">Ramos vendidos</h3>
+          <p class="text-sm text-grafito/50">Conteo por producto y tamaño en el rango seleccionado</p>
+        </div>
+        <button
+          id="btn-exportar-productos-excel"
+          class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-2 px-4 rounded-lg transition text-sm"
+        >
+          Descargar Excel
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full mt-4">
+          <thead class="bg-grafito/10 border-b border-grafito/20">
+            <tr>
+              <th class="text-left px-6 py-3 text-sm font-semibold text-grafito">Producto</th>
+              <th class="text-left px-6 py-3 text-sm font-semibold text-grafito">Tamaño</th>
+              <th class="text-right px-6 py-3 text-sm font-semibold text-grafito">Cantidad vendida</th>
+              <th class="text-right px-6 py-3 text-sm font-semibold text-grafito">Ingresos</th>
+            </tr>
+          </thead>
+          <tbody id="productos-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-6 mb-8">
+      <!-- Comunas con más pedidos -->
+      <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-lg font-bold text-grafito mb-4">Comunas con más pedidos</h3>
+        <ul id="lista-comunas" class="space-y-2 text-sm"></ul>
+      </div>
+    </div>
+
+    <!-- Ventas totales -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+      <div class="p-6 pb-0 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h3 class="text-lg font-bold text-grafito">Ventas totales</h3>
+          <p id="ventas-rango-label" class="text-sm text-grafito/50"></p>
+        </div>
+        <button
+          id="btn-exportar-ventas-excel"
+          class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-2 px-4 rounded-lg transition text-sm"
+        >
+          Descargar Excel
+        </button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full mt-4">
+          <thead class="bg-grafito/10 border-b border-grafito/20">
+            <tr>
+              <th class="text-left px-6 py-3 text-sm font-semibold text-grafito">Cliente</th>
+              <th class="text-left px-6 py-3 text-sm font-semibold text-grafito">Comuna</th>
+              <th class="text-left px-6 py-3 text-sm font-semibold text-grafito">Estado</th>
+              <th class="text-left px-6 py-3 text-sm font-semibold text-grafito">Ítems</th>
+              <th class="text-right px-6 py-3 text-sm font-semibold text-grafito">Total</th>
+              <th class="text-right px-6 py-3 text-sm font-semibold text-grafito">Fecha</th>
+            </tr>
+          </thead>
+          <tbody id="ventas-body"></tbody>
+        </table>
+      </div>
+      <div class="p-4 flex items-center justify-between text-sm text-grafito/60">
+        <button id="btn-pagina-anterior" class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-40">← Anterior</button>
+        <span id="ventas-paginacion-info"></span>
+        <button id="btn-pagina-siguiente" class="px-3 py-1 rounded border border-gray-300 hover:bg-gray-50 disabled:opacity-40">Siguiente →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  interface OrderItem {
+    name?: string;
+    size?: string;
+    quantity?: number;
+    price?: number;
+  }
+
+  interface OrderRow {
+    id: string;
+    customer_name: string;
+    customer_email?: string;
+    status: string;
+    total_amount: number;
+    shipping_commune?: string;
+    created_at: string;
+    items: OrderItem[];
+  }
+
+  interface ProductSale {
+    name: string;
+    size: string;
+    quantity: number;
+    revenue: number;
+  }
+
+  interface ReportSummary {
+    filters: { from: string; to: string; status: string };
+    totalOrders: number;
+    filteredTotalValue: number;
+    confirmedRevenue: number;
+    averageOrderValue: number;
+    activeSubscriptions: number;
+    totalSubscriptions: number;
+    ordersByStatus: Record<string, number>;
+    dailyRevenue: { date: string; total: number }[];
+    topCommunes: { commune: string; count: number }[];
+    productSales: ProductSale[];
+    orders: OrderRow[];
+  }
+
+  const STATUS_LABELS: Record<string, string> = {
+    paid: 'Pagado',
+    shipped: 'Enviado',
+    pending: 'Pendiente',
+    pending_payment: 'Pago pendiente',
+    draft: 'Borrador',
+    failed: 'Fallido',
+    sin_estado: 'Sin estado',
+  };
+
+  const PAGE_SIZE = 50;
+
+  const currencyFmt = new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 });
+  const rangoSelect = document.getElementById('reportes-rango') as HTMLSelectElement;
+  const estadoSelect = document.getElementById('reportes-estado') as HTMLSelectElement;
+  const desdeInput = document.getElementById('reportes-desde') as HTMLInputElement;
+  const hastaInput = document.getElementById('reportes-hasta') as HTMLInputElement;
+  const rangoPersonalizado = document.getElementById('rango-personalizado') as HTMLDivElement;
+  const btnAplicarFiltros = document.getElementById('btn-aplicar-filtros')!;
+  const btnPaginaAnterior = document.getElementById('btn-pagina-anterior') as HTMLButtonElement;
+  const btnPaginaSiguiente = document.getElementById('btn-pagina-siguiente') as HTMLButtonElement;
+
+  let ultimoResumen: ReportSummary | null = null;
+  let paginaActual = 0;
+
+  function escapeHtml(value: unknown): string {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function statusLabel(status: string): string {
+    return STATUS_LABELS[status] || status;
+  }
+
+  function itemsResumen(items: OrderItem[]): string {
+    if (!items || items.length === 0) return '-';
+    return items.map((it) => `${it.quantity ?? 1}x ${it.name ?? 'Producto'}${it.size ? ` (${it.size})` : ''}`).join(', ');
+  }
+
+  rangoSelect.addEventListener('change', () => {
+    const esPersonalizado = rangoSelect.value === 'custom';
+    rangoPersonalizado.classList.toggle('hidden', !esPersonalizado);
+    rangoPersonalizado.classList.toggle('flex', esPersonalizado);
+  });
+
+  function buildQueryParams(): URLSearchParams {
+    const params = new URLSearchParams();
+    params.set('status', estadoSelect.value);
+
+    if (rangoSelect.value === 'custom' && desdeInput.value && hastaInput.value) {
+      params.set('from', desdeInput.value);
+      params.set('to', hastaInput.value);
+    } else if (rangoSelect.value === 'month') {
+      const now = new Date();
+      const inicioMes = new Date(now.getFullYear(), now.getMonth(), 1);
+      params.set('from', inicioMes.toISOString().slice(0, 10));
+      params.set('to', now.toISOString().slice(0, 10));
+    } else {
+      params.set('days', rangoSelect.value);
+    }
+
+    return params;
+  }
+
+  function renderGraficoIngresos(dailyRevenue: { date: string; total: number }[]) {
+    const contenedor = document.getElementById('grafico-ingresos')!;
+    const max = Math.max(1, ...dailyRevenue.map((d) => d.total));
+
+    contenedor.innerHTML = dailyRevenue.map((d) => {
+      const alturaPct = Math.max(2, Math.round((d.total / max) * 100));
+      const fecha = new Date(d.date + 'T00:00:00').toLocaleDateString('es-CL', { day: '2-digit', month: '2-digit' });
+      return `
+        <div class="flex flex-col items-center justify-end h-full min-w-[10px] flex-1" title="${fecha}: ${currencyFmt.format(d.total)}">
+          <div class="w-full bg-rose-400 hover:bg-rose-500 rounded-t transition-colors" style="height: ${alturaPct}%"></div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderListaEstados(ordersByStatus: Record<string, number>) {
+    const lista = document.getElementById('lista-estados')!;
+    const entradas = Object.entries(ordersByStatus).sort((a, b) => b[1] - a[1]);
+
+    if (entradas.length === 0) {
+      lista.innerHTML = '<li class="text-sm text-grafito/50">Sin pedidos en el rango seleccionado.</li>';
+      return;
+    }
+
+    lista.innerHTML = entradas.map(([status, count]) => `
+      <li class="flex items-center justify-between text-sm">
+        <span class="text-grafito/70">${statusLabel(status)}</span>
+        <span class="font-semibold text-grafito">${count}</span>
+      </li>
+    `).join('');
+  }
+
+  function renderListaComunas(topCommunes: { commune: string; count: number }[]) {
+    const lista = document.getElementById('lista-comunas')!;
+
+    if (topCommunes.length === 0) {
+      lista.innerHTML = '<li class="text-grafito/50">Sin datos disponibles.</li>';
+      return;
+    }
+
+    lista.innerHTML = topCommunes.map(({ commune, count }) => `
+      <li class="flex items-center justify-between">
+        <span class="text-grafito/70">${escapeHtml(commune)}</span>
+        <span class="font-semibold text-grafito">${count}</span>
+      </li>
+    `).join('');
+  }
+
+  function renderProductos(productSales: ProductSale[]) {
+    const body = document.getElementById('productos-body')!;
+
+    if (productSales.length === 0) {
+      body.innerHTML = '<tr><td colspan="4" class="px-6 py-6 text-center text-sm text-grafito/50">No hay ramos vendidos en el rango seleccionado.</td></tr>';
+      return;
+    }
+
+    body.innerHTML = productSales.map((p) => `
+      <tr class="border-b border-gray-200 hover:bg-gray-50">
+        <td class="px-6 py-3 text-sm text-grafito">${escapeHtml(p.name)}</td>
+        <td class="px-6 py-3 text-sm text-grafito/60">${escapeHtml(p.size)}</td>
+        <td class="px-6 py-3 text-sm text-right text-grafito font-semibold">${p.quantity}</td>
+        <td class="px-6 py-3 text-sm text-right text-grafito">${currencyFmt.format(p.revenue)}</td>
+      </tr>
+    `).join('');
+  }
+
+  function renderVentas() {
+    const body = document.getElementById('ventas-body')!;
+    const orders = ultimoResumen?.orders ?? [];
+
+    if (orders.length === 0) {
+      body.innerHTML = '<tr><td colspan="6" class="px-6 py-6 text-center text-sm text-grafito/50">No hay pedidos en el rango seleccionado.</td></tr>';
+      document.getElementById('ventas-paginacion-info')!.textContent = '';
+      btnPaginaAnterior.disabled = true;
+      btnPaginaSiguiente.disabled = true;
+      return;
+    }
+
+    const totalPaginas = Math.max(1, Math.ceil(orders.length / PAGE_SIZE));
+    paginaActual = Math.min(paginaActual, totalPaginas - 1);
+    const inicio = paginaActual * PAGE_SIZE;
+    const pagina = orders.slice(inicio, inicio + PAGE_SIZE);
+
+    body.innerHTML = pagina.map((order) => `
+      <tr class="border-b border-gray-200 hover:bg-gray-50">
+        <td class="px-6 py-3 text-sm text-grafito">${escapeHtml(order.customer_name)}</td>
+        <td class="px-6 py-3 text-sm text-grafito/60">${escapeHtml(order.shipping_commune) || '-'}</td>
+        <td class="px-6 py-3 text-sm">
+          <span class="px-2 py-1 rounded-full text-xs font-semibold bg-grafito/10 text-grafito">
+            ${escapeHtml(statusLabel(order.status))}
+          </span>
+        </td>
+        <td class="px-6 py-3 text-sm text-grafito/70 max-w-xs truncate" title="${escapeHtml(itemsResumen(order.items))}">${escapeHtml(itemsResumen(order.items))}</td>
+        <td class="px-6 py-3 text-sm text-right text-grafito">${currencyFmt.format(Number(order.total_amount) || 0)}</td>
+        <td class="px-6 py-3 text-sm text-right text-grafito/60">${new Date(order.created_at).toLocaleDateString('es-CL')}</td>
+      </tr>
+    `).join('');
+
+    document.getElementById('ventas-paginacion-info')!.textContent = `Página ${paginaActual + 1} de ${totalPaginas} (${orders.length} pedidos)`;
+    btnPaginaAnterior.disabled = paginaActual === 0;
+    btnPaginaSiguiente.disabled = paginaActual >= totalPaginas - 1;
+  }
+
+  btnPaginaAnterior.addEventListener('click', () => {
+    paginaActual = Math.max(0, paginaActual - 1);
+    renderVentas();
+  });
+  btnPaginaSiguiente.addEventListener('click', () => {
+    paginaActual += 1;
+    renderVentas();
+  });
+
+  async function cargarReportes() {
+    const params = buildQueryParams();
+
+    try {
+      const res = await fetch(`/api/reports/summary?${params.toString()}`);
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert('Error: ' + (result.message || 'No se pudo cargar el reporte'));
+        return;
+      }
+
+      const summary = result.data as ReportSummary;
+      ultimoResumen = summary;
+      paginaActual = 0;
+
+      document.getElementById('kpi-ingresos')!.textContent = currencyFmt.format(summary.confirmedRevenue);
+      document.getElementById('kpi-valor-filtrado')!.textContent = currencyFmt.format(summary.filteredTotalValue);
+      document.getElementById('kpi-pedidos')!.textContent = String(summary.totalOrders);
+      document.getElementById('kpi-ticket')!.textContent = currencyFmt.format(summary.averageOrderValue);
+      document.getElementById('kpi-suscripciones')!.textContent = String(summary.activeSubscriptions);
+      document.getElementById('ventas-rango-label')!.textContent =
+        `Del ${new Date(summary.filters.from + 'T00:00:00').toLocaleDateString('es-CL')} al ${new Date(summary.filters.to + 'T00:00:00').toLocaleDateString('es-CL')}`;
+
+      renderGraficoIngresos(summary.dailyRevenue);
+      renderListaEstados(summary.ordersByStatus);
+      renderListaComunas(summary.topCommunes);
+      renderProductos(summary.productSales);
+      renderVentas();
+    } catch (error) {
+      console.error('Error al cargar reportes:', error);
+      alert('Error al cargar los reportes');
+    }
+  }
+
+  // --- Exportación a Excel (CSV) ---
+  function descargarCsv(filename: string, headers: string[], rows: (string | number)[][]) {
+    const escapar = (valor: string | number) => {
+      const texto = String(valor ?? '');
+      return /[",\n;]/.test(texto) ? `"${texto.replace(/"/g, '""')}"` : texto;
+    };
+    const contenido = [headers, ...rows].map((fila) => fila.map(escapar).join(',')).join('\r\n');
+    const blob = new Blob(['﻿' + contenido], { type: 'text/csv;charset=utf-8;' });
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(blob);
+    enlace.setAttribute('download', filename);
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
+    URL.revokeObjectURL(enlace.href);
+  }
+
+  document.getElementById('btn-exportar-productos-excel')!.addEventListener('click', () => {
+    if (!ultimoResumen) return;
+    const rows = ultimoResumen.productSales.map((p) => [p.name, p.size, p.quantity, p.revenue]);
+    descargarCsv(`ramos-vendidos_${ultimoResumen.filters.from}_${ultimoResumen.filters.to}.csv`,
+      ['Producto', 'Tamaño', 'Cantidad vendida', 'Ingresos'], rows);
+  });
+
+  document.getElementById('btn-exportar-ventas-excel')!.addEventListener('click', () => {
+    if (!ultimoResumen) return;
+    const rows = ultimoResumen.orders.map((o) => [
+      o.customer_name,
+      o.customer_email || '',
+      o.shipping_commune || '',
+      statusLabel(o.status),
+      itemsResumen(o.items),
+      o.total_amount,
+      new Date(o.created_at).toLocaleString('es-CL'),
+    ]);
+    descargarCsv(`ventas_${ultimoResumen.filters.from}_${ultimoResumen.filters.to}.csv`,
+      ['Cliente', 'Email', 'Comuna', 'Estado', 'Ítems', 'Total', 'Fecha'], rows);
+  });
+
+  // --- Exportación a PDF ---
+  document.getElementById('btn-exportar-pdf')!.addEventListener('click', async () => {
+    if (!ultimoResumen) return;
+    const summary = ultimoResumen;
+
+    const { jsPDF } = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
+
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text('Reporte financiero - Tapti', 14, 16);
+    doc.setFontSize(10);
+    doc.text(`Rango: ${summary.filters.from} a ${summary.filters.to} | Estado: ${summary.filters.status}`, 14, 23);
+
+    doc.setFontSize(11);
+    doc.text(`Ingresos confirmados: ${currencyFmt.format(summary.confirmedRevenue)}`, 14, 32);
+    doc.text(`Valor pedidos filtrados: ${currencyFmt.format(summary.filteredTotalValue)} (${summary.totalOrders} pedidos)`, 14, 38);
+    doc.text(`Ticket promedio: ${currencyFmt.format(summary.averageOrderValue)}`, 14, 44);
+    doc.text(`Suscripciones activas: ${summary.activeSubscriptions}`, 14, 50);
+
+    autoTable(doc, {
+      startY: 58,
+      head: [['Producto', 'Tamaño', 'Cantidad', 'Ingresos']],
+      body: summary.productSales.map((p) => [p.name, p.size, String(p.quantity), currencyFmt.format(p.revenue)]),
+      headStyles: { fillColor: [244, 63, 94] },
+      styles: { fontSize: 8 },
+      margin: { left: 14, right: 14 },
+    });
+
+    const finalY = (doc as any).lastAutoTable?.finalY ?? 58;
+
+    autoTable(doc, {
+      startY: finalY + 10,
+      head: [['Cliente', 'Comuna', 'Estado', 'Total', 'Fecha']],
+      body: summary.orders.map((o) => [
+        o.customer_name,
+        o.shipping_commune || '-',
+        statusLabel(o.status),
+        currencyFmt.format(Number(o.total_amount) || 0),
+        new Date(o.created_at).toLocaleDateString('es-CL'),
+      ]),
+      headStyles: { fillColor: [244, 63, 94] },
+      styles: { fontSize: 8 },
+      margin: { left: 14, right: 14 },
+    });
+
+    doc.save(`reporte-tapti_${summary.filters.from}_${summary.filters.to}.pdf`);
+  });
+
+  btnAplicarFiltros.addEventListener('click', cargarReportes);
+  cargarReportes();
+</script>

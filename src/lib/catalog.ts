@@ -1,0 +1,223 @@
+import { supabase } from "./supabase";
+import catalogImageData from "../data/catalog.json";
+import { slugify } from "../utils/slugify.js";
+import {
+  CATALOG_IMAGES_BASE_URL,
+  DEFAULT_CATALOG_IMAGE,
+  isLocalPublicAssetPath,
+  normalizeStorageImagePath,
+  resolveCatalogImageUrlSync,
+} from "./catalogImage";
+
+export { CATALOG_IMAGES_BASE_URL, resolveCatalogImageUrlSync };
+
+export type CatalogRow = {
+  currency: string | null;
+  Description: string | null;
+  catalog_categories: { categories: { id: string; name: string } | null }[] | null;
+  flowerType: string[] | null;
+  hasForm: string | boolean | null;
+  isQuote: string | boolean | null;
+  name: string | null;
+  price_range: string | null;
+  sizes: Record<string, { total: number; stems?: string | number } | null> | null;
+  unit_price: number | string | null;
+  images?: string[] | null;
+  isAvailable?: boolean | null;
+};
+
+export type CatalogProduct = {
+  currency: string;
+  Description: string;
+  categories: string[];
+  flowerType: string[];
+  hasForm: boolean;
+  isQuote: boolean;
+  name: string;
+  price_range: string | null;
+  sizes: Record<string, { total: number; stems?: string | number } | null>;
+  unit_price: number | null;
+  image: string[];
+  isAvailable: boolean;
+};
+
+export type CatalogData = {
+  currency: string;
+  flowers: CatalogProduct[];
+};
+
+type CatalogImageEntry = {
+  name?: string;
+  image?: string[];
+};
+
+type CatalogImageData = {
+  flowers?: CatalogImageEntry[];
+};
+
+const catalogImageMap = new Map(
+  ((catalogImageData as CatalogImageData).flowers || [])
+    .filter((item) => typeof item.name === "string" && Array.isArray(item.image))
+    .map((item) => [slugify(item.name || ""), item.image || []]),
+);
+
+const resolvedUrlCache = new Map<string, string>();
+
+// Imágenes definidas en el mapeo estático (catalog.json) para productos que aún
+// no tienen imágenes guardadas en la columna `images` de la base de datos.
+export function getLegacyImagePaths(name: string): string[] {
+  const rawPaths = catalogImageMap.get(slugify(name || ""));
+  if (!rawPaths || rawPaths.length === 0) return [];
+  return rawPaths.map(normalizeStorageImagePath).filter(Boolean);
+}
+
+async function headOk(url: string): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 5000);
+    const res = await fetch(url, { method: "HEAD", signal: controller.signal });
+    clearTimeout(id);
+    return res.ok;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function resolveCatalogImageUrl(imagePath: string): Promise<string> {
+  if (!imagePath) return `${DEFAULT_CATALOG_IMAGE}`;
+  if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
+    return imagePath;
+  }
+  if (isLocalPublicAssetPath(imagePath)) {
+    return imagePath;
+  }
+
+  // Try cached
+  if (resolvedUrlCache.has(imagePath)) return resolvedUrlCache.get(imagePath)!;
+
+  const candidates: string[] = [];
+
+  const orig = imagePath;
+  const stripped = normalizeStorageImagePath(orig);
+
+  // Helper to attempt latin1->utf8 fix for mojibake
+  let maybeFixed = stripped;
+  try {
+    if (/[^\x00-\x7F]/.test(stripped)) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const Buffer = require("buffer").Buffer;
+      const fixed = Buffer.from(stripped, "latin1").toString("utf8");
+      if (fixed && fixed !== stripped) maybeFixed = fixed;
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  candidates.push(stripped);
+  if (maybeFixed !== stripped) candidates.push(maybeFixed);
+  // also try original with images/ prefix
+  if (!orig.startsWith("images/")) { candidates.push(orig); }
+
+  for (const cand of candidates) {
+    const encoded = cand.split("/").map(encodeURIComponent).join("/");
+    const url = `${CATALOG_IMAGES_BASE_URL}${encoded}`;
+    // quick check
+    if (await headOk(url)) {
+      resolvedUrlCache.set(imagePath, url);
+      return url;
+    }
+  }
+
+  // fallback to default image
+  const fallback = DEFAULT_CATALOG_IMAGE;
+  resolvedUrlCache.set(imagePath, fallback);
+  return fallback;
+}
+
+export async function resolveCatalogImagePaths(imagePaths: string[]): Promise<string[]> {
+  return Promise.all(imagePaths.map((imagePath) => resolveCatalogImageUrl(imagePath)));
+}
+
+function parseBoolean(value: string | boolean | null): boolean {
+  if (typeof value === "boolean") return value;
+  if (typeof value !== "string") return false;
+
+  return ["true", "1", "yes", "si", "sí"].includes(value.trim().toLowerCase());
+}
+
+function normalizeCatalogRow(row: CatalogRow): CatalogProduct {
+  const dbImages = Array.isArray(row.images) && row.images.length > 0 ? row.images : null;
+  const imagePaths = dbImages || catalogImageMap.get(slugify(row.name || "")) || [DEFAULT_CATALOG_IMAGE];
+
+  const categories = (row.catalog_categories || [])
+    .map((cc) => cc.categories?.name)
+    .filter((name): name is string => Boolean(name));
+
+  return {
+    currency: row.currency || "CLP",
+    Description: row.Description || "",
+    categories: categories.length > 0 ? categories : ["Sin categoría"],
+    flowerType: Array.isArray(row.flowerType) ? row.flowerType : [],
+    hasForm: parseBoolean(row.hasForm),
+    isQuote: parseBoolean(row.isQuote),
+    name: row.name || "Sin nombre",
+    price_range: row.price_range,
+    sizes: row.sizes || {},
+    unit_price:
+      typeof row.unit_price === "number"
+        ? row.unit_price
+        : typeof row.unit_price === "string"
+          ? Number(row.unit_price)
+          : null,
+    // keep unresolved image paths here; they'll be resolved in getCatalogData
+    image: imagePaths,
+    isAvailable: row.isAvailable !== false,
+  };
+}
+
+export function getStartingPrice(product: Pick<CatalogProduct, "isQuote" | "sizes">): number | null {
+  if (product.isQuote) return null;
+
+  const prices: number[] = Object.values(product.sizes)
+    .filter((size): size is { total: number } => size !== null)
+    .map((size) => size.total);
+
+  return prices.length > 0 ? Math.min(...prices) : null;
+}
+
+export async function getCatalogData(): Promise<CatalogData> {
+  const { data, error } = await supabase
+    .from("catalog")
+    .select("currency, Description, flowerType, hasForm, isQuote, name, price_range, sizes, unit_price, images, isAvailable, catalog_categories(categories(id, name))")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error al cargar el catálogo desde Supabase:", error);
+    return {
+      currency: "CLP",
+      flowers: [],
+    };
+  }
+
+  const flowers = (data || [])
+    .map((row) => normalizeCatalogRow(row as CatalogRow))
+    .filter((product) => product.isAvailable);
+
+  // Resolve image URLs (may perform HEAD checks and use cache)
+  await Promise.all(
+    flowers.map(async (f) => {
+      try {
+        // f.image currently holds raw image path strings
+        // @ts-ignore
+        f.image = await resolveCatalogImagePaths(f.image as string[]);
+      } catch (e) {
+        // leave as-is on error
+      }
+    }),
+  );
+
+  return {
+    currency: flowers[0]?.currency || "CLP",
+    flowers,
+  };
+}

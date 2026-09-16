@@ -5,18 +5,24 @@ interface Props extends HTMLAttributes<"div"> {
   variant?: "hero" | "gallery" | "info" | "contact" | "services";
   size?: "small" | "medium" | "large" | "hero";
   background?: string;
+  backgroundFit?: "cover" | "contain";
+  backgroundPosition?: string;
   className?: string;
   disableAnimation?: boolean;
   contentAlignment?: "start" | "center" | "end";
+  contentClassName?: string;
 }
 
 const {
   variant = "info",
   size = "medium",
   background,
+  backgroundFit = "cover",
+  backgroundPosition = "center",
   className = "",
   disableAnimation = false,
   contentAlignment = "end",
+  contentClassName = "text-white",
   ...rest
 } = Astro.props;
 
@@ -24,7 +30,7 @@ const sizeClasses = {
   small: "h-64 md:h-80",
   medium: "h-80 md:h-96",
   large: "h-96 md:h-[500px]",
-  hero: "h-screen max-h-[900px] min-h-[600px]",
+  hero: "h-screen max-h-[600px] min-h-[400px]",
 };
 
 const variantClasses = {
@@ -50,7 +56,7 @@ const animationClasses = disableAnimation
 <div
   class={`relative rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 group ${sizeClasses[size]} ${variantClasses[variant]} ${animationClasses} ${className}`}
   style={background
-    ? `background-image: url(${background.replace(/ /g, "%20")}); background-size: cover; background-position: center;`
+    ? `background-image: url(${background.replace(/ /g, "%20")}); background-repeat: no-repeat; background-position: ${backgroundPosition}; background-size: ${backgroundFit};`
     : ""}
   {...rest}
 >
@@ -63,7 +69,7 @@ const animationClasses = disableAnimation
 
   <!-- Contenido -->
   <div
-    class={`relative min-h-full flex flex-col ${alignmentClasses[contentAlignment]} p-6 md:p-8 lg:p-12 text-white z-20`}
+    class={`relative min-h-full flex flex-col ${alignmentClasses[contentAlignment]} p-6 md:p-8 lg:p-12 z-20 ${contentClassName}`}
   >
     <slot />
   </div>
