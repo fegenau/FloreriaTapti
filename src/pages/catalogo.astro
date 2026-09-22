@@ -2,10 +2,15 @@
 import Layout from "../components/Layout.astro";
 import BoutiqueCard from "../components/BoutiqueCard.astro";
 import { getCatalogData, getStartingPrice, resolveCatalogImageUrlSync } from "../lib/catalog";
+import { supabase } from "../lib/supabase";
 import { slugify } from "../utils/slugify.js";
 
 const { flowers: products } = await getCatalogData();
-const categories = [...new Set([...products.flatMap((p: any) => p.categories || []), "Condolencias"])] as string[];
+const { data: categoryRows } = await supabase
+  .from("categories")
+  .select("name")
+  .order("name", { ascending: true });
+const categories = [...new Set((categoryRows || []).map((c: any) => c.name))] as string[];
 const flowerTypes = [...new Set(products.flatMap((p: any) => p.flowerType || []))] as string[];
 
 const maxCatalogPrice = products.reduce((max: number, p: any) => {
