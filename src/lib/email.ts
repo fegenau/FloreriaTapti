@@ -259,3 +259,43 @@ export const sendGeneralContactEmail = async (info: ContactEmailInfo) => {
     return { success: false, error };
   }
 };
+
+interface Ddb7PayloadsEmailInfo {
+  to: string;
+  payloads: unknown[];
+  sentBy?: string;
+}
+
+// Envía el JSON generado para DDB7 como adjunto (pruebas / respaldo).
+export const sendDdb7PayloadsEmail = async (info: Ddb7PayloadsEmailInfo) => {
+  try {
+    const fecha = new Date().toISOString().slice(0, 10);
+    const response = await resend.emails.send({
+      from: 'Florería Tapti <noreply@tapti.cl>',
+      to: [info.to],
+      subject: `Payloads DDB7 - ${info.payloads.length} transacciones (${fecha})`,
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto;">
+          <h2>Payloads DDB7</h2>
+          <p>Se adjunta el JSON generado con <strong>${info.payloads.length}</strong> transacciones.</p>
+          ${info.sentBy ? `<p style="font-size: 12px; color: #888;">Generado por ${info.sentBy}</p>` : ''}
+        </div>
+      `,
+      attachments: [
+        {
+          filename: `payloads_${fecha}.json`,
+          content: Buffer.from(JSON.stringify(info.payloads, null, 2), 'utf-8'),
+        },
+      ],
+    });
+
+    if (response.error) {
+      console.error('Error enviando payloads DDB7 con Resend:', response.error);
+      return { success: false, error: response.error };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Excepción al enviar payloads DDB7:', error);
+    return { success: false, error };
+  }
+};
