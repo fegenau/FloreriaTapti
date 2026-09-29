@@ -484,7 +484,7 @@ const accessories = catalog.accessories || [];
 
       if (inputDeliveryDate) {
         const now = new Date();
-        now.setDate(now.getDate() + 2); // Add 2 days for preparation
+        now.setDate(now.getDate() + 5); // Add 5 days for preparation
         const year = now.getFullYear();
         const month = (now.getMonth() + 1).toString().padStart(2, "0");
         const day = now.getDate().toString().padStart(2, "0");
