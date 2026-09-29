@@ -2,10 +2,8 @@ import type { APIRoute } from 'astro';
 import { verifyAdmin } from '../../../lib/auth';
 import { configPendientes, type Ddb7Payload } from '../../../lib/ddb7';
 
-const API: Record<'qa' | 'prod', string | undefined> = {
-  qa: import.meta.env.DDB7_API_URL_QA,
-  prod: import.meta.env.DDB7_API_URL_PROD,
-};
+// URL de la API (QA o producción según el entorno).
+const DDB7_API_URL = import.meta.env.DDB7_API_URL;
 
 // Token entregado por DDB7 (manual, sección 4.2). Solo en variables de entorno, nunca en el repo.
 const DDB7_API_TOKEN = import.meta.env.DDB7_API_TOKEN;
@@ -19,21 +17,18 @@ const json = (body: unknown, status = 200) =>
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   if (!(await verifyAdmin(cookies))) return json({ error: 'No autorizado' }, 401);
+  if (!DDB7_API_URL) return json({ error: 'Falta configurar DDB7_API_URL' }, 500);
   if (!DDB7_API_TOKEN) return json({ error: 'Falta configurar DDB7_API_TOKEN' }, 500);
 
   const pendientes = configPendientes();
   if (pendientes.length) return json({ error: `Campos PENDIENTES en CONFIG: ${pendientes.join(', ')}` }, 400);
 
-  let ambiente: string;
   let payloads: Ddb7Payload[];
   try {
-    ({ ambiente, payloads } = await request.json());
+    ({ payloads } = await request.json());
   } catch {
     return json({ error: 'JSON inválido' }, 400);
   }
-  if (ambiente !== 'qa' && ambiente !== 'prod') return json({ error: 'Ambiente inválido' }, 400);
-  const url = API[ambiente];
-  if (!url) return json({ error: `Falta configurar DDB7_API_URL_${ambiente.toUpperCase()}` }, 500);
   if (!Array.isArray(payloads) || !payloads.length || payloads.length > MAX_PER_REQUEST) {
     return json({ error: `Se esperan entre 1 y ${MAX_PER_REQUEST} transacciones` }, 400);
   }
@@ -42,7 +37,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
   for (const payload of payloads) {
     const n_transaccion = payload?.transaction?.n_transaccion;
     try {
-      const res = await fetch(url, {
+      const res = await fetch(DDB7_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${DDB7_API_TOKEN}` },
         body: JSON.stringify(payload),
