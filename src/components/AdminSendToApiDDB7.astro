@@ -1,0 +1,339 @@
+---
+---
+
+<div>
+  <div class="mb-8">
+    <h4 class="text-lg font-semibold text-grafito"><a href="/dashboard"> &larr; Atras </a></h4>
+    <h1 class="text-3xl font-bold text-grafito mb-2">Envío de reportes a DDB7</h1>
+    <p class="text-grafito/60">Carga los exports de vending (Micron) y Transbank, revisa el cruce y envía las transacciones.</p>
+  </div>
+
+  <!-- Carga de archivos -->
+  <div class="bg-white rounded-lg shadow p-6 mb-8">
+    <div class="grid md:grid-cols-2 gap-6">
+      <div>
+        <label for="ddb7-vending" class="block text-sm font-semibold text-grafito mb-1">Reporte de vending (Excel)</label>
+        <input
+          id="ddb7-vending"
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          class="block w-full text-sm text-grafito file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-rose-50 file:text-rose-600 hover:file:bg-rose-100"
+        />
+      </div>
+      <div>
+        <label for="ddb7-tbk" class="block text-sm font-semibold text-grafito mb-1">Reporte de Transbank (Excel)</label>
+        <input
+          id="ddb7-tbk"
+          type="file"
+          accept=".xlsx,.xls,.csv"
+          class="block w-full text-sm text-grafito file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-rose-50 file:text-rose-600 hover:file:bg-rose-100"
+        />
+      </div>
+    </div>
+    <div class="mt-6 flex flex-wrap items-end gap-3">
+      <button
+        id="ddb7-procesar"
+        class="bg-grafito text-white font-semibold py-2 px-6 rounded-lg hover:bg-grafito/90 transition disabled:opacity-40"
+        disabled
+      >
+        Procesar archivos
+      </button>
+      <button
+        id="ddb7-descargar"
+        class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-2 px-4 rounded-lg transition disabled:opacity-40"
+        disabled
+      >
+        Descargar JSON
+      </button>
+      <button
+        id="ddb7-ver-json"
+        class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-2 px-4 rounded-lg transition disabled:opacity-40"
+        disabled
+      >
+        Previsualizar JSON
+      </button>
+      <button
+        id="ddb7-enviar"
+        class="bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 px-6 rounded-lg transition disabled:opacity-40"
+        disabled
+      >
+        Enviar a DDB7
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensajes -->
+  <div id="ddb7-errores" class="hidden bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6 text-sm"></div>
+  <div id="ddb7-avisos" class="hidden bg-amber-50 border border-amber-200 text-amber-800 rounded-lg p-4 mb-6 text-sm">
+    <p class="font-semibold mb-2">Avisos (<span id="ddb7-avisos-count">0</span>)</p>
+    <ul id="ddb7-avisos-lista" class="list-disc pl-5 space-y-1 max-h-64 overflow-y-auto"></ul>
+  </div>
+  <div id="ddb7-sin-cruce" class="hidden bg-white border border-gray-200 rounded-lg p-4 mb-6 text-sm text-grafito space-y-2"></div>
+  <div id="ddb7-envio" class="hidden bg-white rounded-lg shadow p-4 mb-6 text-sm text-grafito"></div>
+
+  <!-- Vista previa -->
+  <div id="ddb7-preview" class="hidden bg-white rounded-lg shadow-lg overflow-hidden">
+    <div class="p-6 pb-0">
+      <h3 class="text-lg font-bold text-grafito">Transacciones a enviar</h3>
+      <p id="ddb7-resumen" class="text-sm text-grafito/50"></p>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full mt-4 text-sm">
+        <thead class="bg-grafito/10 border-b border-grafito/20">
+          <tr>
+            <th class="text-left px-4 py-3 font-semibold text-grafito">Fecha</th>
+            <th class="text-left px-4 py-3 font-semibold text-grafito">N° transacción</th>
+            <th class="text-left px-4 py-3 font-semibold text-grafito">Tipo</th>
+            <th class="text-left px-4 py-3 font-semibold text-grafito">Boleta</th>
+            <th class="text-left px-4 py-3 font-semibold text-grafito">Descripción</th>
+            <th class="text-right px-4 py-3 font-semibold text-grafito">Líneas</th>
+            <th class="text-right px-4 py-3 font-semibold text-grafito">Neto</th>
+            <th class="text-right px-4 py-3 font-semibold text-grafito">IVA</th>
+            <th class="text-right px-4 py-3 font-semibold text-grafito">Total</th>
+            <th class="text-left px-4 py-3 font-semibold text-grafito">Estado envío</th>
+            <th class="px-4 py-3"></th>
+          </tr>
+        </thead>
+        <tbody id="ddb7-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Ventana de previsualización del JSON -->
+  <dialog
+    id="ddb7-modal"
+    class="w-full max-w-4xl rounded-lg shadow-xl p-0 backdrop:bg-black/50"
+  >
+    <div class="flex items-center justify-between gap-4 px-6 py-4 border-b border-gray-200">
+      <h3 id="ddb7-modal-titulo" class="text-lg font-bold text-grafito"></h3>
+      <div class="flex gap-2">
+        <button
+          id="ddb7-modal-copiar"
+          class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-1 px-3 rounded-lg transition text-sm"
+        >
+          Copiar
+        </button>
+        <button
+          id="ddb7-modal-cerrar"
+          class="bg-grafito text-white font-semibold py-1 px-3 rounded-lg hover:bg-grafito/90 transition text-sm"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+    <pre id="ddb7-modal-json" class="max-h-[70vh] overflow-auto bg-gray-50 p-6 text-xs text-grafito whitespace-pre"></pre>
+  </dialog>
+</div>
+
+<script>
+  import * as XLSX from 'xlsx';
+  import {
+    mapToDdb7,
+    rowsFromMatrix,
+    configPendientes,
+    VENDING_KEY_COLUMN,
+    TBK_KEY_COLUMN,
+    type Ddb7Payload,
+  } from '../lib/ddb7';
+
+  const BATCH_SIZE = 10;
+
+  const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+  const vendingInput = $<HTMLInputElement>('ddb7-vending');
+  const tbkInput = $<HTMLInputElement>('ddb7-tbk');
+  const btnProcesar = $<HTMLButtonElement>('ddb7-procesar');
+  const btnDescargar = $<HTMLButtonElement>('ddb7-descargar');
+  const btnEnviar = $<HTMLButtonElement>('ddb7-enviar');
+  const btnVerJson = $<HTMLButtonElement>('ddb7-ver-json');
+  const modal = $<HTMLDialogElement>('ddb7-modal');
+  const modalJson = $('ddb7-modal-json');
+  const errores = $('ddb7-errores');
+  const avisos = $('ddb7-avisos');
+  const sinCruce = $('ddb7-sin-cruce');
+  const envio = $('ddb7-envio');
+  const preview = $('ddb7-preview');
+  const body = $('ddb7-body');
+
+  const pendientes = configPendientes();
+  let payloads: Ddb7Payload[] = [];
+
+  const clp = (n: number) => n.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+  const escapeHtml = (s: string) =>
+    s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+
+  // Lee la primera hoja con la columna clave y devuelve filas con claves normalizadas.
+  async function readRows(file: File, keyColumn: string) {
+    const workbook = XLSX.read(await file.arrayBuffer(), { raw: false, cellDates: false });
+    for (const name of workbook.SheetNames) {
+      const matrix = XLSX.utils.sheet_to_json<unknown[]>(workbook.Sheets[name], { header: 1, raw: true, defval: null });
+      const rows = rowsFromMatrix(matrix, keyColumn);
+      if (rows.length) return rows;
+    }
+    return [];
+  }
+
+  function updateButtons() {
+    btnProcesar.disabled = !vendingInput.files?.length || !tbkInput.files?.length;
+  }
+  vendingInput.addEventListener('change', updateButtons);
+  tbkInput.addEventListener('change', updateButtons);
+
+  function showErrors(list: string[]) {
+    errores.innerHTML = list.map((e) => `<p>${escapeHtml(e)}</p>`).join('');
+    errores.classList.toggle('hidden', !list.length);
+  }
+
+  function showSinCruce(tbk: string[], vending: string[]) {
+    const bloque = (titulo: string, ids: string[]) =>
+      ids.length ? `<p><span class="font-semibold">${titulo} (${ids.length}):</span> ${ids.map(escapeHtml).join(', ')}</p>` : '';
+    sinCruce.innerHTML =
+      bloque('Movimientos Transbank sin venta en vending', tbk) +
+      bloque('Ventas vending sin movimiento Transbank (¿efectivo?)', vending);
+    sinCruce.classList.toggle('hidden', !tbk.length && !vending.length);
+  }
+
+  function renderTable() {
+    body.innerHTML = payloads
+      .map(({ transaction: t }, i) => {
+        const neto = t.Detalle.reduce((s, d) => s + d.mntneto, 0);
+        const iva = t.Detalle.reduce((s, d) => s + d.iva, 0);
+        const total = t.Detalle.reduce((s, d) => s + d.mnttotal, 0);
+        return `<tr class="border-b border-gray-100">
+          <td class="px-4 py-2 whitespace-nowrap">${escapeHtml(t.fecha_hora)}</td>
+          <td class="px-4 py-2">${t.n_transaccion}</td>
+          <td class="px-4 py-2">${t.blart}</td>
+          <td class="px-4 py-2">${escapeHtml(String(t.znumd))}</td>
+          <td class="px-4 py-2">${escapeHtml(t.zarri)}</td>
+          <td class="px-4 py-2 text-right">${t.Detalle.length}</td>
+          <td class="px-4 py-2 text-right">${clp(neto)}</td>
+          <td class="px-4 py-2 text-right">${clp(iva)}</td>
+          <td class="px-4 py-2 text-right font-semibold">${clp(total)}</td>
+          <td class="px-4 py-2" id="ddb7-estado-${i}">—</td>
+          <td class="px-4 py-2 text-right">
+            <button data-ver="${i}" class="text-rose-500 hover:text-rose-600 font-semibold">Ver JSON</button>
+          </td>
+        </tr>`;
+      })
+      .join('');
+    $('ddb7-resumen').textContent = `${payloads.length} transacciones a enviar`;
+    preview.classList.toggle('hidden', !payloads.length);
+  }
+
+  btnProcesar.addEventListener('click', async () => {
+    const vendingFile = vendingInput.files?.[0];
+    const tbkFile = tbkInput.files?.[0];
+    if (!vendingFile || !tbkFile) return;
+
+    btnProcesar.disabled = true;
+    envio.classList.add('hidden');
+    try {
+      const [vendingRows, tbkRows] = await Promise.all([
+        readRows(vendingFile, VENDING_KEY_COLUMN),
+        readRows(tbkFile, TBK_KEY_COLUMN),
+      ]);
+      const result = mapToDdb7(vendingRows, tbkRows);
+      payloads = result.payloads;
+      showErrors([
+        ...result.errores,
+        ...(pendientes.length ? [`No se puede enviar: campos PENDIENTES en CONFIG (${pendientes.join(', ')}).`] : []),
+      ]);
+      showSinCruce(result.sinCruceTbk, result.sinCruceVending);
+      $('ddb7-avisos-count').textContent = String(result.avisos.length);
+      $('ddb7-avisos-lista').innerHTML = result.avisos.map((w) => `<li>${escapeHtml(w)}</li>`).join('');
+      avisos.classList.toggle('hidden', !result.avisos.length);
+      renderTable();
+    } catch (err) {
+      payloads = [];
+      showErrors([`No se pudieron leer los archivos: ${err instanceof Error ? err.message : String(err)}`]);
+      renderTable();
+    } finally {
+      btnProcesar.disabled = false;
+      btnDescargar.disabled = btnVerJson.disabled = !payloads.length;
+      btnEnviar.disabled = !payloads.length || pendientes.length > 0;
+    }
+  });
+
+  btnDescargar.addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify(payloads, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `payloads_${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  // Muestra en una ventana el objeto exacto que se envía a DDB7.
+  function abrirJson(titulo: string, contenido: unknown) {
+    $('ddb7-modal-titulo').textContent = titulo;
+    modalJson.textContent = JSON.stringify(contenido, null, 2);
+    modal.showModal();
+  }
+
+  btnVerJson.addEventListener('click', () => {
+    if (payloads.length) abrirJson(`JSON a enviar (${payloads.length} transacciones)`, payloads);
+  });
+
+  body.addEventListener('click', (e) => {
+    const boton = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-ver]');
+    if (!boton) return;
+    const payload = payloads[Number(boton.dataset.ver)];
+    if (payload) abrirJson(`Transacción ${payload.transaction.n_transaccion}`, payload);
+  });
+
+  $('ddb7-modal-cerrar').addEventListener('click', () => modal.close());
+  // Cerrar al hacer clic fuera del contenido.
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.close();
+  });
+
+  $('ddb7-modal-copiar').addEventListener('click', async (e) => {
+    const boton = e.currentTarget as HTMLButtonElement;
+    try {
+      await navigator.clipboard.writeText(modalJson.textContent ?? '');
+      boton.textContent = 'Copiado';
+    } catch {
+      boton.textContent = 'No se pudo copiar';
+    }
+    setTimeout(() => (boton.textContent = 'Copiar'), 1500);
+  });
+
+  btnEnviar.addEventListener('click', async () => {
+    if (!payloads.length) return;
+    if (!confirm(`¿Enviar ${payloads.length} transacciones a DDB7?`)) return;
+
+    btnEnviar.disabled = btnProcesar.disabled = true;
+    envio.classList.remove('hidden');
+    const fallidos: number[] = [];
+
+    for (let start = 0; start < payloads.length; start += BATCH_SIZE) {
+      envio.textContent = `Enviando ${start + 1}–${Math.min(start + BATCH_SIZE, payloads.length)} de ${payloads.length}…`;
+      const batch = payloads.slice(start, start + BATCH_SIZE);
+      let results: { ok: boolean; http: number | null; respuesta: unknown }[];
+      try {
+        const res = await fetch('/api/ddb7/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ payloads: batch }),
+        });
+        const data = await res.json();
+        results = res.ok ? data.results : batch.map(() => ({ ok: false, http: res.status, respuesta: data.error ?? '' }));
+      } catch (err) {
+        results = batch.map(() => ({ ok: false, http: null, respuesta: String(err) }));
+      }
+      results.forEach((r, j) => {
+        if (!r.ok) fallidos.push(batch[j].transaction.n_transaccion);
+        const cell = document.getElementById(`ddb7-estado-${start + j}`);
+        if (cell) {
+          const detalle = escapeHtml(typeof r.respuesta === 'string' ? r.respuesta : JSON.stringify(r.respuesta));
+          cell.innerHTML = r.ok
+            ? `<span class="text-green-600 font-semibold" title="${detalle}">OK</span>`
+            : `<span class="text-red-600 font-semibold" title="${detalle}">Error ${r.http ?? '-'}</span>`;
+        }
+      });
+    }
+
+    envio.textContent = `Envío terminado: ${payloads.length - fallidos.length} correctos, fallidos: ${fallidos.length ? fallidos.join(', ') : 'ninguno'}.`;
+    btnProcesar.disabled = false;
+    btnEnviar.disabled = false;
+  });
+</script>
