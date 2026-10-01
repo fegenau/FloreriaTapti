@@ -46,6 +46,13 @@
         Descargar JSON
       </button>
       <button
+        id="ddb7-descargar-dj"
+        class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-2 px-4 rounded-lg transition disabled:opacity-40"
+        disabled
+      >
+        Descargar Excel declaración jurada
+      </button>
+      <button
         id="ddb7-ver-json"
         class="bg-white border border-rose-300 text-rose-500 hover:bg-rose-50 font-semibold py-2 px-4 rounded-lg transition disabled:opacity-40"
         disabled
@@ -135,6 +142,7 @@
     TBK_KEY_COLUMN,
     type Ddb7Payload,
   } from '../lib/ddb7';
+  import { generarDeclaracionJurada, nombreArchivoDJ } from '../lib/declaracionJurada';
 
   const BATCH_SIZE = 10;
 
@@ -144,6 +152,7 @@
   const btnProcesar = $<HTMLButtonElement>('ddb7-procesar');
   const btnDescargar = $<HTMLButtonElement>('ddb7-descargar');
   const btnEnviar = $<HTMLButtonElement>('ddb7-enviar');
+  const btnDescargarDj = $<HTMLButtonElement>('ddb7-descargar-dj');
   const btnVerJson = $<HTMLButtonElement>('ddb7-ver-json');
   const modal = $<HTMLDialogElement>('ddb7-modal');
   const modalJson = $('ddb7-modal-json');
@@ -248,7 +257,7 @@
       renderTable();
     } finally {
       btnProcesar.disabled = false;
-      btnDescargar.disabled = btnVerJson.disabled = !payloads.length;
+      btnDescargar.disabled = btnVerJson.disabled = btnDescargarDj.disabled = !payloads.length;
       btnEnviar.disabled = !payloads.length || pendientes.length > 0;
     }
   });
@@ -260,6 +269,23 @@
     a.download = `payloads_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
+  });
+
+  btnDescargarDj.addEventListener('click', async () => {
+    if (!payloads.length) return;
+    btnDescargarDj.disabled = true;
+    try {
+      const blob = await generarDeclaracionJurada(payloads);
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = nombreArchivoDJ();
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (err) {
+      showErrors([`No se pudo generar el Excel: ${err instanceof Error ? err.message : String(err)}`]);
+    } finally {
+      btnDescargarDj.disabled = false;
+    }
   });
 
   // Muestra en una ventana el objeto exacto que se envía a DDB7.
