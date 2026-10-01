@@ -137,6 +137,7 @@ const T = {
   boleta: 'n de boleta',
   monto: 'monto original de la venta',
   fecha: 'fecha de movimiento',
+  orden: 'orden de pedido/orden de compra',
 };
 
 const T_CAMPOS_CERO: [string, string][] = [
@@ -375,6 +376,22 @@ export function mapToDdb7(vendingRows: Row[], tbkRows: Row[]): MappingResult {
       continue;
     }
     const monto = montoClp(mov[T.monto]);
+
+    // 1) Cruce directo: la orden de compra de Transbank es el número de serie de vending.
+    const porOrden = grupos.get(toText(mov[T.orden]));
+    if (porOrden && !usados.has(porOrden.serie) && porOrden.total === monto) {
+      usados.add(porOrden.serie);
+      const fueraDeVentana = Math.abs(porOrden.fecha.getTime() - tTbk.getTime()) > VENTANA_MIN * 60_000;
+      if (fueraDeVentana) {
+        result.avisos.push(
+          `#${unico}: cruzado por orden de compra, pero la hora difiere (Transbank ${fmtDia(tTbk)} ${fmtHora(tTbk)}, vending ${fmtDia(porOrden.fecha)} ${fmtHora(porOrden.fecha)}). Se usa la fecha de Transbank.`,
+        );
+      }
+      result.payloads.push(construirPayload(porOrden.filas, mov, fueraDeVentana ? tTbk : porOrden.fecha));
+      continue;
+    }
+
+    // 2) Respaldo: mismo monto y hora cercana.
     const candidatos = [...grupos.values()]
       .filter((g) => !usados.has(g.serie) && g.total === monto)
       .map((g) => ({ g, diff: Math.abs(g.fecha.getTime() - tTbk.getTime()) }))
