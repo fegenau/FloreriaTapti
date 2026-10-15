@@ -237,7 +237,7 @@ const accessories = catalog.accessories || [];
                           >¿Qué día deseas recibirlo? *</label
                         >
                         <input
-                          type="date"
+                          type="text"
                           name="delivery_date"
                           id="input-delivery-date"
                           required
@@ -457,6 +457,10 @@ const accessories = catalog.accessories || [];
       addCartItem,
     } from "../store/cartStore";
     import { resolveCatalogImageUrlSync } from "../lib/catalogImage";
+    import flatpickr from "flatpickr";
+    import { Spanish } from "flatpickr/dist/l10n/es.js";
+    import "flatpickr/dist/flatpickr.min.css";
+    import "flatpickr/dist/themes/dark.css";
     import {
       MIN_DELIVERY_DAYS,
       getMinDeliveryDate,
@@ -505,23 +509,28 @@ const accessories = catalog.accessories || [];
       const deliveryDateMsg = `Necesitamos ${MIN_DELIVERY_DAYS} días de preparación. Elige una fecha desde el ${formatDeliveryDate(minDeliveryDate)}.`;
 
       // iOS Safari (y algunos Android) ignoran el atributo min en el selector
-      // nativo, así que validamos manualmente cada vez que cambia la fecha.
-      function validateDeliveryDateInput(): boolean {
-        if (!inputDeliveryDate) return true;
-        const value = inputDeliveryDate.value;
-        if (value && !isValidDeliveryDate(value)) {
-          inputDeliveryDate.value = "";
-          showDeliveryDateError(deliveryDateMsg);
-          return false;
-        }
-        hideDeliveryDateError();
-        return true;
-      }
-
+      // nativo, así que usamos flatpickr, que deshabilita las fechas en
+      // todos los dispositivos. disableMobile evita que vuelva al nativo.
       if (inputDeliveryDate) {
-        inputDeliveryDate.min = minDeliveryDate;
-        inputDeliveryDate.addEventListener("change", validateDeliveryDateInput);
-        inputDeliveryDate.addEventListener("blur", validateDeliveryDateInput);
+        flatpickr(inputDeliveryDate, {
+          locale: Spanish,
+          disableMobile: true,
+          minDate: minDeliveryDate,
+          dateFormat: "Y-m-d",
+          altInput: true,
+          altFormat: "d-m-Y",
+          altInputClass: inputDeliveryDate.className,
+          onChange: (selectedDates) => {
+            if (selectedDates.length) hideDeliveryDateError();
+          },
+        });
+        const altInput = inputDeliveryDate.nextElementSibling as HTMLInputElement | null;
+        if (altInput) {
+          altInput.placeholder = "Selecciona una fecha";
+          // La obligatoriedad se valida en el submit; si queda required y el
+          // usuario elige Express (campo oculto), el navegador bloquea el envío.
+          altInput.removeAttribute("required");
+        }
       }
 
       let subtotalGlobal = 0;
@@ -759,9 +768,12 @@ const accessories = catalog.accessories || [];
           inputDeliveryDate &&
           !isValidDeliveryDate(inputDeliveryDate.value)
         ) {
-          inputDeliveryDate.value = "";
-          showDeliveryDateError(deliveryDateMsg);
-          inputDeliveryDate.scrollIntoView({ behavior: "smooth", block: "center" });
+          showDeliveryDateError(
+            inputDeliveryDate.value
+              ? deliveryDateMsg
+              : "Selecciona la fecha de entrega.",
+          );
+          datePickerContainer?.scrollIntoView({ behavior: "smooth", block: "center" });
           return;
         }
 
