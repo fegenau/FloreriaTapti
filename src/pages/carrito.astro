@@ -457,6 +457,12 @@ const accessories = catalog.accessories || [];
       addCartItem,
     } from "../store/cartStore";
     import { resolveCatalogImageUrlSync } from "../lib/catalogImage";
+    import {
+      MIN_DELIVERY_DAYS,
+      getMinDeliveryDate,
+      isValidDeliveryDate,
+      formatDeliveryDate,
+    } from "../utils/deliveryDate";
 
     document.addEventListener("astro:page-load", () => {
       const cartEmpty = document.getElementById("cart-empty");
@@ -482,14 +488,40 @@ const accessories = catalog.accessories || [];
         "input-delivery-date",
       ) as HTMLInputElement;
 
+      const errorDeliveryDate = document.getElementById("error-delivery_date");
+      const minDeliveryDate = getMinDeliveryDate();
+
+      function showDeliveryDateError(msg: string) {
+        if (!errorDeliveryDate) return;
+        errorDeliveryDate.textContent = msg;
+        errorDeliveryDate.classList.remove("hidden");
+      }
+
+      function hideDeliveryDateError() {
+        errorDeliveryDate?.classList.add("hidden");
+        if (errorDeliveryDate) errorDeliveryDate.textContent = "";
+      }
+
+      const deliveryDateMsg = `Necesitamos ${MIN_DELIVERY_DAYS} días de preparación. Elige una fecha desde el ${formatDeliveryDate(minDeliveryDate)}.`;
+
+      // iOS Safari (y algunos Android) ignoran el atributo min en el selector
+      // nativo, así que validamos manualmente cada vez que cambia la fecha.
+      function validateDeliveryDateInput(): boolean {
+        if (!inputDeliveryDate) return true;
+        const value = inputDeliveryDate.value;
+        if (value && !isValidDeliveryDate(value)) {
+          inputDeliveryDate.value = "";
+          showDeliveryDateError(deliveryDateMsg);
+          return false;
+        }
+        hideDeliveryDateError();
+        return true;
+      }
+
       if (inputDeliveryDate) {
-        const now = new Date();
-        now.setDate(now.getDate() + 5); // Add 5 days for preparation
-        const year = now.getFullYear();
-        const month = (now.getMonth() + 1).toString().padStart(2, "0");
-        const day = now.getDate().toString().padStart(2, "0");
-        const minDate = `${year}-${month}-${day}`;
-        inputDeliveryDate.min = minDate;
+        inputDeliveryDate.min = minDeliveryDate;
+        inputDeliveryDate.addEventListener("change", validateDeliveryDateInput);
+        inputDeliveryDate.addEventListener("blur", validateDeliveryDateInput);
       }
 
       let subtotalGlobal = 0;
@@ -716,6 +748,22 @@ const accessories = catalog.accessories || [];
         });
 
         if (currentItems.length === 0) return alert("El carrito está vacío");
+
+        const selectedType = (
+          formCheckout.querySelector(
+            'input[name="delivery_type"]:checked',
+          ) as HTMLInputElement
+        )?.value;
+        if (
+          selectedType !== "express" &&
+          inputDeliveryDate &&
+          !isValidDeliveryDate(inputDeliveryDate.value)
+        ) {
+          inputDeliveryDate.value = "";
+          showDeliveryDateError(deliveryDateMsg);
+          inputDeliveryDate.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
 
         const formData = new FormData(formCheckout);
         const customerData = {

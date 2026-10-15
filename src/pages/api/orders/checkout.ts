@@ -4,6 +4,7 @@ import { initTransaction } from '../../../lib/webpay';
 import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
 import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
+import { MIN_DELIVERY_DAYS, getMinDeliveryDate, isValidDeliveryDate, formatDeliveryDate } from '../../../utils/deliveryDate';
 
 // Checkout is permanently enabled
 
@@ -29,6 +30,14 @@ const CheckoutSchema = z.object({
     quantity: z.number().min(1).max(100, "Cantidad sospechosa"),
     price: z.number()
   }).passthrough()).min(1, "El carrito está vacío").max(50, "Límite de ítems excedido")
+}).superRefine((data, ctx) => {
+  if (data.delivery_type !== 'express' && !isValidDeliveryDate(data.delivery_date)) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['delivery_date'],
+      message: `Necesitamos ${MIN_DELIVERY_DAYS} días de preparación. Elige una fecha desde el ${formatDeliveryDate(getMinDeliveryDate())}.`,
+    });
+  }
 });
 
 export const POST: APIRoute = async ({ request }) => {
