@@ -237,7 +237,7 @@ const accessories = catalog.accessories || [];
                           >¿Qué día deseas recibirlo? *</label
                         >
                         <input
-                          type="date"
+                          type="text"
                           name="delivery_date"
                           id="input-delivery-date"
                           required
@@ -457,6 +457,16 @@ const accessories = catalog.accessories || [];
       addCartItem,
     } from "../store/cartStore";
     import { resolveCatalogImageUrlSync } from "../lib/catalogImage";
+    import flatpickr from "flatpickr";
+    import { Spanish } from "flatpickr/dist/l10n/es.js";
+    import "flatpickr/dist/flatpickr.min.css";
+    import "flatpickr/dist/themes/dark.css";
+    import {
+      MIN_DELIVERY_DAYS,
+      getMinDeliveryDate,
+      isValidDeliveryDate,
+      formatDeliveryDate,
+    } from "../utils/deliveryDate";
 
     document.addEventListener("astro:page-load", () => {
       const cartEmpty = document.getElementById("cart-empty");
@@ -482,14 +492,45 @@ const accessories = catalog.accessories || [];
         "input-delivery-date",
       ) as HTMLInputElement;
 
+      const errorDeliveryDate = document.getElementById("error-delivery_date");
+      const minDeliveryDate = getMinDeliveryDate();
+
+      function showDeliveryDateError(msg: string) {
+        if (!errorDeliveryDate) return;
+        errorDeliveryDate.textContent = msg;
+        errorDeliveryDate.classList.remove("hidden");
+      }
+
+      function hideDeliveryDateError() {
+        errorDeliveryDate?.classList.add("hidden");
+        if (errorDeliveryDate) errorDeliveryDate.textContent = "";
+      }
+
+      const deliveryDateMsg = `Necesitamos ${MIN_DELIVERY_DAYS} días de preparación. Elige una fecha desde el ${formatDeliveryDate(minDeliveryDate)}.`;
+
+      // iOS Safari (y algunos Android) ignoran el atributo min en el selector
+      // nativo, así que usamos flatpickr, que deshabilita las fechas en
+      // todos los dispositivos. disableMobile evita que vuelva al nativo.
       if (inputDeliveryDate) {
-        const now = new Date();
-        now.setDate(now.getDate() + 5); // Add 5 days for preparation
-        const year = now.getFullYear();
-        const month = (now.getMonth() + 1).toString().padStart(2, "0");
-        const day = now.getDate().toString().padStart(2, "0");
-        const minDate = `${year}-${month}-${day}`;
-        inputDeliveryDate.min = minDate;
+        flatpickr(inputDeliveryDate, {
+          locale: Spanish,
+          disableMobile: true,
+          minDate: minDeliveryDate,
+          dateFormat: "Y-m-d",
+          altInput: true,
+          altFormat: "d-m-Y",
+          altInputClass: inputDeliveryDate.className,
+          onChange: (selectedDates) => {
+            if (selectedDates.length) hideDeliveryDateError();
+          },
+        });
+        const altInput = inputDeliveryDate.nextElementSibling as HTMLInputElement | null;
+        if (altInput) {
+          altInput.placeholder = "Selecciona una fecha";
+          // La obligatoriedad se valida en el submit; si queda required y el
+          // usuario elige Express (campo oculto), el navegador bloquea el envío.
+          altInput.removeAttribute("required");
+        }
       }
 
       let subtotalGlobal = 0;
@@ -716,6 +757,25 @@ const accessories = catalog.accessories || [];
         });
 
         if (currentItems.length === 0) return alert("El carrito está vacío");
+
+        const selectedType = (
+          formCheckout.querySelector(
+            'input[name="delivery_type"]:checked',
+          ) as HTMLInputElement
+        )?.value;
+        if (
+          selectedType !== "express" &&
+          inputDeliveryDate &&
+          !isValidDeliveryDate(inputDeliveryDate.value)
+        ) {
+          showDeliveryDateError(
+            inputDeliveryDate.value
+              ? deliveryDateMsg
+              : "Selecciona la fecha de entrega.",
+          );
+          datePickerContainer?.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
 
         const formData = new FormData(formCheckout);
         const customerData = {
