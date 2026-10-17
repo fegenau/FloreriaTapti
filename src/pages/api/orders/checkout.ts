@@ -4,7 +4,7 @@ import { initTransaction } from '../../../lib/webpay';
 import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
 import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
-import { MIN_DELIVERY_DAYS, getMinDeliveryDate, isValidDeliveryDate, formatDeliveryDate } from '../../../utils/deliveryDate';
+import { DELIVERY_DATE_MESSAGE_PREFIX, getMinDeliveryDate, isValidDeliveryDate, formatDeliveryDate } from '../../../utils/deliveryDate';
 
 // Checkout is permanently enabled
 
@@ -35,7 +35,7 @@ const CheckoutSchema = z.object({
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['delivery_date'],
-      message: `Necesitamos ${MIN_DELIVERY_DAYS} días de preparación. Elige una fecha desde el ${formatDeliveryDate(getMinDeliveryDate())}.`,
+      message: `${DELIVERY_DATE_MESSAGE_PREFIX} Elige una fecha desde el ${formatDeliveryDate(getMinDeliveryDate())}.`,
     });
   }
 });

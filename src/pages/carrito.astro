@@ -462,7 +462,7 @@ const accessories = catalog.accessories || [];
     import "flatpickr/dist/flatpickr.min.css";
     import "flatpickr/dist/themes/dark.css";
     import {
-      MIN_DELIVERY_DAYS,
+      DELIVERY_DATE_MESSAGE_PREFIX,
       getMinDeliveryDate,
       isValidDeliveryDate,
       formatDeliveryDate,
@@ -506,7 +506,7 @@ const accessories = catalog.accessories || [];
         if (errorDeliveryDate) errorDeliveryDate.textContent = "";
       }
 
-      const deliveryDateMsg = `Necesitamos ${MIN_DELIVERY_DAYS} días de preparación. Elige una fecha desde el ${formatDeliveryDate(minDeliveryDate)}.`;
+      const deliveryDateMsg = `${DELIVERY_DATE_MESSAGE_PREFIX} Elige una fecha desde el ${formatDeliveryDate(minDeliveryDate)}.`;
 
       // iOS Safari (y algunos Android) ignoran el atributo min en el selector
       // nativo, así que usamos flatpickr, que deshabilita las fechas en
