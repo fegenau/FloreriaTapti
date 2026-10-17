@@ -1,5 +1,7 @@
 // Días mínimos de preparación para despacho normal
-export const MIN_DELIVERY_DAYS = 5;
+export const MIN_DELIVERY_DAYS = 1;
+
+export const DELIVERY_DATE_MESSAGE_PREFIX = "Necesitamos 24 horas de preparación.";
 
 // Fecha mínima de despacho (YYYY-MM-DD) calculada en hora de Chile,
 // para que cliente y servidor coincidan sin importar la zona del dispositivo.
