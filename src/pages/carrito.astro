@@ -824,6 +824,14 @@ const accessories = catalog.accessories || [];
                 "Por favor corrige los errores en el formulario.",
               );
             }
+            if (data.priceUpdates) {
+              // Corrige el carrito con los precios vigentes de la BD
+              const updated = { ...cartItems.get() };
+              data.priceUpdates.forEach((u: { id: string; newPrice: number }) => {
+                if (updated[u.id]) updated[u.id] = { ...updated[u.id], price: u.newPrice };
+              });
+              cartItems.set(updated);
+            }
             throw new Error(data.error || "Error desconocido");
           }
 

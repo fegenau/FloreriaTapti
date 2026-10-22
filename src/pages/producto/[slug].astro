@@ -11,11 +11,13 @@ const product = products.find((p: any) => slugify(p.name) === slug);
 if (!product) return Astro.redirect('/catalogo');
 
 const startingPrice = getStartingPrice(product);
+// Postgres (jsonb) reordena las claves de `sizes` por largo, así que se ordenan
+// por precio para que el tamaño preseleccionado coincida con el precio mostrado.
 const validSizes: [string, { total: number; stems?: string | number }][] = product.isQuote
   ? []
-  : (Object.entries(product.sizes as Record<string, any>).filter(
-      (e): e is [string, { total: number; stems?: string | number }] => e[1] !== null
-    ));
+  : (Object.entries(product.sizes as Record<string, any>)
+      .filter((e): e is [string, { total: number; stems?: string | number }] => e[1] !== null)
+      .sort((a, b) => a[1].total - b[1].total));
 
 // Productos relacionados de la misma categoría
 const related = products
