@@ -4,6 +4,7 @@ import { initTransaction } from '../../../lib/webpay';
 import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
 import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
+import { priceCartItems, PricingError } from '../../../lib/checkoutPricing';
 import { DELIVERY_DATE_MESSAGE_PREFIX, getMinDeliveryDate, isValidDeliveryDate, formatDeliveryDate } from '../../../utils/deliveryDate';
 
 // Checkout is permanently enabled
@@ -45,7 +46,20 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items, receiver_name, receiver_phone, dedication } = CheckoutSchema.parse(body);
+    const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items: cartItems, receiver_name, receiver_phone, dedication } = CheckoutSchema.parse(body);
+
+    // Precios siempre desde la BD; si el carrito tenía precios desactualizados
+    // se devuelven para que el cliente los corrija antes de pagar.
+    const { items, updates } = await priceCartItems(cartItems);
+    if (updates.length > 0) {
+      return new Response(JSON.stringify({
+        error: "Algunos precios de tu carrito cambiaron. Revisa el total actualizado antes de pagar.",
+        priceUpdates: updates
+      }), {
+        status: 409,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
     let shippingCost = 0;
     if (delivery_type === 'express') {
@@ -151,6 +165,13 @@ export const POST: APIRoute = async ({ request }) => {
         error: "Error de validación", 
         fieldErrors 
       }), { 
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    if (e instanceof PricingError) {
+      return new Response(JSON.stringify({ error: e.message }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
