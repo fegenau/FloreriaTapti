@@ -4,7 +4,10 @@
 <div>
   <div class="mb-8">
     <h4 class="text-lg font-semibold text-grafito"><a href="/dashboard"> &larr; Atras </a></h4>
-    <h1 class="text-3xl font-bold text-grafito mb-2">Envío de reportes a DDB7</h1>
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
+      <h1 class="text-3xl font-bold text-grafito">Envío de reportes a DDB7</h1>
+      <a href="/admin/envioReportes/historial" class="text-rose-500 hover:text-rose-600 font-semibold">Ver historial de envíos &rarr;</a>
+    </div>
     <p class="text-grafito/60">Carga los exports de vending (Micron) y Transbank, revisa el cruce y envía las transacciones.</p>
   </div>
 
@@ -330,8 +333,16 @@
     btnEnviar.disabled = btnProcesar.disabled = true;
     envio.classList.remove('hidden');
     const fallidos: number[] = [];
+    const lotesSinRegistro: number[] = [];
+
+    // Datos para el historial (ddb7_envios): todos los lotes de este clic comparten envio_id.
+    const envioId = crypto.randomUUID();
+    const lotesTotal = Math.ceil(payloads.length / BATCH_SIZE);
+    const archivoVending = vendingInput.files?.[0]?.name ?? '';
+    const archivoTbk = tbkInput.files?.[0]?.name ?? '';
 
     for (let start = 0; start < payloads.length; start += BATCH_SIZE) {
+      const lote = start / BATCH_SIZE + 1;
       envio.textContent = `Enviando ${start + 1}–${Math.min(start + BATCH_SIZE, payloads.length)} de ${payloads.length}…`;
       const batch = payloads.slice(start, start + BATCH_SIZE);
       let results: { ok: boolean; http: number | null; respuesta: unknown }[];
@@ -339,10 +350,14 @@
         const res = await fetch('/api/ddb7/send', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ payloads: batch }),
+          body: JSON.stringify({
+            payloads: batch,
+            meta: { envio_id: envioId, lote, lotes_total: lotesTotal, archivo_vending: archivoVending, archivo_tbk: archivoTbk },
+          }),
         });
         const data = await res.json();
         results = res.ok ? data.results : batch.map(() => ({ ok: false, http: res.status, respuesta: data.error ?? '' }));
+        if (res.ok && !data.registro?.ok) lotesSinRegistro.push(lote);
       } catch (err) {
         results = batch.map(() => ({ ok: false, http: null, respuesta: String(err) }));
       }
@@ -359,6 +374,12 @@
     }
 
     envio.textContent = `Envío terminado: ${payloads.length - fallidos.length} correctos, fallidos: ${fallidos.length ? fallidos.join(', ') : 'ninguno'}.`;
+    if (lotesSinRegistro.length) {
+      const aviso = document.createElement('p');
+      aviso.className = 'mt-2 text-amber-700 font-semibold';
+      aviso.textContent = `Atención: el envío a DDB7 se completó, pero no se pudo guardar en el historial (lote ${lotesSinRegistro.join(', ')} de ${lotesTotal}). Descarga el JSON como respaldo.`;
+      envio.appendChild(aviso);
+    }
     btnProcesar.disabled = false;
     btnEnviar.disabled = false;
   });
