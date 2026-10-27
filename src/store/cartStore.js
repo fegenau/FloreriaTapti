@@ -1,9 +1,25 @@
 import { persistentAtom } from '@nanostores/persistent';
 
+// Si el valor guardado está corrupto o tiene un formato antiguo, se descarta
+// en vez de lanzar: un error aquí deja sin listeners a los botones del carrito.
+function decodeCart(value) {
+    try {
+        const parsed = JSON.parse(value);
+        if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) return {};
+        return Object.fromEntries(
+            Object.entries(parsed).filter(([, item]) =>
+                item && typeof item === 'object' && typeof item.name === 'string' && Number.isFinite(item.quantity)
+            )
+        );
+    } catch {
+        return {};
+    }
+}
+
 // Structure: { [productId_size]: { id, name, size, price, quantity, image } }
 export const cartItems = persistentAtom('cartItems', {}, {
     encode: JSON.stringify,
-    decode: JSON.parse
+    decode: decodeCart
 });
 
 export function addCartItem(product, size, price, metadata = null) {
