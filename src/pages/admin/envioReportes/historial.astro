@@ -1,0 +1,249 @@
+---
+import LayoutAdmin from '../../../components/LayoutAdmin.astro';
+import { getAuthUser, isAdminEmail } from '../../../lib/auth';
+import { supabase } from '../../../lib/supabase';
+
+const user = await getAuthUser(Astro.cookies);
+
+if (!user || !isAdminEmail(user.email)) {
+  return Astro.redirect("/login");
+}
+
+interface Fallido {
+  n_transaccion: number;
+  http: number | null;
+  mensaje: string;
+}
+
+interface Envio {
+  id: string;
+  created_at: string;
+  envio_id: string;
+  lote: number;
+  lotes_total: number;
+  admin_email: string | null;
+  archivo_vending: string | null;
+  archivo_tbk: string | null;
+  fecha_venta_desde: string | null;
+  fecha_venta_hasta: string | null;
+  total_enviadas: number;
+  total_ok: number;
+  total_fallidas: number;
+  exitosos: number[];
+  fallidos: Fallido[];
+  reintento: boolean;
+}
+
+const LIMITE = 200;
+const TZ = 'America/Santiago';
+const FECHA_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+const params = Astro.url.searchParams;
+const desde = FECHA_RE.test(params.get('desde') ?? '') ? params.get('desde')! : '';
+const hasta = FECHA_RE.test(params.get('hasta') ?? '') ? params.get('hasta')! : '';
+const nParam = (params.get('n') ?? '').trim();
+const n = /^\d{1,18}$/.test(nParam) ? Number(nParam) : null;
+
+// Medianoche de un día (YYYY-MM-DD) en hora de Santiago, como ISO con su offset (-03:00 / -04:00).
+function inicioDiaSantiago(dia: string): string {
+  const mediodia = new Date(`${dia}T12:00:00Z`);
+  const offset = new Intl.DateTimeFormat('en-US', { timeZone: TZ, timeZoneName: 'longOffset' })
+    .formatToParts(mediodia)
+    .find((p) => p.type === 'timeZoneName')?.value.replace('GMT', '') || '-03:00';
+  return `${dia}T00:00:00${offset}`;
+}
+
+function diaSiguiente(dia: string): string {
+  const d = new Date(`${dia}T12:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + 1);
+  return d.toISOString().slice(0, 10);
+}
+
+function consulta() {
+  let q = supabase.from('ddb7_envios').select('*').order('created_at', { ascending: false }).limit(LIMITE);
+  if (desde) q = q.gte('created_at', inicioDiaSantiago(desde));
+  if (hasta) q = q.lt('created_at', inicioDiaSantiago(diaSiguiente(hasta)));
+  return q;
+}
+
+let envios: Envio[] = [];
+let errorCarga = '';
+
+if (nParam && n === null) {
+  errorCarga = 'El N° de transacción debe ser numérico.';
+} else if (n !== null) {
+  // Busca el n_transaccion tanto en los exitosos como en los fallidos.
+  const [ok, ko] = await Promise.all([
+    consulta().contains('exitosos', [n]),
+    consulta().contains('fallidos', JSON.stringify([{ n_transaccion: n }])),
+  ]);
+  if (ok.error || ko.error) {
+    errorCarga = (ok.error ?? ko.error)!.message;
+  } else {
+    const porId = new Map<string, Envio>();
+    for (const e of [...(ok.data ?? []), ...(ko.data ?? [])] as Envio[]) porId.set(e.id, e);
+    envios = [...porId.values()].sort((a, b) => b.created_at.localeCompare(a.created_at));
+  }
+} else {
+  const { data, error } = await consulta();
+  if (error) errorCarga = error.message;
+  else envios = (data ?? []) as Envio[];
+}
+
+const fmtFechaHora = (iso: string) =>
+  new Date(iso).toLocaleString('es-CL', { timeZone: TZ, dateStyle: 'short', timeStyle: 'medium' });
+const fmtDia = (dia: string | null) => (dia ? dia.split('-').reverse().join('-') : '—');
+const rangoVentas = (e: Envio) =>
+  e.fecha_venta_desde === e.fecha_venta_hasta
+    ? fmtDia(e.fecha_venta_desde)
+    : `${fmtDia(e.fecha_venta_desde)} a ${fmtDia(e.fecha_venta_hasta)}`;
+
+const hayFiltros = Boolean(desde || hasta || nParam);
+---
+
+<LayoutAdmin title="Historial envíos DDB7 | Tapti">
+  <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
+    <div class="border-b border-gray-200 bg-white shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-6 flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-grafito">Administración</h1>
+          <p class="text-gray-600 text-sm">Bienvenido, {user.email}</p>
+        </div>
+        <div class="flex gap-4">
+          <a
+            href="/api/auth/logout"
+            class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition"
+          >
+            Cerrar Sesión
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+      <div class="mb-8">
+        <h4 class="text-lg font-semibold text-grafito"><a href="/admin/envioReportes"> &larr; Volver al envío </a></h4>
+        <h1 class="text-3xl font-bold text-grafito mb-2">Historial de envíos a DDB7</h1>
+        <p class="text-grafito/60">Un registro por lote enviado. Busca un N° de transacción para saber cuándo y en qué lote se envió.</p>
+      </div>
+
+      <!-- Filtros -->
+      <form method="get" class="bg-white rounded-lg shadow p-6 mb-8 flex flex-wrap items-end gap-4">
+        <div>
+          <label for="desde" class="block text-sm font-semibold text-grafito mb-1">Enviado desde</label>
+          <input id="desde" name="desde" type="date" value={desde} class="border border-gray-300 rounded-lg px-3 py-2 text-sm text-grafito" />
+        </div>
+        <div>
+          <label for="hasta" class="block text-sm font-semibold text-grafito mb-1">Enviado hasta</label>
+          <input id="hasta" name="hasta" type="date" value={hasta} class="border border-gray-300 rounded-lg px-3 py-2 text-sm text-grafito" />
+        </div>
+        <div class="flex-1 min-w-[200px]">
+          <label for="n" class="block text-sm font-semibold text-grafito mb-1">N° de transacción</label>
+          <input id="n" name="n" type="text" inputmode="numeric" value={nParam} placeholder="Ej: 123456789" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm text-grafito" />
+        </div>
+        <button type="submit" class="bg-grafito text-white font-semibold py-2 px-6 rounded-lg hover:bg-grafito/90 transition">Buscar</button>
+        {hayFiltros && <a href="/admin/envioReportes/historial" class="text-rose-500 hover:text-rose-600 font-semibold py-2">Limpiar</a>}
+      </form>
+
+      {errorCarga && (
+        <div class="bg-red-50 border border-red-200 text-red-700 rounded-lg p-4 mb-6 text-sm">
+          No se pudo cargar el historial: {errorCarga}
+        </div>
+      )}
+
+      {n !== null && !errorCarga && (
+        <div class={`rounded-lg p-4 mb-6 text-sm border ${envios.length ? 'bg-green-50 border-green-200 text-green-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+          {envios.length
+            ? `La transacción ${n} aparece en ${envios.length} lote(s). Revisa abajo si fue aceptada o rechazada en cada uno.`
+            : `La transacción ${n} no aparece en ningún envío registrado${desde || hasta ? ' en el rango de fechas elegido' : ''}.`}
+        </div>
+      )}
+
+      <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="p-6 pb-0">
+          <p class="text-sm text-grafito/50">
+            {envios.length} lote(s){envios.length === LIMITE ? ` (se muestran los ${LIMITE} más recientes, usa los filtros para acotar)` : ''}
+          </p>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full mt-4 text-sm">
+            <thead class="bg-grafito/10 border-b border-grafito/20">
+              <tr>
+                <th class="text-left px-4 py-3 font-semibold text-grafito">Enviado</th>
+                <th class="text-left px-4 py-3 font-semibold text-grafito">Envío / lote</th>
+                <th class="text-left px-4 py-3 font-semibold text-grafito">Admin</th>
+                <th class="text-left px-4 py-3 font-semibold text-grafito">Archivos</th>
+                <th class="text-left px-4 py-3 font-semibold text-grafito">Ventas del</th>
+                <th class="text-right px-4 py-3 font-semibold text-grafito">Enviadas</th>
+                <th class="text-right px-4 py-3 font-semibold text-grafito">OK</th>
+                <th class="text-right px-4 py-3 font-semibold text-grafito">Fallidas</th>
+                <th class="text-left px-4 py-3 font-semibold text-grafito">Detalle</th>
+              </tr>
+            </thead>
+            <tbody>
+              {envios.map((e) => {
+                const fallidoBuscado = n !== null ? e.fallidos.find((f) => f.n_transaccion === n) : undefined;
+                const exitosoBuscado = n !== null && e.exitosos.includes(n);
+                return (
+                  <tr class="border-b border-gray-100 align-top">
+                    <td class="px-4 py-2 whitespace-nowrap">{fmtFechaHora(e.created_at)}</td>
+                    <td class="px-4 py-2 whitespace-nowrap">
+                      <span class="font-mono text-xs" title={e.envio_id}>{e.envio_id.slice(0, 8)}</span>
+                      <span class="text-grafito/60"> · lote {e.lote}/{e.lotes_total}</span>
+                      {e.reintento && (
+                        <span
+                          class="ml-1 inline-block bg-amber-100 text-amber-800 text-xs font-semibold px-2 py-0.5 rounded"
+                          title="Alguna transacción de este lote ya había sido aceptada en un envío anterior"
+                        >
+                          Reintento
+                        </span>
+                      )}
+                    </td>
+                    <td class="px-4 py-2">{e.admin_email ?? '—'}</td>
+                    <td class="px-4 py-2 text-xs text-grafito/70">
+                      <div title="Vending">{e.archivo_vending ?? '—'}</div>
+                      <div title="Transbank">{e.archivo_tbk ?? '—'}</div>
+                    </td>
+                    <td class="px-4 py-2 whitespace-nowrap">{rangoVentas(e)}</td>
+                    <td class="px-4 py-2 text-right">{e.total_enviadas}</td>
+                    <td class="px-4 py-2 text-right text-green-600 font-semibold">{e.total_ok}</td>
+                    <td class={`px-4 py-2 text-right font-semibold ${e.total_fallidas ? 'text-red-600' : 'text-grafito/40'}`}>{e.total_fallidas}</td>
+                    <td class="px-4 py-2 min-w-[220px]">
+                      {exitosoBuscado && <p class="text-green-700 font-semibold mb-1">#{n} aceptada en este lote</p>}
+                      {fallidoBuscado && (
+                        <p class="text-red-700 font-semibold mb-1">
+                          #{n} rechazada (HTTP {fallidoBuscado.http ?? '-'}): <span class="font-normal">{fallidoBuscado.mensaje}</span>
+                        </p>
+                      )}
+                      <details>
+                        <summary class="cursor-pointer text-rose-500 hover:text-rose-600 font-semibold">Ver transacciones</summary>
+                        {e.exitosos.length > 0 && (
+                          <p class="mt-2 text-xs"><span class="font-semibold text-green-700">OK:</span> {e.exitosos.join(', ')}</p>
+                        )}
+                        {e.fallidos.length > 0 && (
+                          <ul class="mt-2 text-xs space-y-1">
+                            {e.fallidos.map((f) => (
+                              <li>
+                                <span class="font-semibold text-red-700">{f.n_transaccion}</span>
+                                <span class="text-grafito/60"> (HTTP {f.http ?? '-'})</span>: {f.mensaje}
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </details>
+                    </td>
+                  </tr>
+                );
+              })}
+              {!envios.length && !errorCarga && (
+                <tr>
+                  <td colspan="9" class="px-4 py-8 text-center text-grafito/50">No hay envíos registrados{hayFiltros ? ' con estos filtros' : ''}.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</LayoutAdmin>
