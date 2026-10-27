@@ -61,6 +61,19 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Validate commune is within delivery coverage
+    let communePrice: number;
+    try {
+      communePrice = getCommunePrice(commune || '');
+    } catch (err) {
+      return new Response(JSON.stringify({
+        error: "No realizamos despachos a esta comuna. Escríbenos por WhatsApp para consultar disponibilidad."
+      }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
     let shippingCost = 0;
     if (delivery_type === 'express') {
       // Validate hour in Santiago
@@ -72,11 +85,7 @@ export const POST: APIRoute = async ({ request }) => {
       }
       shippingCost = EXPRESS_DELIVERY_PRICE;
     } else {
-      try {
-        shippingCost = getCommunePrice(commune);
-      } catch (err) {
-        shippingCost = 0; // fallback in case of missing commune
-      }
+      shippingCost = communePrice;
     }
 
     // Calculate total incl. shipping
