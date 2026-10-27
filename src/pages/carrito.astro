@@ -193,6 +193,16 @@ const accessories = catalog.accessories || [];
                           >
                         </div>
                       </div>
+                      <p class="text-cherry-blossom-100/70 text-xs mt-2">
+                        ¿Tu comuna no aparece?
+                        <a
+                          href="https://wa.me/56998133149?text=Hola%2C%20quisiera%20consultar%20disponibilidad%20de%20despacho%20a%20mi%20comuna"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="underline hover:text-honey-bronze-400"
+                          >Escríbenos por WhatsApp</a
+                        > para consultar disponibilidad.
+                      </p>
                       <p
                         class="text-red-400 text-sm mt-1 hidden error-msg"
                         id="error-commune"
@@ -436,11 +446,11 @@ const accessories = catalog.accessories || [];
                     Ir a Pagar Seguro
                   </button>
                 </div>
+              </div>
               </form>
             </div>
           </div>
         </div>
-      </div>
     </BoutiqueCard>
   </div>
 
@@ -823,6 +833,14 @@ const accessories = catalog.accessories || [];
               throw new Error(
                 "Por favor corrige los errores en el formulario.",
               );
+            }
+            if (data.priceUpdates) {
+              // Corrige el carrito con los precios vigentes de la BD
+              const updated = { ...cartItems.get() };
+              data.priceUpdates.forEach((u: { id: string; newPrice: number }) => {
+                if (updated[u.id]) updated[u.id] = { ...updated[u.id], price: u.newPrice };
+              });
+              cartItems.set(updated);
             }
             throw new Error(data.error || "Error desconocido");
           }

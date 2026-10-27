@@ -4,3 +4,5 @@
 
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "WEBPAY_ENV"
+  # Astro 7 requiere Node >= 22.23.4
+  NODE_VERSION = "24"
