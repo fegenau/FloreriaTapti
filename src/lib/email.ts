@@ -259,3 +259,65 @@ export const sendGeneralContactEmail = async (info: ContactEmailInfo) => {
     return { success: false, error };
   }
 };
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+export interface ContestEntryInfo {
+  name: string;
+  email: string;
+  phone: string;
+  instagram?: string;
+  importantDate?: string;
+  motive: string;
+  reason: string;
+  period: string;
+}
+
+export const sendContestEntryEmail = async (info: ContestEntryInfo) => {
+  try {
+    const ownerEmail = process.env.OWNER_EMAIL || 'tapti.contacto@gmail.com';
+    const e = (v?: string) => escapeHtml(v ?? '');
+    const subject = `Nueva participación concurso ${info.period} — ${info.name}`;
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 10px;">
+        <h2 style="color: #D97A6A;">Nueva participación en el sorteo del ramo sorpresa</h2>
+        <p><strong>Periodo:</strong> ${e(info.period)}</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p><strong>Nombre:</strong> ${e(info.name)}</p>
+        <p><strong>Email:</strong> ${e(info.email)}</p>
+        <p><strong>Teléfono:</strong> ${e(info.phone)}</p>
+        ${info.instagram ? `<p><strong>Instagram:</strong> @${e(info.instagram)}</p>` : ''}
+        ${info.importantDate ? `<p><strong>Fecha importante:</strong> ${e(info.importantDate)}</p>` : ''}
+        <p><strong>Motivo:</strong> ${e(info.motive)}</p>
+        <p><strong>¿Por qué debería ganarse el ramo?</strong></p>
+        <p style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; font-style: italic; white-space: pre-wrap;">${e(info.reason)}</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #888;">Aviso automático generado por el formulario de concursos de tapti.cl.</p>
+      </div>
+    `;
+
+    const response = await resend.emails.send({
+      from: 'Florería Tapti <noreply@tapti.cl>',
+      to: [ownerEmail],
+      replyTo: info.email,
+      subject,
+      html,
+    });
+
+    if (response.error) {
+      console.error('Error enviando participación de concurso:', response.error);
+      return { success: false, error: response.error };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Excepción al enviar participación de concurso:', error);
+    return { success: false, error };
+  }
+};

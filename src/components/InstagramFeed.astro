@@ -3,7 +3,9 @@ interface Props {
   username?: string;
 }
 
-const { username = "tapti_flores" } = Astro.props;
+import { INSTAGRAM_USERNAME } from "../data/promotions";
+
+const { username = INSTAGRAM_USERNAME } = Astro.props;
 
 // Datos estáticos de Instagram (sin API)
 const posts = [
@@ -70,7 +72,7 @@ const posts = [
     <!-- Botón para seguir en Instagram -->
     <div class="text-center">
       <a
-        href={`https://instagram.com/${username}`}
+        href={`https://www.instagram.com/${username}`}
         target="_blank"
         rel="noopener noreferrer"
         class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-full hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-base"
