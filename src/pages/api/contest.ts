@@ -1,7 +1,13 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
-import { sendContestEntryEmail } from "../../lib/email";
-import { CONTEST_MOTIVES, getContestDrawInfo } from "../../data/promotions";
+import { supabase } from "../../lib/supabase";
+import { sendContestConfirmationEmail, sendContestEntryEmail } from "../../lib/email";
+import {
+  CONTEST_MOTIVES,
+  INSTAGRAM_URL,
+  INSTAGRAM_USERNAME,
+  getContestDrawInfo,
+} from "../../data/promotions";
 
 const json = (body: unknown, status: number) =>
   new Response(JSON.stringify(body), {
@@ -50,12 +56,50 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const { website: _hp, acceptTerms: _t, ...entry } = parsed.data;
-  const { periodKey } = getContestDrawInfo();
+  const email = entry.email.toLowerCase();
+  const { periodKey, monthName, drawDateLabel } = getContestDrawInfo();
 
-  const result = await sendContestEntryEmail({ ...entry, period: periodKey });
-  if (!result.success) {
+  // 1. Guardar primero: si un correo falla después, la participación ya quedó registrada.
+  const { error: dbError } = await supabase.from("contest_entries").insert({
+    period: periodKey,
+    name: entry.name,
+    email,
+    phone: entry.phone,
+    instagram: entry.instagram || null,
+    important_date: entry.importantDate || null,
+    motive: entry.motive,
+    reason: entry.reason,
+    accepted_terms: true,
+  });
+
+  if (dbError) {
+    if (dbError.code === "23505") {
+      return json(
+        { error: `Este email ya está participando en el sorteo de ${monthName}. ¡Suerte!` },
+        409,
+      );
+    }
+    console.error("Error guardando participación de concurso:", dbError);
     return json({ error: "No pudimos registrar tu participación. Intenta nuevamente." }, 500);
   }
 
-  return json({ success: true }, 200);
+  // 2. Correos: aviso a Tapti y confirmación al participante. Un fallo aquí se
+  //    registra en logs pero no invalida la participación.
+  const [owner, confirmation] = await Promise.allSettled([
+    sendContestEntryEmail({ ...entry, email, period: periodKey }),
+    sendContestConfirmationEmail({
+      name: entry.name,
+      email,
+      monthName,
+      drawDateLabel,
+      instagramUrl: INSTAGRAM_URL,
+      instagramUsername: INSTAGRAM_USERNAME,
+    }),
+  ]);
+  const failed = (r: PromiseSettledResult<{ success: boolean }>) =>
+    r.status === "rejected" || !r.value.success;
+  if (failed(owner)) console.error("Concurso: no se pudo enviar el aviso al dueño", { email, periodKey });
+  if (failed(confirmation)) console.error("Concurso: no se pudo enviar la confirmación", { email, periodKey });
+
+  return json({ success: true, confirmationSent: !failed(confirmation) }, 200);
 };

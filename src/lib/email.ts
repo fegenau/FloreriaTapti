@@ -321,3 +321,51 @@ export const sendContestEntryEmail = async (info: ContestEntryInfo) => {
     return { success: false, error };
   }
 };
+
+export interface ContestConfirmationInfo {
+  name: string;
+  email: string;
+  monthName: string;
+  drawDateLabel: string;
+  instagramUrl: string;
+  instagramUsername: string;
+}
+
+export const sendContestConfirmationEmail = async (info: ContestConfirmationInfo) => {
+  try {
+    const e = (v: string) => escapeHtml(v);
+    const firstName = info.name.trim().split(/\s+/)[0] || info.name;
+
+    const html = `
+      <div style="font-family: Arial, sans-serif; padding: 24px; max-width: 600px; margin: auto; border: 1px solid #eee; border-radius: 12px; color: #27485A;">
+        <h2 style="color: #D97A6A; margin-top: 0;">¡Ya estás participando, ${e(firstName)}! 🌸</h2>
+        <p>Recibimos tu participación en el sorteo del <strong>ramo sorpresa de ${e(info.monthName)}</strong>.</p>
+        <p>El sorteo se realizará a fin de mes, el <strong>${e(info.drawDateLabel)}</strong>, y anunciaremos al ganador en nuestro Instagram.</p>
+        <p style="text-align: center; margin: 28px 0;">
+          <a href="${e(info.instagramUrl)}" style="background: #D97A6A; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 999px; font-weight: bold; display: inline-block;">
+            Seguir a @${e(info.instagramUsername)}
+          </a>
+        </p>
+        <p>¡Mucha suerte!<br/>Equipo Tapti</p>
+        <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;" />
+        <p style="font-size: 12px; color: #888;">Recibes este correo porque participaste en el concurso de tapti.cl. Si no fuiste tú, puedes ignorarlo.</p>
+      </div>
+    `;
+
+    const response = await resend.emails.send({
+      from: 'Florería Tapti <noreply@tapti.cl>',
+      to: [info.email],
+      subject: `¡Ya estás participando en el sorteo de ${info.monthName}! 🌸`,
+      html,
+    });
+
+    if (response.error) {
+      console.error('Error enviando confirmación de concurso:', response.error);
+      return { success: false, error: response.error };
+    }
+    return { success: true };
+  } catch (error) {
+    console.error('Excepción al enviar confirmación de concurso:', error);
+    return { success: false, error };
+  }
+};

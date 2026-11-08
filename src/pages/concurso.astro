@@ -131,6 +131,9 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
         <p class="text-white/80 mb-6">
           El sorteo se realizará el {drawDateLabel}. Síguenos en Instagram para enterarte del resultado.
         </p>
+        <p id="contest-confirm-note" class="hidden text-white/70 text-sm -mt-3 mb-6">
+          Te enviamos un correo de confirmación (revisa también la carpeta de spam).
+        </p>
       </div>
     </BoutiqueCard>
 
@@ -203,6 +206,9 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
         if (!res.ok) throw new Error(body.error || "No pudimos registrar tu participación.");
 
         form.classList.add("hidden");
+        if (body.confirmationSent) {
+          document.getElementById("contest-confirm-note")?.classList.remove("hidden");
+        }
         success.classList.remove("hidden");
         success.scrollIntoView({ behavior: "smooth", block: "center" });
       } catch (err) {
