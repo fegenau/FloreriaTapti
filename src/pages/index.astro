@@ -4,6 +4,15 @@ import BoutiqueCard from "../components/BoutiqueCard.astro";
 import FloatingNav from "../components/FloatingNav.astro";
 import OccasionCard from "../components/OccasionCard.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
+import HeroCarousel, { type HeroSlide } from "../components/HeroCarousel.astro";
+import { slugify } from "../utils/slugify.js";
+import {
+  BANNER_IMAGES,
+  INSTAGRAM_URL,
+  INSTAGRAM_USERNAME,
+  RAMOS_DEL_MES,
+  getContestDrawInfo,
+} from "../data/promotions";
 import { getCatalogData, resolveCatalogImageUrlSync, CATALOG_IMAGES_BASE_URL } from "../lib/catalog";
 
 const catalogImageBase = CATALOG_IMAGES_BASE_URL;
@@ -84,6 +93,65 @@ const categoryShowcase = [
   };
 });
 
+// --- Banner rotativo: hero, concurso y ramos del mes ---
+// Las imágenes del banner viven en la raíz del bucket (ej: "Banner/..."), no en "Flores/".
+const bucketRootUrl = catalogImageBase.replace(/Flores\/$/, "");
+const resolveBannerImage = (path: string | null | undefined) => {
+  if (!path) return null;
+  if (/^https?:\/\//.test(path)) return path;
+  return bucketRootUrl + path.replace(/^\/+/, "").split("/").map(encodeURIComponent).join("/");
+};
+const bannerImageFor = (name: string) =>
+  resolveBannerImage(
+    Object.entries(BANNER_IMAGES.ramos).find(
+      ([key]) => key.trim().toLowerCase() === name.trim().toLowerCase(),
+    )?.[1],
+  );
+
+const availableWithImage = catalogProducts.filter((p) => p.isAvailable && p.image?.length);
+const featuredByName = RAMOS_DEL_MES.map((name) =>
+  availableWithImage.find((p) => p.name.trim().toLowerCase() === name.trim().toLowerCase()),
+).filter((p): p is (typeof catalogProducts)[number] => Boolean(p));
+const ramosDelMes = (featuredByName.length ? featuredByName : availableWithImage).slice(0, 3);
+
+const { monthName, drawDateLabel } = getContestDrawInfo();
+const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+const heroSlides: HeroSlide[] = [
+  {
+    image: `${catalogImageBase}Banner.avif`,
+    title: "Tengo algo para ti",
+    text: "Ramos elegantes y regalos personalizados, diseñados con la esencia única de Tapti",
+    ctas: [
+      { label: "Explorar Catálogo", href: "/catalogo" },
+      { label: "Nuestra Historia", href: "/sobre", variant: "outline" },
+    ],
+  },
+  {
+    image:
+      resolveBannerImage(BANNER_IMAGES.concurso) ??
+      resolveCatalogImageUrlSync(`${catalogImageBase}Experiencia%20Tapti/Experiencia%20Tapti%202.avif`),
+    eyebrow: `Concurso de ${monthName}`,
+    title: "Sortearemos un ramo sorpresa",
+    text: `Cuéntanos tu fecha importante y por qué deberías ganártelo. El sorteo se realizará a fin de mes (${drawDateLabel}).`,
+    ctas: [
+      { label: "Participar", href: "/concurso" },
+      { label: `Seguir @${INSTAGRAM_USERNAME}`, href: INSTAGRAM_URL, variant: "outline", external: true },
+    ],
+  },
+  ...ramosDelMes.map((p) => ({
+    image: bannerImageFor(p.name) ?? p.image[0],
+    fit: "contain" as const,
+    eyebrow: `Ramo del mes · ${capitalizedMonth}`,
+    title: p.name,
+    text: p.Description || undefined,
+    ctas: [
+      { label: "Ver ramo", href: `/producto/${slugify(p.name)}` },
+      { label: "Ver catálogo", href: "/catalogo", variant: "outline" as const },
+    ],
+  })),
+];
+
 const specialOccasions = [
   {
     title: "Rosas",
@@ -116,41 +184,8 @@ const specialOccasions = [
 >
   <!-- Eliminar padding del main para que las cards toquen los bordes -->
   <div class="min-h-screen pt-20 pb-24 space-y-6">
-    <!-- Hero Card Principal -->
-    <BoutiqueCard
-      variant="hero"
-      size="hero"
-      background={`${catalogImageBase}Banner.avif`}
-      className="md-4 md:mx-6"
-    >
-      <div class="max-w-4xl pl-8 md:pl-16">
-        <h1
-          class="font-serif text-5xl md:text-7xl lg:text-8xl text-white mb-6 leading-tight"
-        >
-          Tengo algo para ti
-        </h1>
-        <p
-          class="text-lg md:text-xl lg:text-2xl text-white/90 mb-8 leading-relaxed max-w-2xl"
-        >
-          Ramos elegantes y regalos personalizados, diseñados con la esencia
-          única de Tapti
-        </p>
-        <div class="flex flex-wrap gap-4">
-          <a
-            href="/catalogo"
-            class="px-10 py-5 bg-terracota text-white font-semibold rounded-full hover:bg-terracota-hover transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 text-lg relative z-10"
-          >
-            Explorar Catálogo
-          </a>
-          <a
-            href="/sobre"
-            class="px-10 py-5 border-2 border-white text-white rounded-full hover:bg-white hover:text-azul-profundo transition-all duration-300 text-lg relative z-10"
-          >
-            Nuestra Historia
-          </a>
-        </div>
-      </div>
-    </BoutiqueCard>
+    <!-- Banner principal rotativo: hero, concurso y ramos del mes -->
+    <HeroCarousel slides={heroSlides} className="mx-4 md:mx-6" />
 
     <!-- Productos Destacados - Ancho completo -->
     <div class="px-4 md:px-6">
@@ -272,7 +307,7 @@ const specialOccasions = [
     </div>
 
     <!-- Feed de Instagram con scraping -->
-    <InstagramFeed username="tapti_regalo" />
+    <InstagramFeed username={INSTAGRAM_USERNAME} />
 
     <!-- Card de Membresías - Ancho ajustado y centrado (Oculto temporalmente) -->
     <div class="justify-center px-4 md:px-6 hidden">

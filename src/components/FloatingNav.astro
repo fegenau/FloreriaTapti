@@ -64,6 +64,18 @@ const isActive = (href: string) =>
         Sobre
       </a>
       <a
+        href="/concurso"
+        aria-current={isActive("/concurso") ? "page" : undefined}
+        class:list={[
+          "text-sm transition-colors px-3 py-1 rounded-full",
+          isActive("/concurso")
+            ? "text-terracota font-semibold bg-terracota/10"
+            : "text-azul-profundo hover:text-terracota hover:bg-terracota/10",
+        ]}
+      >
+        Concurso
+      </a>
+      <a
         href="/contacto"
         aria-current={isActive("/contacto") ? "page" : undefined}
         class:list={[
