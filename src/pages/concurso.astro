@@ -7,7 +7,9 @@ import {
   INSTAGRAM_USERNAME,
   getContestDrawInfo,
 } from "../data/promotions";
+import { isContestEnabled } from "../lib/banner";
 
+const contestEnabled = await isContestEnabled();
 const { monthName, drawDateLabel } = getContestDrawInfo();
 
 const inputClass =
@@ -17,7 +19,9 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
 
 <Layout title="Concurso: ramo sorpresa — Tapti">
   <div class="min-h-screen pt-24 pb-12 px-4 space-y-8">
-    <!-- Encabezado del concurso -->
+    {contestEnabled ? (
+      <>
+    {/* Encabezado del concurso */}
     <section class="max-w-4xl mx-auto text-center">
       <span class="inline-block mb-4 px-4 py-1 rounded-full bg-terracota/10 text-terracota text-sm font-semibold uppercase tracking-wider">
         Concurso de {monthName}
@@ -48,7 +52,7 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
       </ol>
     </section>
 
-    <!-- Formulario -->
+    {/* Formulario */}
     <BoutiqueCard
       variant="services"
       size="large"
@@ -100,7 +104,7 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
           ></textarea>
         </div>
 
-        <!-- Honeypot anti-spam (oculto para personas) -->
+        {/* Honeypot anti-spam (oculto para personas) */}
         <div class="hidden" aria-hidden="true">
           <label>No llenar <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
         </div>
@@ -125,7 +129,7 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
         </div>
       </form>
 
-      <!-- Estado de éxito -->
+      {/* Estado de éxito */}
       <div id="contest-success" class="hidden text-center max-w-xl mx-auto py-8">
         <h2 class="font-serif text-3xl text-white mb-3">¡Ya estás participando! 🌸</h2>
         <p class="text-white/80 mb-6">
@@ -136,8 +140,19 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
         </p>
       </div>
     </BoutiqueCard>
+      </>
+    ) : (
+    <section class="max-w-2xl mx-auto text-center py-12">
+      <h1 class="font-serif text-4xl md:text-5xl text-azul-profundo mb-4">
+        No hay un concurso activo en este momento
+      </h1>
+      <p class="text-azul-profundo/80 text-lg">
+        Síguenos en Instagram para enterarte cuando abramos el próximo sorteo. 🌸
+      </p>
+    </section>
+    )}
 
-    <!-- Botón de Instagram para seguimiento del concurso -->
+    <!-- Botón de Instagram (siempre visible) -->
     <section class="max-w-4xl mx-auto text-center">
       <p class="text-azul-profundo mb-4 text-lg">Sigue el concurso y conoce al ganador en Instagram</p>
       <a
