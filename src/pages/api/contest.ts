@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { z } from "zod";
 import { supabase } from "../../lib/supabase";
+import { isContestEnabled } from "../../lib/banner";
 import { sendContestConfirmationEmail, sendContestEntryEmail } from "../../lib/email";
 import {
   CONTEST_MOTIVES,
@@ -39,6 +40,10 @@ const entrySchema = z.object({
 });
 
 export const POST: APIRoute = async ({ request }) => {
+  if (!(await isContestEnabled())) {
+    return json({ error: "No hay un concurso activo en este momento." }, 403);
+  }
+
   let data: unknown;
   try {
     data = await request.json();

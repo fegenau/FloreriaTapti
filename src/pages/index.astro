@@ -6,13 +6,15 @@ import OccasionCard from "../components/OccasionCard.astro";
 import InstagramFeed from "../components/InstagramFeed.astro";
 import HeroCarousel, { type HeroSlide } from "../components/HeroCarousel.astro";
 import { slugify } from "../utils/slugify.js";
+import { INSTAGRAM_URL, INSTAGRAM_USERNAME, getContestDrawInfo } from "../data/promotions";
 import {
-  BANNER_IMAGES,
-  INSTAGRAM_URL,
-  INSTAGRAM_USERNAME,
-  RAMOS_DEL_MES,
-  getContestDrawInfo,
-} from "../data/promotions";
+  DEFAULT_CONCURSO_IMAGE,
+  DEFAULT_HERO_IMAGE,
+  MAX_RAMOS_DEL_MES,
+  fillBannerText,
+  getBannerConfig,
+  resolveBannerImage,
+} from "../lib/banner";
 import { getCatalogData, resolveCatalogImageUrlSync, CATALOG_IMAGES_BASE_URL } from "../lib/catalog";
 
 const catalogImageBase = CATALOG_IMAGES_BASE_URL;
@@ -94,57 +96,62 @@ const categoryShowcase = [
 });
 
 // --- Banner rotativo: hero, concurso y ramos del mes ---
-// Las imágenes del banner viven en la raíz del bucket (ej: "Banner/..."), no en "Flores/".
-const bucketRootUrl = catalogImageBase.replace(/Flores\/$/, "");
-const resolveBannerImage = (path: string | null | undefined) => {
-  if (!path) return null;
-  if (/^https?:\/\//.test(path)) return path;
-  return bucketRootUrl + path.replace(/^\/+/, "").split("/").map(encodeURIComponent).join("/");
-};
-const bannerImageFor = (name: string) =>
-  resolveBannerImage(
-    Object.entries(BANNER_IMAGES.ramos).find(
-      ([key]) => key.trim().toLowerCase() === name.trim().toLowerCase(),
-    )?.[1],
-  );
-
-const availableWithImage = catalogProducts.filter((p) => p.isAvailable && p.image?.length);
-const featuredByName = RAMOS_DEL_MES.map((name) =>
-  availableWithImage.find((p) => p.name.trim().toLowerCase() === name.trim().toLowerCase()),
-).filter((p): p is (typeof catalogProducts)[number] => Boolean(p));
-const ramosDelMes = (featuredByName.length ? featuredByName : availableWithImage).slice(0, 3);
-
+// Imágenes y textos se editan desde /admin/banner (tabla site_settings).
+const banner = await getBannerConfig();
 const { monthName, drawDateLabel } = getContestDrawInfo();
-const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+const fill = (value: string) =>
+  fillBannerText(value, { monthName, drawDateLabel, instagramUsername: INSTAGRAM_USERNAME });
+
+type Product = (typeof catalogProducts)[number];
+const availableWithImage = catalogProducts.filter((p) => p.isAvailable && p.image?.length);
+const findProduct = (name: string) =>
+  availableWithImage.find((p) => p.name.trim().toLowerCase() === name.trim().toLowerCase());
+
+let ramosDelMes = banner.ramos
+  .map((r) => ({ config: r, product: findProduct(r.product) }))
+  .filter((r): r is { config: (typeof banner.ramos)[number]; product: Product } => Boolean(r.product));
+if (!ramosDelMes.length) {
+  ramosDelMes = availableWithImage
+    .slice(0, MAX_RAMOS_DEL_MES)
+    .map((product) => ({ config: { product: product.name, image: null, title: "", text: "" }, product }));
+}
 
 const heroSlides: HeroSlide[] = [
   {
-    image: `${catalogImageBase}Banner.avif`,
-    title: "Tengo algo para ti",
-    text: "Ramos elegantes y regalos personalizados, diseñados con la esencia única de Tapti",
+    image: resolveBannerImage(banner.hero.image ?? DEFAULT_HERO_IMAGE)!,
+    title: fill(banner.hero.title),
+    text: fill(banner.hero.text) || undefined,
     ctas: [
       { label: "Explorar Catálogo", href: "/catalogo" },
       { label: "Nuestra Historia", href: "/sobre", variant: "outline" },
     ],
   },
-  {
-    image:
-      resolveBannerImage(BANNER_IMAGES.concurso) ??
-      resolveCatalogImageUrlSync(`${catalogImageBase}Experiencia%20Tapti/Experiencia%20Tapti%202.avif`),
-    eyebrow: `Concurso de ${monthName}`,
-    title: "Sortearemos un ramo sorpresa",
-    text: `Cuéntanos tu fecha importante y por qué deberías ganártelo. El sorteo se realizará a fin de mes (${drawDateLabel}).`,
-    ctas: [
-      { label: "Participar", href: "/concurso" },
-      { label: `Seguir @${INSTAGRAM_USERNAME}`, href: INSTAGRAM_URL, variant: "outline", external: true },
-    ],
-  },
-  ...ramosDelMes.map((p) => ({
-    image: bannerImageFor(p.name) ?? p.image[0],
+  // Diapositiva del concurso solo si está activo (interruptor en /admin/banner).
+  ...(banner.concurso.enabled
+    ? [
+        {
+          image: resolveBannerImage(banner.concurso.image ?? DEFAULT_CONCURSO_IMAGE)!,
+          eyebrow: fill(banner.concurso.eyebrow) || undefined,
+          title: fill(banner.concurso.title),
+          text: fill(banner.concurso.text) || undefined,
+          ctas: [
+            { label: "Participar", href: "/concurso" },
+            {
+              label: `Seguir @${INSTAGRAM_USERNAME}`,
+              href: INSTAGRAM_URL,
+              variant: "outline" as const,
+              external: true,
+            },
+          ],
+        },
+      ]
+    : []),
+  ...ramosDelMes.map(({ config, product: p }) => ({
+    image: resolveBannerImage(config.image) ?? p.image[0],
     fit: "contain" as const,
-    eyebrow: `Ramo del mes · ${capitalizedMonth}`,
-    title: p.name,
-    text: p.Description || undefined,
+    eyebrow: fill(banner.ramosEyebrow) || undefined,
+    title: fill(config.title) || p.name,
+    text: fill(config.text) || p.Description || undefined,
     ctas: [
       { label: "Ver ramo", href: `/producto/${slugify(p.name)}` },
       { label: "Ver catálogo", href: "/catalogo", variant: "outline" as const },
