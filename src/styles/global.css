@@ -1,0 +1,4 @@
+/* Antes los inyectaba @astrojs/tailwind (descontinuado, sin soporte para Astro 7). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

@@ -4,7 +4,8 @@ import FloatingNav from "./FloatingNav.astro";
 import MainMenu from "./MainMenu.astro";
 import FloatingWhatsApp from "./FloatingWhatsApp.astro";
 import AccessoriesModal from "./AccessoriesModal.astro";
-import { ViewTransitions } from "astro:transitions";
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
 import { getAuthUser } from "../lib/auth";
 
 interface Props {
@@ -35,7 +36,7 @@ const hasAdminBar = Boolean(user);
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>{title}</title>
-    <ViewTransitions />
+    <ClientRouter />
     <script is:inline>
       // Run before first paint to prevent flash
       if (sessionStorage.getItem("tapti_intro_shown")) {

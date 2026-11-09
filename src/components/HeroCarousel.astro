@@ -1,0 +1,214 @@
+---
+// Banner principal rotativo ("ruleta"): cambia automáticamente entre slides.
+export interface HeroSlide {
+  image: string;
+  eyebrow?: string;
+  title: string;
+  text?: string;
+  ctas?: { label: string; href: string; variant?: "primary" | "outline"; external?: boolean }[];
+  // "contain": en escritorio muestra la foto completa a la derecha, sin agrandarla,
+  // sobre un fondo desenfocado de la misma foto (ideal para fotos verticales).
+  fit?: "cover" | "contain";
+}
+
+const cssUrl = (src: string) =>
+  `url("${src.replace(/ /g, "%20").replace(/\(/g, "%28").replace(/\)/g, "%29").replace(/"/g, "%22")}")`;
+
+interface Props {
+  slides: HeroSlide[];
+  interval?: number;
+  className?: string;
+}
+
+const { slides, interval = 6000, className = "" } = Astro.props;
+---
+
+<section
+  class={`hero-carousel relative rounded-3xl overflow-hidden shadow-2xl h-screen max-h-[600px] min-h-[460px] bg-tapti-deep ${className}`}
+  data-interval={interval}
+  aria-roledescription="carrusel"
+  aria-label="Destacados Tapti"
+>
+  {
+    slides.map((slide, i) => (
+      <div
+        class:list={[
+          "hero-slide absolute inset-0 transition-opacity duration-1000 ease-in-out",
+          i === 0 ? "opacity-100 z-10" : "opacity-0 z-0 pointer-events-none",
+        ]}
+        data-slide={i}
+        role="group"
+        aria-roledescription="slide"
+        aria-label={`${i + 1} de ${slides.length}`}
+        aria-hidden={i === 0 ? "false" : "true"}
+      >
+        <div
+          class:list={[
+            "absolute inset-0 bg-cover bg-center",
+            slide.fit === "contain" && "md:blur-2xl md:scale-110 md:brightness-75",
+          ]}
+          style={`background-image: ${cssUrl(slide.image)};`}
+        />
+        {slide.fit === "contain" && (
+          <img
+            src={slide.image}
+            alt={slide.title}
+            loading={i === 0 ? "eager" : "lazy"}
+            decoding="async"
+            class="hidden md:block absolute inset-y-0 right-0 w-1/2 h-full object-contain object-center py-8 pr-8 drop-shadow-2xl"
+          />
+        )}
+        <div class="absolute inset-0 bg-gradient-to-r from-black/65 via-black/35 to-transparent" />
+        <div class="relative h-full flex items-center">
+          <div class="max-w-4xl px-8 md:pl-16 pb-10">
+            {slide.eyebrow && (
+              <span class="inline-block mb-4 px-4 py-1 rounded-full bg-terracota/90 text-white text-xs md:text-sm font-semibold uppercase tracking-wider">
+                {slide.eyebrow}
+              </span>
+            )}
+            <h2 class="font-serif text-4xl md:text-6xl lg:text-7xl text-white mb-5 leading-tight">
+              {slide.title}
+            </h2>
+            {slide.text && (
+              <p class="text-base md:text-xl text-white/90 mb-8 leading-relaxed max-w-2xl">
+                {slide.text}
+              </p>
+            )}
+            {slide.ctas && (
+              <div class="flex flex-wrap gap-3 md:gap-4">
+                {slide.ctas.map((cta) => (
+                  <a
+                    href={cta.href}
+                    tabindex={i === 0 ? undefined : -1}
+                    target={cta.external ? "_blank" : undefined}
+                    rel={cta.external ? "noopener noreferrer" : undefined}
+                    class:list={[
+                      "px-7 py-3 md:px-10 md:py-4 rounded-full transition-all duration-300 text-base md:text-lg font-semibold",
+                      cta.variant === "outline"
+                        ? "border-2 border-white text-white hover:bg-white hover:text-azul-profundo"
+                        : "bg-terracota text-white hover:bg-terracota-hover shadow-lg hover:shadow-xl hover:scale-105",
+                    ]}
+                  >
+                    {cta.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    ))
+  }
+
+  {
+    slides.length > 1 && (
+      <>
+        <button
+          type="button"
+          class="hero-prev absolute left-3 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm transition"
+          aria-label="Anterior"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        </button>
+        <button
+          type="button"
+          class="hero-next absolute right-3 top-1/2 -translate-y-1/2 z-20 hidden md:flex w-11 h-11 items-center justify-center rounded-full bg-black/30 hover:bg-black/50 text-white backdrop-blur-sm transition"
+          aria-label="Siguiente"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+        </button>
+        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          {slides.map((_, i) => (
+            <button
+              type="button"
+              class:list={[
+                "hero-dot h-2.5 rounded-full transition-all duration-300",
+                i === 0 ? "w-8 bg-white" : "w-2.5 bg-white/50 hover:bg-white/80",
+              ]}
+              data-index={i}
+              aria-label={`Ir al slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      </>
+    )
+  }
+</section>
+
+<script>
+  function initHeroCarousels() {
+    document.querySelectorAll<HTMLElement>(".hero-carousel").forEach((root) => {
+      if (root.dataset.ready === "1") return;
+      root.dataset.ready = "1";
+
+      const slides = Array.from(root.querySelectorAll<HTMLElement>(".hero-slide"));
+      const dots = Array.from(root.querySelectorAll<HTMLElement>(".hero-dot"));
+      if (slides.length < 2) return;
+
+      const interval = Number(root.dataset.interval) || 6000;
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      let current = 0;
+      let timer: number | undefined;
+
+      const show = (index: number) => {
+        current = (index + slides.length) % slides.length;
+        slides.forEach((s, i) => {
+          const active = i === current;
+          s.classList.toggle("opacity-100", active);
+          s.classList.toggle("z-10", active);
+          s.classList.toggle("opacity-0", !active);
+          s.classList.toggle("z-0", !active);
+          s.classList.toggle("pointer-events-none", !active);
+          s.setAttribute("aria-hidden", active ? "false" : "true");
+          s.querySelectorAll("a").forEach((a) => {
+            if (active) a.removeAttribute("tabindex");
+            else a.setAttribute("tabindex", "-1");
+          });
+        });
+        dots.forEach((d, i) => {
+          const active = i === current;
+          d.classList.toggle("w-8", active);
+          d.classList.toggle("bg-white", active);
+          d.classList.toggle("w-2.5", !active);
+          d.classList.toggle("bg-white/50", !active);
+        });
+      };
+
+      const stop = () => {
+        if (timer) window.clearInterval(timer);
+        timer = undefined;
+      };
+      const start = () => {
+        stop();
+        if (!reduceMotion) timer = window.setInterval(() => show(current + 1), interval);
+      };
+      const go = (index: number) => {
+        show(index);
+        start();
+      };
+
+      root.querySelector(".hero-prev")?.addEventListener("click", () => go(current - 1));
+      root.querySelector(".hero-next")?.addEventListener("click", () => go(current + 1));
+      dots.forEach((d) => d.addEventListener("click", () => go(Number(d.dataset.index))));
+
+      root.addEventListener("mouseenter", stop);
+      root.addEventListener("mouseleave", start);
+      root.addEventListener("focusin", stop);
+      root.addEventListener("focusout", start);
+
+      let startX = 0;
+      root.addEventListener("touchstart", (e) => (startX = e.touches[0].clientX), { passive: true });
+      root.addEventListener("touchend", (e) => {
+        const diff = startX - e.changedTouches[0].clientX;
+        if (Math.abs(diff) > 50) go(current + (diff > 0 ? 1 : -1));
+      });
+
+      // Con View Transitions el nodo se reemplaza al navegar: limpiar el timer.
+      document.addEventListener("astro:before-swap", stop, { once: true });
+
+      start();
+    });
+  }
+
+  document.addEventListener("astro:page-load", initHeroCarousels);
+</script>

@@ -1,0 +1,237 @@
+---
+import Layout from "../components/Layout.astro";
+import BoutiqueCard from "../components/BoutiqueCard.astro";
+import {
+  CONTEST_MOTIVES,
+  INSTAGRAM_URL,
+  INSTAGRAM_USERNAME,
+  getContestDrawInfo,
+} from "../data/promotions";
+import { isContestEnabled } from "../lib/banner";
+
+const contestEnabled = await isContestEnabled();
+const { monthName, drawDateLabel } = getContestDrawInfo();
+
+const inputClass =
+  "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/40 focus:border-terracota outline-none transition-colors";
+const labelClass = "block text-sm font-medium text-gray-300 mb-2";
+---
+
+<Layout title="Concurso: ramo sorpresa — Tapti">
+  <div class="min-h-screen pt-24 pb-12 px-4 space-y-8">
+    {contestEnabled ? (
+      <>
+    {/* Encabezado del concurso */}
+    <section class="max-w-4xl mx-auto text-center">
+      <span class="inline-block mb-4 px-4 py-1 rounded-full bg-terracota/10 text-terracota text-sm font-semibold uppercase tracking-wider">
+        Concurso de {monthName}
+      </span>
+      <h1 class="font-serif text-4xl md:text-6xl text-azul-profundo mb-4">
+        Sortearemos un ramo sorpresa
+      </h1>
+      <p class="text-azul-profundo/80 text-lg md:text-xl max-w-2xl mx-auto mb-6">
+        Cuéntanos tu fecha importante y el motivo. El sorteo se realizará a fin de mes:
+        <strong class="text-terracota">el {drawDateLabel}</strong>.
+      </p>
+
+      <ol class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-3xl mx-auto">
+        <li class="rounded-2xl bg-white/70 border border-borde-claro p-4">
+          <span class="font-serif text-2xl text-terracota">1.</span>
+          <p class="text-azul-profundo text-sm mt-1">Completa el formulario con tu fecha y motivo.</p>
+        </li>
+        <li class="rounded-2xl bg-white/70 border border-borde-claro p-4">
+          <span class="font-serif text-2xl text-terracota">2.</span>
+          <p class="text-azul-profundo text-sm mt-1">
+            Síguenos en Instagram <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" class="underline">@{INSTAGRAM_USERNAME}</a>.
+          </p>
+        </li>
+        <li class="rounded-2xl bg-white/70 border border-borde-claro p-4">
+          <span class="font-serif text-2xl text-terracota">3.</span>
+          <p class="text-azul-profundo text-sm mt-1">Anunciamos al ganador en Instagram a fin de mes.</p>
+        </li>
+      </ol>
+    </section>
+
+    {/* Formulario */}
+    <BoutiqueCard
+      variant="services"
+      size="large"
+      className="!h-auto p-6 md:p-10 max-w-4xl mx-auto"
+      disableAnimation={true}
+    >
+      <form id="contest-form" class="space-y-6 max-w-2xl mx-auto" novalidate>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="c-name" class={labelClass}>Nombre *</label>
+            <input id="c-name" type="text" name="name" required maxlength="100" autocomplete="name" class={inputClass} placeholder="Tu nombre" />
+          </div>
+          <div>
+            <label for="c-email" class={labelClass}>Email *</label>
+            <input id="c-email" type="email" name="email" required maxlength="150" autocomplete="email" class={inputClass} placeholder="correo@ejemplo.com" />
+          </div>
+          <div>
+            <label for="c-phone" class={labelClass}>Teléfono *</label>
+            <input id="c-phone" type="tel" name="phone" required maxlength="20" autocomplete="tel" class={inputClass} placeholder="+56 9 1234 5678" />
+          </div>
+          <div>
+            <label for="c-instagram" class={labelClass}>Usuario de Instagram</label>
+            <input id="c-instagram" type="text" name="instagram" maxlength="31" class={inputClass} placeholder="@tu_usuario" />
+          </div>
+          <div>
+            <label for="c-date" class={labelClass}>Fecha importante</label>
+            <input id="c-date" type="date" name="importantDate" class={`${inputClass} [color-scheme:dark]`} />
+          </div>
+          <div>
+            <label for="c-motive" class={labelClass}>Motivo *</label>
+            <select id="c-motive" name="motive" required class={`${inputClass} [&>option]:text-black`}>
+              <option value="" disabled selected>Selecciona un motivo</option>
+              {CONTEST_MOTIVES.map((m) => <option value={m}>{m}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label for="c-reason" class={labelClass}>¿Por qué deberías ganarte el ramo? *</label>
+          <textarea
+            id="c-reason"
+            name="reason"
+            required
+            minlength="10"
+            maxlength="1500"
+            rows="5"
+            class={`${inputClass} resize-none`}
+            placeholder="Cuéntanos tu historia, a quién se lo regalarías o qué mensaje le dedicarías..."
+          ></textarea>
+        </div>
+
+        {/* Honeypot anti-spam (oculto para personas) */}
+        <div class="hidden" aria-hidden="true">
+          <label>No llenar <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+        </div>
+
+        <label class="flex items-start gap-3 text-sm text-gray-300">
+          <input type="checkbox" name="acceptTerms" required class="mt-1 accent-terracota" />
+          <span>
+            Acepto las bases: un ganador por mes, sorteo el último día del mes, entrega dentro de nuestra zona de despacho.
+            Acepto la <a href="/politica-de-privacidad" class="underline hover:text-white">política de privacidad</a>.
+          </span>
+        </label>
+
+        <p id="contest-status" class="hidden text-center rounded-xl px-4 py-3 text-sm" role="status" aria-live="polite"></p>
+
+        <div class="text-center">
+          <button
+            type="submit"
+            class="w-full md:w-auto px-12 bg-terracota hover:bg-terracota-hover text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(217,122,106,0.3)] transition-all duration-300 transform hover:-translate-y-0.5 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            Participar
+          </button>
+        </div>
+      </form>
+
+      {/* Estado de éxito */}
+      <div id="contest-success" class="hidden text-center max-w-xl mx-auto py-8">
+        <h2 class="font-serif text-3xl text-white mb-3">¡Ya estás participando! 🌸</h2>
+        <p class="text-white/80 mb-6">
+          El sorteo se realizará el {drawDateLabel}. Síguenos en Instagram para enterarte del resultado.
+        </p>
+        <p id="contest-confirm-note" class="hidden text-white/70 text-sm -mt-3 mb-6">
+          Te enviamos un correo de confirmación (revisa también la carpeta de spam).
+        </p>
+      </div>
+    </BoutiqueCard>
+      </>
+    ) : (
+    <section class="max-w-2xl mx-auto text-center py-12">
+      <h1 class="font-serif text-4xl md:text-5xl text-azul-profundo mb-4">
+        No hay un concurso activo en este momento
+      </h1>
+      <p class="text-azul-profundo/80 text-lg">
+        Síguenos en Instagram para enterarte cuando abramos el próximo sorteo. 🌸
+      </p>
+    </section>
+    )}
+
+    <!-- Botón de Instagram (siempre visible) -->
+    <section class="max-w-4xl mx-auto text-center">
+      <p class="text-azul-profundo mb-4 text-lg">Sigue el concurso y conoce al ganador en Instagram</p>
+      <a
+        href={INSTAGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold rounded-full hover:from-pink-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg"
+      >
+        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+        </svg>
+        Seguir @{INSTAGRAM_USERNAME}
+      </a>
+    </section>
+  </div>
+</Layout>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const form = document.getElementById("contest-form") as HTMLFormElement | null;
+    if (!form || form.dataset.ready === "1") return;
+    form.dataset.ready = "1";
+
+    const status = document.getElementById("contest-status") as HTMLParagraphElement;
+    const success = document.getElementById("contest-success") as HTMLDivElement;
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    const showStatus = (msg: string) => {
+      status.textContent = msg;
+      status.className = "text-center rounded-xl px-4 py-3 text-sm bg-red-500/15 text-red-200 border border-red-400/30";
+    };
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      status.className = "hidden";
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      const fd = new FormData(form);
+      const payload = {
+        name: String(fd.get("name") ?? ""),
+        email: String(fd.get("email") ?? ""),
+        phone: String(fd.get("phone") ?? ""),
+        instagram: String(fd.get("instagram") ?? ""),
+        importantDate: String(fd.get("importantDate") ?? ""),
+        motive: String(fd.get("motive") ?? ""),
+        reason: String(fd.get("reason") ?? ""),
+        acceptTerms: fd.get("acceptTerms") === "on",
+        website: String(fd.get("website") ?? ""),
+      };
+
+      const original = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Enviando...";
+
+      try {
+        const res = await fetch("/api/contest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.error || "No pudimos registrar tu participación.");
+
+        form.classList.add("hidden");
+        if (body.confirmationSent) {
+          document.getElementById("contest-confirm-note")?.classList.remove("hidden");
+        }
+        success.classList.remove("hidden");
+        success.scrollIntoView({ behavior: "smooth", block: "center" });
+      } catch (err) {
+        showStatus(err instanceof Error ? err.message : "Ocurrió un error. Intenta nuevamente.");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = original;
+      }
+    });
+  });
+</script>

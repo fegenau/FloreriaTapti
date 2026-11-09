@@ -1,0 +1,376 @@
+---
+import LayoutAdmin from "../../components/LayoutAdmin.astro";
+import { getAuthUser, isAdminEmail } from "../../lib/auth";
+import { getCatalogData } from "../../lib/catalog";
+import {
+  BUCKET_ROOT_URL,
+  DEFAULT_CONCURSO_IMAGE,
+  DEFAULT_HERO_IMAGE,
+  MAX_RAMOS_DEL_MES,
+  getBannerConfig,
+  resolveBannerImage,
+} from "../../lib/banner";
+
+const user = await getAuthUser(Astro.cookies);
+if (!user || !isAdminEmail(user.email)) {
+  return Astro.redirect("/login");
+}
+
+const banner = await getBannerConfig();
+const { flowers } = await getCatalogData();
+const products = flowers
+  .filter((p) => p.isAvailable && p.image?.length)
+  .map((p) => ({ name: p.name, image: p.image[0], description: p.Description }))
+  .sort((a, b) => a.name.localeCompare(b.name, "es"));
+const productMap = Object.fromEntries(products.map((p) => [p.name, p]));
+const sameName = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+const ramoSlots = Array.from({ length: MAX_RAMOS_DEL_MES }, (_, i) => banner.ramos[i] ?? null);
+const missingProducts = banner.ramos
+  .filter((r) => !products.some((p) => sameName(p.name, r.product)))
+  .map((r) => r.product);
+
+const inputClass =
+  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none";
+const labelClass = "block text-sm font-medium text-gray-700 mb-1";
+const cardClass = "bg-white rounded-2xl shadow-sm border border-gray-200 p-6";
+---
+
+<LayoutAdmin title="Banner | Tapti">
+  <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
+    <div class="border-b border-gray-200 bg-white shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-6 flex flex-wrap gap-4 justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-grafito">Banner de inicio</h1>
+          <p class="text-gray-600 text-sm">Bienvenido, {user.email}</p>
+        </div>
+        <div class="flex flex-wrap gap-2 md:gap-4">
+          <a href="/admin" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Catálogo</a>
+          <a href="/admin/reportes" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Reportes</a>
+          <a href="/" target="_blank" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Ver sitio</a>
+          <a href="/api/auth/logout" class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+
+    <form
+      id="banner-form"
+      class="max-w-6xl mx-auto px-4 py-8 space-y-6"
+      data-bucket-root={BUCKET_ROOT_URL}
+      data-products={JSON.stringify(productMap)}
+    >
+      <div class="rounded-xl bg-white/70 border border-rose-200 p-4 text-sm text-gray-700">
+        En los textos puedes usar <code class="bg-rose-100 px-1 rounded">{"{mes}"}</code>,
+        <code class="bg-rose-100 px-1 rounded">{"{Mes}"}</code> (con mayúscula),
+        <code class="bg-rose-100 px-1 rounded">{"{fecha_sorteo}"}</code> e
+        <code class="bg-rose-100 px-1 rounded">{"{instagram}"}</code>; se reemplazan solos cada mes.
+        Imágenes: JPG, PNG, WEBP o AVIF de hasta 5MB.
+      </div>
+
+      {missingProducts.length > 0 && (
+        <div class="rounded-xl bg-amber-50 border border-amber-300 p-4 text-sm text-amber-800">
+          Estos ramos guardados ya no están disponibles en el catálogo y no se muestran en el banner:
+          <strong>{missingProducts.join(", ")}</strong>. Elige otros y guarda.
+        </div>
+      )}
+
+      <!-- Banner principal -->
+      <section class={cardClass}>
+        <h2 class="text-lg font-semibold text-grafito mb-4">1. Banner principal</h2>
+        <div class="grid md:grid-cols-[260px_1fr] gap-6">
+          <div class="image-field" data-slot="hero" data-default-url={resolveBannerImage(DEFAULT_HERO_IMAGE)}>
+            <input type="hidden" class="image-path" value={banner.hero.image ?? ""} />
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class={labelClass} for="hero-title">Título *</label>
+              <input id="hero-title" data-field="hero.title" class={inputClass} maxlength="120" required value={banner.hero.title} />
+            </div>
+            <div>
+              <label class={labelClass} for="hero-text">Texto</label>
+              <textarea id="hero-text" data-field="hero.text" class={inputClass} maxlength="300" rows="3">{banner.hero.text}</textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Concurso -->
+      <section class={cardClass}>
+        <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+          <div>
+            <h2 class="text-lg font-semibold text-grafito">2. Concurso</h2>
+            <p id="contest-toggle-help" class="text-sm text-gray-500 max-w-xl">
+              Al desactivarlo se oculta la diapositiva del banner y el enlace del menú, la página /concurso muestra
+              "No hay un concurso activo" y no se aceptan nuevas participaciones.
+            </p>
+          </div>
+          <label class="inline-flex items-center gap-3 cursor-pointer select-none">
+            <span id="contest-toggle-label" class="text-sm font-medium text-gray-700">
+              {banner.concurso.enabled ? "Activo" : "Desactivado"}
+            </span>
+            <input
+              id="contest-enabled"
+              type="checkbox"
+              role="switch"
+              class="sr-only peer"
+              checked={banner.concurso.enabled}
+              aria-describedby="contest-toggle-help"
+            />
+            <span class="relative w-12 h-7 rounded-full bg-gray-300 peer-checked:bg-green-500 transition-colors after:content-[''] after:absolute after:top-1 after:left-1 after:w-5 after:h-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5 peer-focus-visible:ring-2 peer-focus-visible:ring-rose-300"></span>
+          </label>
+        </div>
+        <div class="grid md:grid-cols-[260px_1fr] gap-6">
+          <div class="image-field" data-slot="concurso" data-default-url={resolveBannerImage(DEFAULT_CONCURSO_IMAGE)}>
+            <input type="hidden" class="image-path" value={banner.concurso.image ?? ""} />
+          </div>
+          <div class="space-y-4">
+            <div>
+              <label class={labelClass} for="concurso-eyebrow">Etiqueta superior</label>
+              <input id="concurso-eyebrow" data-field="concurso.eyebrow" class={inputClass} maxlength="60" value={banner.concurso.eyebrow} />
+            </div>
+            <div>
+              <label class={labelClass} for="concurso-title">Título *</label>
+              <input id="concurso-title" data-field="concurso.title" class={inputClass} maxlength="120" required value={banner.concurso.title} />
+            </div>
+            <div>
+              <label class={labelClass} for="concurso-text">Texto</label>
+              <textarea id="concurso-text" data-field="concurso.text" class={inputClass} maxlength="300" rows="3">{banner.concurso.text}</textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ramos del mes -->
+      <section class={cardClass}>
+        <h2 class="text-lg font-semibold text-grafito mb-1">3. Ramos del mes</h2>
+        <p class="text-sm text-gray-500 mb-4">
+          Hasta {MAX_RAMOS_DEL_MES} ramos. Si dejas el título o el texto vacíos, se usan el nombre y la descripción del catálogo.
+          Para estas diapositivas funcionan mejor las fotos verticales.
+        </p>
+        <div class="mb-6 max-w-md">
+          <label class={labelClass} for="ramos-eyebrow">Etiqueta superior (para todos los ramos)</label>
+          <input id="ramos-eyebrow" data-field="ramosEyebrow" class={inputClass} maxlength="60" value={banner.ramosEyebrow} />
+        </div>
+
+        <div class="space-y-6">
+          {ramoSlots.map((ramo, i) => (
+            <div class="ramo-row grid md:grid-cols-[260px_1fr] gap-6 border-t border-gray-100 pt-6" data-index={i}>
+              <div class="image-field" data-slot="ramo" data-default-url="">
+                <input type="hidden" class="image-path" value={ramo?.image ?? ""} />
+              </div>
+              <div class="space-y-4">
+                <div>
+                  <label class={labelClass} for={`ramo-${i}-product`}>Ramo {i + 1}</label>
+                  <select id={`ramo-${i}-product`} class={`${inputClass} ramo-product`}>
+                    <option value="">— Ninguno —</option>
+                    {products.map((p) => (
+                      <option value={p.name} selected={ramo ? sameName(ramo.product, p.name) : false}>{p.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label class={labelClass} for={`ramo-${i}-title`}>Título (opcional)</label>
+                  <input id={`ramo-${i}-title`} class={`${inputClass} ramo-title`} maxlength="120" value={ramo?.title ?? ""} />
+                </div>
+                <div>
+                  <label class={labelClass} for={`ramo-${i}-text`}>Texto (opcional)</label>
+                  <textarea id={`ramo-${i}-text`} class={`${inputClass} ramo-text`} maxlength="300" rows="2">{ramo?.text ?? ""}</textarea>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div class="sticky bottom-0 bg-white/90 backdrop-blur border border-gray-200 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-3 shadow-lg">
+        <p id="banner-status" class="text-sm text-gray-600" role="status" aria-live="polite"></p>
+        <div class="flex gap-3">
+          <a href="/" target="_blank" class="px-5 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition">Ver banner</a>
+          <button type="submit" class="px-6 py-2 rounded-lg bg-rose-500 text-white font-semibold hover:bg-rose-600 transition disabled:opacity-60">
+            Guardar cambios
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</LayoutAdmin>
+
+<script>
+  type ProductInfo = { name: string; image: string; description: string };
+
+  const form = document.getElementById("banner-form") as HTMLFormElement;
+  const status = document.getElementById("banner-status") as HTMLParagraphElement;
+  const bucketRoot = form.dataset.bucketRoot ?? "";
+  const products: Record<string, ProductInfo> = JSON.parse(form.dataset.products || "{}");
+  let pendingUploads = 0;
+
+  const setStatus = (msg: string, kind: "info" | "ok" | "error" = "info") => {
+    status.textContent = msg;
+    status.className = `text-sm ${kind === "ok" ? "text-green-700" : kind === "error" ? "text-red-600" : "text-gray-600"}`;
+  };
+
+  const resolveUrl = (path: string) =>
+    /^https?:\/\//.test(path) ? path : bucketRoot + path.split("/").map(encodeURIComponent).join("/");
+
+  // --- Campos de imagen ---
+  function setupImageField(field: HTMLElement) {
+    const pathInput = field.querySelector<HTMLInputElement>(".image-path")!;
+    field.insertAdjacentHTML(
+      "beforeend",
+      `<div class="aspect-[4/3] rounded-xl overflow-hidden bg-gray-100 border border-gray-200 relative">
+         <img class="image-preview w-full h-full object-cover" alt="Vista previa" />
+         <span class="image-badge absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full"></span>
+       </div>
+       <div class="flex flex-wrap gap-2 mt-3">
+         <label class="cursor-pointer px-3 py-1.5 text-sm rounded-lg bg-rose-500 text-white hover:bg-rose-600 transition">
+           Subir imagen
+           <input type="file" class="image-file hidden" accept="image/jpeg,image/png,image/webp,image/avif" />
+         </label>
+         <button type="button" class="image-clear px-3 py-1.5 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition">
+           Usar por defecto
+         </button>
+       </div>
+       <p class="image-msg text-xs text-gray-500 mt-2"></p>`,
+    );
+    const preview = field.querySelector<HTMLImageElement>(".image-preview")!;
+    const badge = field.querySelector<HTMLSpanElement>(".image-badge")!;
+    const fileInput = field.querySelector<HTMLInputElement>(".image-file")!;
+    const clearBtn = field.querySelector<HTMLButtonElement>(".image-clear")!;
+    const msg = field.querySelector<HTMLParagraphElement>(".image-msg")!;
+
+    const render = () => {
+      const custom = pathInput.value;
+      const fallback = field.dataset.defaultUrl || "";
+      const src = custom ? resolveUrl(custom) : fallback;
+      preview.src = src;
+      preview.classList.toggle("invisible", !src);
+      badge.textContent = custom ? "Imagen del banner" : fallback ? "Por defecto" : "Sin imagen";
+      badge.className = `image-badge absolute top-2 left-2 text-xs px-2 py-0.5 rounded-full ${custom ? "bg-rose-500 text-white" : "bg-white/90 text-gray-700"}`;
+      clearBtn.disabled = !custom;
+      clearBtn.classList.toggle("opacity-50", !custom);
+    };
+    (field as any).render = render;
+
+    fileInput.addEventListener("change", async () => {
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        msg.textContent = "La imagen no debe superar 5MB.";
+        fileInput.value = "";
+        return;
+      }
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("slot", field.dataset.slot || "ramo");
+      msg.textContent = "Subiendo...";
+      pendingUploads++;
+      try {
+        const res = await fetch("/api/banner/upload", { method: "POST", body: fd });
+        const body = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(body.message || "Error al subir la imagen");
+        pathInput.value = body.path;
+        msg.textContent = "Imagen subida. Recuerda guardar los cambios.";
+        render();
+      } catch (err) {
+        msg.textContent = err instanceof Error ? err.message : "Error al subir la imagen";
+      } finally {
+        pendingUploads--;
+        fileInput.value = "";
+      }
+    });
+
+    clearBtn.addEventListener("click", () => {
+      pathInput.value = "";
+      msg.textContent = "Se usará la imagen por defecto. Recuerda guardar los cambios.";
+      render();
+    });
+
+    render();
+  }
+
+  document.querySelectorAll<HTMLElement>(".image-field").forEach(setupImageField);
+
+  // La imagen por defecto de cada ramo es su foto del catálogo.
+  document.querySelectorAll<HTMLElement>(".ramo-row").forEach((row) => {
+    const select = row.querySelector<HTMLSelectElement>(".ramo-product")!;
+    const field = row.querySelector<HTMLElement>(".image-field")!;
+    const update = () => {
+      field.dataset.defaultUrl = products[select.value]?.image ?? "";
+      (field as any).render?.();
+    };
+    select.addEventListener("change", update);
+    update();
+  });
+
+  // --- Interruptor del concurso ---
+  const contestToggle = document.getElementById("contest-enabled") as HTMLInputElement;
+  const contestToggleLabel = document.getElementById("contest-toggle-label") as HTMLSpanElement;
+  contestToggle.addEventListener("change", () => {
+    contestToggleLabel.textContent = contestToggle.checked ? "Activo" : "Desactivado";
+    setStatus("Recuerda guardar los cambios para aplicar el estado del concurso.");
+  });
+
+  // --- Guardar ---
+  const val = (selector: string, root: ParentNode = form) =>
+    (root.querySelector<HTMLInputElement | HTMLTextAreaElement>(selector)?.value ?? "").trim();
+  const imageOf = (root: Element) => root.querySelector<HTMLInputElement>(".image-path")!.value.trim() || null;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (pendingUploads > 0) {
+      setStatus("Espera a que terminen de subir las imágenes.", "error");
+      return;
+    }
+    if (!form.reportValidity()) return;
+
+    const ramos = Array.from(form.querySelectorAll<HTMLElement>(".ramo-row"))
+      .map((row) => ({
+        product: val(".ramo-product", row),
+        image: imageOf(row.querySelector(".image-field")!),
+        title: val(".ramo-title", row),
+        text: val(".ramo-text", row),
+      }))
+      .filter((r) => r.product);
+
+    const names = ramos.map((r) => r.product);
+    if (new Set(names).size !== names.length) {
+      setStatus("Elegiste el mismo ramo más de una vez.", "error");
+      return;
+    }
+
+    const config = {
+      hero: {
+        image: imageOf(form.querySelector('[data-slot="hero"]')!),
+        title: val('[data-field="hero.title"]'),
+        text: val('[data-field="hero.text"]'),
+      },
+      concurso: {
+        enabled: contestToggle.checked,
+        image: imageOf(form.querySelector('[data-slot="concurso"]')!),
+        eyebrow: val('[data-field="concurso.eyebrow"]'),
+        title: val('[data-field="concurso.title"]'),
+        text: val('[data-field="concurso.text"]'),
+      },
+      ramosEyebrow: val('[data-field="ramosEyebrow"]'),
+      ramos,
+    };
+
+    const btn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    btn.disabled = true;
+    setStatus("Guardando...");
+    try {
+      const res = await fetch("/api/banner", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(config),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.message || "No se pudo guardar");
+      setStatus(`Cambios guardados (${new Date().toLocaleTimeString("es-CL")}). Ya se ven en el sitio.`, "ok");
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "No se pudo guardar", "error");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+</script>
