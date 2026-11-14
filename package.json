@@ -12,7 +12,7 @@
     "@astrojs/netlify": "^8.2.10",
     "@nanostores/persistent": "^1.2.0",
     "@supabase/supabase-js": "^2.89.0",
-    "astro": "^7.4.2",
+    "astro": "^7.4.12",
     "autoprefixer": "^10.6.2",
     "aws4fetch": "^1.0.20",
     "bcrypt": "^6.0.0",
