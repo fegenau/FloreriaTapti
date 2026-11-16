@@ -165,7 +165,12 @@ const isActive = (href: string) =>
       }
     });
 
+    // Modal de accesorios desactivado: el carrito navega directo a /carrito.
+    // Cambiar a true para volver a activarlo.
+    const ACCESSORIES_MODAL_ENABLED = false;
+
     function handleCartClick(e: Event) {
+      if (!ACCESSORIES_MODAL_ENABLED) return;
       // Only show modal if we are NOT already on the cart page
       // and we have items in the cart
       if (currentItemCount > 0 && window.location.pathname !== "/carrito") {
