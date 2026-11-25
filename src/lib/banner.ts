@@ -12,6 +12,17 @@ export const MAX_RAMOS_DEL_MES = 3;
 export const DEFAULT_HERO_IMAGE = "Flores/Banner.avif";
 export const DEFAULT_CONCURSO_IMAGE = "Flores/Experiencia Tapti/Experiencia Tapti 2.avif";
 
+// Bases por defecto del concurso. Admiten {mes}, {Mes}, {fecha_sorteo} e {instagram}.
+export const DEFAULT_CONTEST_BASES = `1. Concurso válido para las participaciones recibidas durante el mes de {mes}.
+2. Puede participar cualquier persona mayor de 18 años con domicilio dentro de nuestra zona de despacho.
+3. Se permite una participación por correo electrónico por mes.
+4. Habrá un (1) ganador por mes, elegido al azar entre todas las participaciones válidas.
+5. El sorteo se realizará el {fecha_sorteo} y el resultado se publicará en nuestro Instagram {instagram}.
+6. El premio es un ramo sorpresa diseñado por Tapti, entregado dentro de nuestra zona de despacho en la fecha que se coordine con el ganador.
+7. El premio no es canjeable por dinero ni por otros productos.
+8. Si no logramos contactar al ganador dentro de 7 días, se realizará un nuevo sorteo.
+9. Los datos entregados se usarán solo para gestionar el concurso, según nuestra política de privacidad.`;
+
 // Ruta dentro del bucket (sin "..", sin "\" ni "/" inicial) o URL https absoluta.
 const imagePath = z
   .string()
@@ -43,6 +54,8 @@ export const bannerConfigSchema = z.object({
     eyebrow: text(60),
     title: text(120).min(1, "El título del concurso es obligatorio"),
     text: text(300),
+    // Bases legales del concurso; se editan mes a mes desde /admin/banner.
+    bases: text(5000).default(DEFAULT_CONTEST_BASES),
   }),
   ramosEyebrow: text(60),
   ramos: z
@@ -71,6 +84,7 @@ export const DEFAULT_BANNER: BannerConfig = {
     eyebrow: "Concurso de {mes}",
     title: "Sortearemos un ramo sorpresa",
     text: "Cuéntanos tu fecha importante y por qué deberías ganártelo. El sorteo se realizará a fin de mes ({fecha_sorteo}).",
+    bases: DEFAULT_CONTEST_BASES,
   },
   ramosEyebrow: "Ramo del mes · {Mes}",
   ramos: [
