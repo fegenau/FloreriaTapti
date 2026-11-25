@@ -10,183 +10,268 @@ const { data: categoryRows } = await supabase
   .from("categories")
   .select("name")
   .order("name", { ascending: true });
-const categories = [...new Set((categoryRows || []).map((c: any) => c.name))] as string[];
-const flowerTypes = [...new Set(products.flatMap((p: any) => p.flowerType || []))] as string[];
 
-const maxCatalogPrice = products.reduce((max: number, p: any) => {
+// Categorías: solo las que tienen productos, con su cantidad. Se respeta el orden de la
+// tabla "categories" y "Sin categoría" queda al final.
+const categoryCounts = new Map<string, number>();
+for (const p of products as any[]) {
+  for (const c of p.categories || []) categoryCounts.set(c, (categoryCounts.get(c) || 0) + 1);
+}
+const tableOrder = [...new Set((categoryRows || []).map((c: any) => c.name as string))];
+const categories = [
+  ...tableOrder.filter((c) => categoryCounts.has(c)),
+  ...[...categoryCounts.keys()]
+    .filter((c) => !tableOrder.includes(c) && c !== "Sin categoría")
+    .sort((a, b) => a.localeCompare(b, "es")),
+  ...(categoryCounts.has("Sin categoría") ? ["Sin categoría"] : []),
+];
+
+const flowerCounts = new Map<string, number>();
+for (const p of products as any[]) {
+  for (const f of p.flowerType || []) flowerCounts.set(f, (flowerCounts.get(f) || 0) + 1);
+}
+const flowerTypes = [...flowerCounts.keys()].sort((a, b) => a.localeCompare(b, "es"));
+
+const rawMaxPrice = products.reduce((max: number, p: any) => {
   if (p.isQuote) return max;
   const prices: number[] = Object.values(p.sizes as Record<string, any>)
     .filter((s: any) => s !== null)
     .map((s: any) => s.total as number);
   return prices.length > 0 ? Math.max(max, ...prices) : max;
 }, 0);
+// El slider usa step=1000: si el máximo no es múltiplo de 1000 el navegador lo redondea
+// hacia abajo y deja fuera los ramos más caros. Se redondea hacia arriba.
+const PRICE_STEP = 1000;
+const maxCatalogPrice = Math.ceil(rawMaxPrice / PRICE_STEP) * PRICE_STEP;
+
+// Texto de búsqueda: nombre, categorías, tipos de flor y descripción (normalizado sin tildes).
+const normalize = (s: string) =>
+  s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+const searchText = (p: any) =>
+  normalize(
+    [p.name, ...(p.categories || []), ...(p.flowerType || []), p.Description || ""].join(" "),
+  );
+
+const sectionBtn = "w-full flex items-center justify-between mb-4";
+const sectionTitle = "text-sm font-semibold text-azul-profundo tracking-wide";
+const chevronClass = "text-grafito/40 transition-transform duration-200";
 ---
 
 <Layout title="Catálogo | Tapti">
-  <div class="max-w-7xl mx-auto px-4 py-12">
+  <div class="max-w-7xl mx-auto px-2 sm:px-4 py-8 md:py-12">
     <BoutiqueCard
       variant="services"
       size="large"
-      className="!h-auto min-h-[70vh] p-8"
+      className="!h-auto min-h-[70vh] md:p-8"
+      contentClassName="text-white !px-3 !py-6 sm:!p-6 md:!p-8 lg:!p-12"
+      disableAnimation={true}
     >
 
-    <h1 class="font-serif text-3xl md:text-4xl text-center text-azul-profundo mb-8">
+    <h1 class="font-serif text-3xl md:text-4xl text-center text-azul-profundo mb-6">
       Catálogo de Ramos
     </h1>
 
+    <!-- Buscador -->
+    <div class="max-w-xl w-full mx-auto mb-5">
+      <label for="catalog-search" class="sr-only">Buscar ramos</label>
+      <div class="relative">
+        <svg class="absolute left-4 top-1/2 -translate-y-1/2 text-grafito/40 pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" />
+        </svg>
+        <input
+          id="catalog-search"
+          type="search"
+          enterkeyhint="search"
+          autocomplete="off"
+          placeholder="Buscar ramos, flores u ocasiones…"
+          class="w-full bg-white border border-borde-claro rounded-full pl-11 pr-11 py-3 text-base text-grafito placeholder:text-grafito/40 focus:border-terracota focus:ring-2 focus:ring-terracota/20 outline-none transition [&::-webkit-search-cancel-button]:hidden"
+        />
+        <button
+          id="catalog-search-clear"
+          type="button"
+          aria-label="Borrar búsqueda"
+          class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center text-grafito/50 hover:text-azul-profundo hover:bg-marfil"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Categorías rápidas (chips) -->
+    {categories.length > 0 && (
+      <div class="-mx-3 sm:mx-0 mb-6">
+        <div
+          id="category-chips"
+          class="flex gap-2 overflow-x-auto px-3 sm:px-0 pb-2 sm:flex-wrap sm:justify-center sm:overflow-visible [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          role="group"
+          aria-label="Filtrar por categoría"
+        >
+          <button type="button" class="category-chip" data-chip="" aria-pressed="true">Todos</button>
+          {categories.map((cat) => (
+            <button type="button" class="category-chip" data-chip={cat} aria-pressed="false">
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+    )}
+
     <!-- Top bar -->
     <div class="border-b border-borde-claro mb-6">
-      <div class="max-w-screen-xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-y-2 relative">
+      <div class="max-w-screen-xl mx-auto px-1 md:px-6 py-3 flex flex-wrap items-center justify-between gap-y-2 relative">
 
         <!-- Filter toggle -->
-        <button id="toggle-sidebar"
-          class="flex items-center gap-1.5 text-grafito/70 hover:text-azul-profundo transition-colors text-sm">
+        <button id="toggle-sidebar" type="button" aria-controls="filter-panel" aria-expanded="false"
+          class="flex items-center gap-1.5 text-grafito/70 hover:text-azul-profundo transition-colors text-sm py-2">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
-            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="4" y1="6" x2="20" y2="6"/>
             <line x1="4" y1="12" x2="14" y2="12"/>
             <line x1="4" y1="18" x2="10" y2="18"/>
           </svg>
-          <span>Filtro</span>
+          <span>Filtros</span>
+          <span id="active-filter-count" class="hidden bg-terracota text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full items-center justify-center">0</span>
           <svg id="toggle-icon" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200">
+            stroke-linecap="round" stroke-linejoin="round" class="hidden lg:block transition-transform duration-200" aria-hidden="true">
             <polyline points="15 18 9 12 15 6"/>
           </svg>
         </button>
 
-        <!-- Product count (centrado en desktop, en su propia línea en mobile) -->
-        <span id="product-count"
+        <!-- Product count -->
+        <span id="product-count" aria-live="polite"
           class="order-3 w-full text-center md:order-none md:w-auto md:absolute md:left-1/2 md:-translate-x-1/2 text-sm text-grafito/60 pointer-events-none">
           {products.length} productos
         </span>
 
         <!-- Sort -->
         <div class="relative">
-          <button id="sort-toggle"
-            class="flex items-center gap-1 text-sm text-grafito/70 hover:text-azul-profundo transition-colors">
+          <button id="sort-toggle" type="button" aria-haspopup="true" aria-expanded="false"
+            class="flex items-center gap-1 text-sm text-grafito/70 hover:text-azul-profundo transition-colors py-2">
             <span id="sort-label">Más vendidos</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <polyline points="6 9 12 15 18 9"/>
             </svg>
           </button>
           <div id="sort-dropdown"
             class="hidden absolute right-0 top-full mt-2 bg-white border border-borde-claro rounded-lg shadow-2xl z-50 w-52 py-1">
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="default">Más vendidos</button>
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="price-asc">Precio: menor a mayor</button>
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="price-desc">Precio: mayor a menor</button>
-            <button class="sort-option block w-full text-left px-4 py-2 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="name">Nombre A-Z</button>
+            <button type="button" class="sort-option block w-full text-left px-4 py-2.5 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="default">Más vendidos</button>
+            <button type="button" class="sort-option block w-full text-left px-4 py-2.5 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="price-asc">Precio: menor a mayor</button>
+            <button type="button" class="sort-option block w-full text-left px-4 py-2.5 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="price-desc">Precio: mayor a menor</button>
+            <button type="button" class="sort-option block w-full text-left px-4 py-2.5 text-sm text-grafito hover:text-azul-profundo hover:bg-marfil transition-colors" data-sort="name">Nombre A-Z</button>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Body -->
-    <div class="max-w-screen-xl mx-auto px-6 flex gap-10">
+    <div class="max-w-screen-xl mx-auto md:px-6 flex gap-10">
 
-      <!-- Sidebar -->
-      <aside id="sidebar"
-        class="w-52 flex-shrink-0 hidden lg:block sticky top-28 self-start max-h-[calc(100vh-8rem)] overflow-y-auto pr-2">
-
-        <!-- Categoría -->
-        <div class="mb-8">
-          <button id="toggle-cat" class="w-full flex items-center justify-between mb-4">
-            <span class="text-sm font-semibold text-azul-profundo tracking-wide">Categoría</span>
-            <svg id="cat-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round"
-              class="text-grafito/40 transition-transform duration-200">
-              <polyline points="18 15 12 9 6 15"/>
-            </svg>
-          </button>
-          <div id="cat-list" class="space-y-2.5">
-            {categories.map(cat => (
-              <label class="flex items-center gap-2.5 cursor-pointer group">
-                <input type="checkbox" class="category-filter w-3.5 h-3.5 rounded-sm border border-borde-claro bg-white cursor-pointer accent-terracota" value={cat} />
-                <span class="text-sm text-grafito/70 group-hover:text-azul-profundo transition-colors leading-tight">{cat}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <!-- Tipo de flor -->
-        <div class="mb-8">
-          <button id="toggle-flower" class="w-full flex items-center justify-between mb-4">
-            <span class="text-sm font-semibold text-azul-profundo tracking-wide">Tipo de flor</span>
-            <svg id="flower-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round"
-              class="text-grafito/40 transition-transform duration-200">
-              <polyline points="18 15 12 9 6 15"/>
-            </svg>
-          </button>
-          <div id="flower-list" class="space-y-2.5">
-            {flowerTypes.map(flower => (
-              <label class="flex items-center gap-2.5 cursor-pointer group">
-                <input type="checkbox" class="flower-filter w-3.5 h-3.5 rounded-sm border border-borde-claro bg-white cursor-pointer accent-terracota" value={flower} />
-                <span class="text-sm text-grafito/70 group-hover:text-azul-profundo transition-colors leading-tight">{flower}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        <!-- Precio -->
-        <div class="mb-8">
-          <button id="toggle-price" class="w-full flex items-center justify-between mb-4">
-            <span class="text-sm font-semibold text-azul-profundo tracking-wide">Precio</span>
-            <svg id="price-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13"
-              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-              stroke-linecap="round" stroke-linejoin="round"
-              class="text-grafito/40 transition-transform duration-200">
-              <polyline points="18 15 12 9 6 15"/>
-            </svg>
-          </button>
-          <div id="price-list">
-            <!-- Min/Max inputs -->
-            <div class="flex gap-2 mb-4">
-              <div class="flex-1 bg-white border border-borde-claro rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
-                <span class="text-grafito/50 text-xs flex-shrink-0">$</span>
-                <input type="number" id="price-min-input" value="0"
-                  class="w-full bg-transparent text-grafito text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
-              </div>
-              <div class="flex-1 bg-white border border-borde-claro rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
-                <span class="text-grafito/50 text-xs flex-shrink-0">$</span>
-                <input type="number" id="price-max-input" value={maxCatalogPrice}
-                  class="w-full bg-transparent text-grafito text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
-              </div>
-            </div>
-            <!-- Dual range slider -->
-            <div id="price-slider-wrap" class="relative h-5" data-max={maxCatalogPrice}>
-              <div class="absolute top-1/2 -translate-y-1/2 w-full h-[3px] bg-borde-claro rounded-full">
-                <div id="range-fill" class="absolute h-full bg-terracota rounded-full" style="left:0%;right:0%"></div>
-              </div>
-              <input type="range" id="price-range-min" class="price-range"
-                min="0" max={maxCatalogPrice} value="0" step="1000" />
-              <input type="range" id="price-range-max" class="price-range"
-                min="0" max={maxCatalogPrice} value={maxCatalogPrice} step="1000" />
+      <!-- Sidebar (escritorio). En pantallas < lg el panel de filtros se mueve a un cajón lateral. -->
+      <aside id="sidebar-slot"
+        class="w-52 flex-shrink-0 hidden lg:block self-start pr-2">
+        <div id="filter-panel">
+          <!-- Categoría -->
+          <div class="mb-8">
+            <button id="toggle-cat" type="button" class={sectionBtn} aria-expanded="true">
+              <span class={sectionTitle}>Categoría</span>
+              <svg id="cat-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class={chevronClass} aria-hidden="true">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+            </button>
+            <div id="cat-list" class="space-y-1">
+              {categories.map(cat => (
+                <label class="flex items-center gap-2.5 cursor-pointer group py-1">
+                  <input type="checkbox" class="category-filter w-4 h-4 lg:w-3.5 lg:h-3.5 rounded-sm border border-borde-claro bg-white cursor-pointer accent-terracota" value={cat} />
+                  <span class="text-sm text-grafito/70 group-hover:text-azul-profundo transition-colors leading-tight flex-1">{cat}</span>
+                  <span class="text-xs text-grafito/40">{categoryCounts.get(cat)}</span>
+                </label>
+              ))}
             </div>
           </div>
+
+          <!-- Tipo de flor -->
+          {flowerTypes.length > 0 && (
+            <div class="mb-8">
+              <button id="toggle-flower" type="button" class={sectionBtn} aria-expanded="true">
+                <span class={sectionTitle}>Tipo de flor</span>
+                <svg id="flower-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class={chevronClass} aria-hidden="true">
+                  <polyline points="18 15 12 9 6 15"/>
+                </svg>
+              </button>
+              <div id="flower-list" class="space-y-1">
+                {flowerTypes.map(flower => (
+                  <label class="flex items-center gap-2.5 cursor-pointer group py-1">
+                    <input type="checkbox" class="flower-filter w-4 h-4 lg:w-3.5 lg:h-3.5 rounded-sm border border-borde-claro bg-white cursor-pointer accent-terracota" value={flower} />
+                    <span class="text-sm text-grafito/70 group-hover:text-azul-profundo transition-colors leading-tight flex-1">{flower}</span>
+                    <span class="text-xs text-grafito/40">{flowerCounts.get(flower)}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <!-- Precio -->
+          <div class="mb-8">
+            <button id="toggle-price" type="button" class={sectionBtn} aria-expanded="true">
+              <span class={sectionTitle}>Precio</span>
+              <svg id="price-chevron" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class={chevronClass} aria-hidden="true">
+                <polyline points="18 15 12 9 6 15"/>
+              </svg>
+            </button>
+            <div id="price-list">
+              <div class="flex gap-2 mb-4">
+                <div class="flex-1 bg-white border border-borde-claro rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
+                  <span class="text-grafito/50 text-xs flex-shrink-0">$</span>
+                  <input type="number" id="price-min-input" value="0" min="0" max={maxCatalogPrice} inputmode="numeric" aria-label="Precio mínimo"
+                    class="w-full bg-transparent text-grafito text-sm lg:text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
+                </div>
+                <div class="flex-1 bg-white border border-borde-claro rounded px-2 py-1.5 flex items-center gap-0.5 min-w-0">
+                  <span class="text-grafito/50 text-xs flex-shrink-0">$</span>
+                  <input type="number" id="price-max-input" value={maxCatalogPrice} min="0" max={maxCatalogPrice} inputmode="numeric" aria-label="Precio máximo"
+                    class="w-full bg-transparent text-grafito text-sm lg:text-xs focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none min-w-0" />
+                </div>
+              </div>
+              <div id="price-slider-wrap" class="relative h-6" data-max={maxCatalogPrice}>
+                <div class="absolute top-1/2 -translate-y-1/2 w-full h-[3px] bg-borde-claro rounded-full">
+                  <div id="range-fill" class="absolute h-full bg-terracota rounded-full" style="left:0%;right:0%"></div>
+                </div>
+                <input type="range" id="price-range-min" class="price-range" aria-label="Precio mínimo"
+                  min="0" max={maxCatalogPrice} value="0" step={PRICE_STEP} />
+                <input type="range" id="price-range-max" class="price-range" aria-label="Precio máximo"
+                  min="0" max={maxCatalogPrice} value={maxCatalogPrice} step={PRICE_STEP} />
+              </div>
+            </div>
+          </div>
+
+          <button id="clear-filters" type="button"
+            class="hidden w-full text-sm text-terracota hover:text-terracota-hover underline underline-offset-2 py-2">
+            Limpiar filtros
+          </button>
         </div>
       </aside>
 
       <!-- Grid -->
       <main class="flex-1 min-w-0">
         <div id="catalog-grid"
-          class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-5 gap-y-10">
-          {products.map((product: any) => {
+          class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-7 md:gap-x-5 md:gap-y-10">
+          {products.map((product: any, index: number) => {
             const startingPrice = getStartingPrice(product);
             const slug = slugify(product.name);
             return (
               <a
                 href={`/producto/${slug}`}
                 class="catalog-item group block"
+                data-index={index}
                 data-category={(product.categories || []).join('|')}
-                data-flower={(product.flowerType || []).join(',')}
+                data-flower={(product.flowerType || []).join('|')}
                 data-price={startingPrice ?? 0}
                 data-name={product.name.toLowerCase()}
+                data-search={searchText(product)}
               >
-                <!-- Image carousel -->
                 <div
                   class="relative aspect-square overflow-hidden rounded-sm bg-marfil border border-borde-claro group/carousel"
                   data-images={JSON.stringify(
@@ -209,13 +294,11 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
                       loading="lazy"
                     />
                   </div>
-                  <!-- Dots indicator -->
                   <div class="absolute bottom-2 left-0 right-0 flex justify-center gap-1 opacity-0 group-hover/carousel:opacity-100 transition-opacity pointer-events-none">
                     <div class="w-1.5 h-1.5 rounded-full bg-white shadow"></div>
                     <div class="w-1.5 h-1.5 rounded-full bg-white/40 shadow"></div>
                   </div>
                 </div>
-                <!-- Info -->
                 <div class="mt-2.5 px-0.5">
                   <p class="text-sm text-cyan-950 leading-snug">{product.name}</p>
                   {startingPrice != null ? (
@@ -231,12 +314,45 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
           })}
         </div>
 
-        <p id="no-results" class="hidden text-center py-24 text-grafito/40 text-sm">
-          No hay productos que coincidan con los filtros.
-        </p>
+        <div id="no-results" class="hidden text-center py-20">
+          <p class="text-grafito/60 text-sm mb-4">No hay productos que coincidan con tu búsqueda o filtros.</p>
+          <button id="no-results-clear" type="button"
+            class="px-5 py-2.5 rounded-full bg-terracota text-white text-sm hover:bg-terracota-hover transition">
+            Ver todo el catálogo
+          </button>
+        </div>
       </main>
     </div>
     </BoutiqueCard>
+  </div>
+
+  <!-- Cajón de filtros para celular/tablet. Está fuera de BoutiqueCard porque su
+       backdrop-blur y overflow-hidden rompen los elementos con position: fixed. -->
+  <div id="filter-drawer" class="filter-drawer lg:hidden fixed inset-0 z-50" aria-hidden="true">
+    <div id="filter-drawer-backdrop" class="absolute inset-0 bg-azul-profundo/40"></div>
+    <div
+      class="filter-drawer-panel absolute inset-y-0 left-0 w-[86%] max-w-sm bg-marfil shadow-2xl flex flex-col"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="filter-drawer-title"
+    >
+      <div class="flex items-center justify-between px-5 h-16 border-b border-borde-claro flex-shrink-0">
+        <h2 id="filter-drawer-title" class="font-serif text-xl text-azul-profundo">Filtros</h2>
+        <button id="filter-drawer-close" type="button" aria-label="Cerrar filtros"
+          class="w-10 h-10 -mr-2 rounded-full flex items-center justify-center text-azul-profundo active:bg-terracota/10">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+      </div>
+      <div id="drawer-slot" class="flex-1 overflow-y-auto px-5 py-5 overscroll-contain"></div>
+      <div class="p-4 border-t border-borde-claro flex-shrink-0">
+        <button id="filter-drawer-apply" type="button"
+          class="w-full py-3.5 rounded-xl bg-terracota text-white font-semibold hover:bg-terracota-hover transition">
+          Ver <span id="drawer-count">{products.length}</span> productos
+        </button>
+      </div>
+    </div>
   </div>
 </Layout>
 
@@ -258,8 +374,8 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
     -webkit-appearance: none;
     appearance: none;
     pointer-events: all;
-    width: 15px;
-    height: 15px;
+    width: 18px;
+    height: 18px;
     background: #D97A6A;
     border-radius: 50%;
     cursor: pointer;
@@ -267,31 +383,87 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
   }
   input[type='range'].price-range::-moz-range-thumb {
     pointer-events: all;
-    width: 15px;
-    height: 15px;
+    width: 18px;
+    height: 18px;
     background: #D97A6A;
     border-radius: 50%;
     cursor: pointer;
     border: none;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   }
+
+  .category-chip {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    border: 1px solid #DCE3EA;
+    background: rgba(255, 255, 255, 0.85);
+    color: #27485A;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  }
+  .category-chip:hover {
+    border-color: #D97A6A;
+  }
+  .category-chip[aria-pressed='true'] {
+    background: #D97A6A;
+    border-color: #D97A6A;
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .filter-drawer {
+    visibility: hidden;
+    transition: visibility 0s linear 0.3s;
+  }
+  .filter-drawer > #filter-drawer-backdrop {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .filter-drawer-panel {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+  .filter-drawer.is-open {
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .filter-drawer.is-open > #filter-drawer-backdrop {
+    opacity: 1;
+  }
+  .filter-drawer.is-open .filter-drawer-panel {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .filter-drawer,
+    .filter-drawer > #filter-drawer-backdrop,
+    .filter-drawer-panel {
+      transition: none;
+    }
+  }
 </style>
 
 <script>
+  const normalize = (s: string) =>
+    s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().trim();
+
   document.addEventListener('astro:page-load', () => {
+    const grid = document.getElementById('catalog-grid');
+    if (!grid) return; // no estamos en el catálogo
 
-    // --- Sidebar toggle ---
-    const sidebar = document.getElementById('sidebar');
-    const toggleIcon = document.getElementById('toggle-icon');
-    let sidebarOpen = window.innerWidth >= 1024;
+    const countEl = document.getElementById('product-count');
+    const drawerCount = document.getElementById('drawer-count');
+    const noResults = document.getElementById('no-results');
+    const activeCountEl = document.getElementById('active-filter-count');
+    const clearBtn = document.getElementById('clear-filters');
+    const searchInput = document.getElementById('catalog-search') as HTMLInputElement | null;
+    const searchClear = document.getElementById('catalog-search-clear');
+    const chips = Array.from(document.querySelectorAll<HTMLButtonElement>('.category-chip'));
+    const catBoxes = () => Array.from(document.querySelectorAll<HTMLInputElement>('.category-filter'));
+    const flowerBoxes = () => Array.from(document.querySelectorAll<HTMLInputElement>('.flower-filter'));
 
-    document.getElementById('toggle-sidebar')?.addEventListener('click', () => {
-      sidebarOpen = !sidebarOpen;
-      sidebar?.classList.toggle('hidden', !sidebarOpen);
-      toggleIcon?.classList.toggle('rotate-180', !sidebarOpen);
-    });
-
-    // --- Price range dual slider ---
+    // --- Precio ---
     const wrap = document.getElementById('price-slider-wrap');
     const maxPrice = parseInt(wrap?.dataset.max || '0');
     const rMin = document.getElementById('price-range-min') as HTMLInputElement;
@@ -308,62 +480,121 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
       fill.style.right = (((maxPrice - hi) / maxPrice) * 100) + '%';
     }
 
-    // --- Filter ---
-    const grid = document.getElementById('catalog-grid');
-    const countEl = document.getElementById('product-count');
-    const noResults = document.getElementById('no-results');
+    const clampPrice = (v: number) => Math.min(Math.max(Number.isFinite(v) ? v : 0, 0), maxPrice);
 
+    // --- Filtrado ---
     function applyFilters() {
-      const selectedCats = Array.from(
-        document.querySelectorAll<HTMLInputElement>('.category-filter:checked')
-      ).map(cb => cb.value);
-
-      const selectedFlowers = Array.from(
-        document.querySelectorAll<HTMLInputElement>('.flower-filter:checked')
-      ).map(cb => cb.value);
-
+      const selectedCats = catBoxes().filter(cb => cb.checked).map(cb => cb.value);
+      const selectedFlowers = flowerBoxes().filter(cb => cb.checked).map(cb => cb.value);
+      const terms = normalize(searchInput?.value || '').split(/\s+/).filter(Boolean);
       const lo = parseInt(rMin?.value || '0');
-      const hi = parseInt(rMax?.value || maxPrice.toString());
+      const hi = parseInt(rMax?.value || String(maxPrice));
+      const priceActive = lo > 0 || hi < maxPrice;
 
       let visible = 0;
-      grid?.querySelectorAll<HTMLElement>('.catalog-item').forEach(item => {
+      grid!.querySelectorAll<HTMLElement>('.catalog-item').forEach(item => {
         const cats = (item.dataset.category || '').split('|').filter(Boolean);
-        const flowers = (item.dataset.flower || '').split(',').filter(Boolean);
+        const flowers = (item.dataset.flower || '').split('|').filter(Boolean);
         const price = parseInt(item.dataset.price || '0');
+        const haystack = item.dataset.search || '';
         const isQuote = price === 0;
 
         const catOk = selectedCats.length === 0 || selectedCats.some(c => cats.includes(c));
         const flowerOk = selectedFlowers.length === 0 || flowers.some(f => selectedFlowers.includes(f));
-        const priceOk = isQuote || (price >= lo && price <= hi);
+        // Los productos "a cotizar" no tienen precio: se ocultan solo si se acotó el rango.
+        const priceOk = isQuote ? !priceActive : price >= lo && price <= hi;
+        const searchOk = terms.every(t => haystack.includes(t));
 
-        const show = catOk && flowerOk && priceOk;
+        const show = catOk && flowerOk && priceOk && searchOk;
         item.style.display = show ? '' : 'none';
         if (show) visible++;
       });
 
-      if (countEl) countEl.textContent = `${visible} productos`;
+      const label = `${visible} ${visible === 1 ? 'producto' : 'productos'}`;
+      if (countEl) countEl.textContent = label;
+      if (drawerCount) drawerCount.textContent = String(visible);
       noResults?.classList.toggle('hidden', visible > 0);
+
+      // Chips sincronizados con las casillas de categoría.
+      chips.forEach(chip => {
+        const value = chip.dataset.chip || '';
+        const pressed = value === '' ? selectedCats.length === 0 : selectedCats.includes(value);
+        chip.setAttribute('aria-pressed', String(pressed));
+      });
+
+      const activeCount = selectedCats.length + selectedFlowers.length + (priceActive ? 1 : 0);
+      if (activeCountEl) {
+        activeCountEl.textContent = String(activeCount);
+        activeCountEl.classList.toggle('hidden', activeCount === 0);
+        activeCountEl.classList.toggle('inline-flex', activeCount > 0);
+      }
+      clearBtn?.classList.toggle('hidden', activeCount === 0);
+      searchClear?.classList.toggle('hidden', !searchInput?.value);
+    }
+
+    function clearFilters({ keepSearch = true } = {}) {
+      catBoxes().forEach(cb => (cb.checked = false));
+      flowerBoxes().forEach(cb => (cb.checked = false));
+      if (rMin) rMin.value = '0';
+      if (rMax) rMax.value = String(maxPrice);
+      if (iMin) iMin.value = '0';
+      if (iMax) iMax.value = String(maxPrice);
+      if (!keepSearch && searchInput) searchInput.value = '';
+      updateFill();
+      applyFilters();
     }
 
     document.querySelectorAll('.category-filter, .flower-filter').forEach(cb =>
       cb.addEventListener('change', applyFilters)
     );
 
-    // --- Preselección de filtro de flor vía query param (?flor=tulipanes) ---
-    const flowerParam = new URLSearchParams(window.location.search).get('flor');
-    if (flowerParam) {
-      document.querySelectorAll<HTMLInputElement>('.flower-filter').forEach(cb => {
-        if (cb.value.toLowerCase() === flowerParam.toLowerCase()) cb.checked = true;
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const value = chip.dataset.chip || '';
+        const boxes = catBoxes();
+        if (value === '') {
+          boxes.forEach(cb => (cb.checked = false));
+        } else {
+          const box = boxes.find(cb => cb.value === value);
+          if (box) box.checked = !box.checked;
+        }
+        applyFilters();
       });
-    }
+    });
 
-    // --- Preselección de filtro de categoría vía query param (?categoria=Nacimientos) ---
-    const categoriaParam = new URLSearchParams(window.location.search).get('categoria');
-    if (categoriaParam) {
-      document.querySelectorAll<HTMLInputElement>('.category-filter').forEach(cb => {
-        if (cb.value.toLowerCase() === categoriaParam.toLowerCase()) cb.checked = true;
+    clearBtn?.addEventListener('click', () => clearFilters());
+    document.getElementById('no-results-clear')?.addEventListener('click', () => clearFilters({ keepSearch: false }));
+
+    // --- Buscador ---
+    let searchTimer: ReturnType<typeof setTimeout>;
+    searchInput?.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(applyFilters, 150);
+    });
+    searchInput?.addEventListener('keydown', e => {
+      if (e.key === 'Enter') searchInput.blur(); // cierra el teclado en celular
+    });
+    searchClear?.addEventListener('click', () => {
+      if (searchInput) { searchInput.value = ''; searchInput.focus(); }
+      applyFilters();
+    });
+
+    // --- Preselección vía query params (?flor=, ?categoria=, ?q=) ---
+    const params = new URLSearchParams(window.location.search);
+    const flowerParam = params.get('flor');
+    if (flowerParam) {
+      flowerBoxes().forEach(cb => {
+        if (normalize(cb.value) === normalize(flowerParam)) cb.checked = true;
       });
     }
+    const categoriaParam = params.get('categoria');
+    if (categoriaParam) {
+      catBoxes().forEach(cb => {
+        if (normalize(cb.value) === normalize(categoriaParam)) cb.checked = true;
+      });
+    }
+    const qParam = params.get('q');
+    if (qParam && searchInput) searchInput.value = qParam;
 
     rMin?.addEventListener('input', () => {
       if (parseInt(rMin.value) > parseInt(rMax.value)) rMin.value = rMax.value;
@@ -371,64 +602,132 @@ const maxCatalogPrice = products.reduce((max: number, p: any) => {
       updateFill();
       applyFilters();
     });
-
     rMax?.addEventListener('input', () => {
       if (parseInt(rMax.value) < parseInt(rMin.value)) rMax.value = rMin.value;
       if (iMax) iMax.value = rMax.value;
       updateFill();
       applyFilters();
     });
-
     iMin?.addEventListener('change', () => {
-      if (rMin) { rMin.value = iMin.value; updateFill(); applyFilters(); }
+      const v = Math.min(clampPrice(parseInt(iMin.value)), parseInt(rMax.value));
+      iMin.value = String(v);
+      rMin.value = String(v);
+      updateFill();
+      applyFilters();
     });
     iMax?.addEventListener('change', () => {
-      if (rMax) { rMax.value = iMax.value; updateFill(); applyFilters(); }
+      const v = Math.max(clampPrice(parseInt(iMax.value || String(maxPrice))), parseInt(rMin.value));
+      iMax.value = String(v);
+      rMax.value = String(v);
+      updateFill();
+      applyFilters();
     });
 
-    // --- Sort ---
+    // --- Orden ---
     const sortDropdown = document.getElementById('sort-dropdown');
     const sortLabel = document.getElementById('sort-label');
+    const sortToggle = document.getElementById('sort-toggle');
 
-    document.getElementById('sort-toggle')?.addEventListener('click', e => {
+    const setSortOpen = (open: boolean) => {
+      sortDropdown?.classList.toggle('hidden', !open);
+      sortToggle?.setAttribute('aria-expanded', String(open));
+    };
+    sortToggle?.addEventListener('click', e => {
       e.stopPropagation();
-      sortDropdown?.classList.toggle('hidden');
+      setSortOpen(sortDropdown?.classList.contains('hidden') ?? false);
     });
-    document.addEventListener('click', () => sortDropdown?.classList.add('hidden'));
+    document.addEventListener('click', () => setSortOpen(false));
 
     document.querySelectorAll('.sort-option').forEach(btn => {
       btn.addEventListener('click', () => {
         const sortType = (btn as HTMLElement).dataset.sort;
         if (sortLabel) sortLabel.textContent = btn.textContent?.trim() || '';
-        sortDropdown?.classList.add('hidden');
-        if (!grid) return;
+        setSortOpen(false);
 
         const items = Array.from(grid.querySelectorAll<HTMLElement>('.catalog-item'));
+        const idx = (el: HTMLElement) => parseInt(el.dataset.index || '0');
+        // Los productos "a cotizar" (precio 0) van al final al ordenar por precio.
+        const priceOf = (el: HTMLElement, empty: number) => parseInt(el.dataset.price || '0') || empty;
         items.sort((a, b) => {
-          const pa = parseInt(a.dataset.price || '0');
-          const pb = parseInt(b.dataset.price || '0');
-          if (sortType === 'price-asc') return pa - pb;
-          if (sortType === 'price-desc') return pb - pa;
-          if (sortType === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '');
-          return 0;
+          if (sortType === 'price-asc') return priceOf(a, Infinity) - priceOf(b, Infinity) || idx(a) - idx(b);
+          if (sortType === 'price-desc') return priceOf(b, -Infinity) - priceOf(a, -Infinity) || idx(a) - idx(b);
+          if (sortType === 'name') return (a.dataset.name || '').localeCompare(b.dataset.name || '', 'es');
+          return idx(a) - idx(b); // "Más vendidos" = orden original
         });
         items.forEach(item => grid.appendChild(item));
         applyFilters();
       });
     });
 
-    // --- Collapsible sections ---
+    // --- Secciones plegables ---
     function setupSection(btnId: string, listId: string, chevronId: string) {
-      document.getElementById(btnId)?.addEventListener('click', () => {
-        document.getElementById(listId)?.classList.toggle('hidden');
-        document.getElementById(chevronId)?.classList.toggle('rotate-180');
+      const btn = document.getElementById(btnId);
+      btn?.addEventListener('click', () => {
+        const hidden = document.getElementById(listId)?.classList.toggle('hidden');
+        document.getElementById(chevronId)?.classList.toggle('rotate-180', hidden);
+        btn.setAttribute('aria-expanded', String(!hidden));
       });
     }
     setupSection('toggle-cat', 'cat-list', 'cat-chevron');
     setupSection('toggle-flower', 'flower-list', 'flower-chevron');
     setupSection('toggle-price', 'price-list', 'price-chevron');
 
-    // --- Carousel on hover ---
+    // --- Panel de filtros: barra lateral en escritorio, cajón en celular/tablet ---
+    const panel = document.getElementById('filter-panel');
+    const sidebarSlot = document.getElementById('sidebar-slot');
+    const drawerSlot = document.getElementById('drawer-slot');
+    const drawer = document.getElementById('filter-drawer');
+    const toggleBtn = document.getElementById('toggle-sidebar');
+    const toggleIcon = document.getElementById('toggle-icon');
+    const desktopMq = window.matchMedia('(min-width: 1024px)');
+    let sidebarOpen = true;
+
+    function placePanel() {
+      if (!panel) return;
+      const target = desktopMq.matches ? sidebarSlot : drawerSlot;
+      if (target && panel.parentElement !== target) target.appendChild(panel);
+      if (desktopMq.matches) setDrawer(false);
+      toggleBtn?.setAttribute('aria-expanded', String(desktopMq.matches ? sidebarOpen : drawer?.classList.contains('is-open')));
+    }
+
+    function setDrawer(open: boolean) {
+      if (!drawer) return;
+      const wasOpen = drawer.classList.contains('is-open');
+      drawer.classList.toggle('is-open', open);
+      drawer.setAttribute('aria-hidden', String(!open));
+      toggleBtn?.setAttribute('aria-expanded', String(open));
+      if (open !== wasOpen) document.documentElement.style.overflow = open ? 'hidden' : '';
+      if (open) document.getElementById('filter-drawer-close')?.focus();
+      else if (wasOpen) toggleBtn?.focus();
+    }
+
+    toggleBtn?.addEventListener('click', () => {
+      if (desktopMq.matches) {
+        sidebarOpen = !sidebarOpen;
+        sidebarSlot?.classList.toggle('lg:block', sidebarOpen);
+        toggleIcon?.classList.toggle('rotate-180', !sidebarOpen);
+        toggleBtn.setAttribute('aria-expanded', String(sidebarOpen));
+      } else {
+        setDrawer(true);
+      }
+    });
+    document.getElementById('filter-drawer-close')?.addEventListener('click', () => setDrawer(false));
+    document.getElementById('filter-drawer-apply')?.addEventListener('click', () => {
+      setDrawer(false);
+      grid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    document.getElementById('filter-drawer-backdrop')?.addEventListener('click', () => setDrawer(false));
+    drawer?.addEventListener('keydown', e => {
+      if (e.key === 'Escape') setDrawer(false);
+    });
+    desktopMq.addEventListener('change', placePanel);
+    document.addEventListener('astro:before-swap', () => {
+      desktopMq.removeEventListener('change', placePanel);
+      setDrawer(false);
+    }, { once: true });
+    placePanel();
+
+    // --- Carrusel al pasar el mouse ---
     document.querySelectorAll<HTMLElement>('.group\\/carousel').forEach(carousel => {
       const track = carousel.querySelector<HTMLElement>('.carousel-track');
       let timer: ReturnType<typeof setInterval>;

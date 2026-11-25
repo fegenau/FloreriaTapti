@@ -7,10 +7,16 @@ import {
   INSTAGRAM_USERNAME,
   getContestDrawInfo,
 } from "../data/promotions";
-import { isContestEnabled } from "../lib/banner";
+import { fillBannerText, getBannerConfig } from "../lib/banner";
 
-const contestEnabled = await isContestEnabled();
+const banner = await getBannerConfig();
+const contestEnabled = banner.concurso.enabled;
 const { monthName, drawDateLabel } = getContestDrawInfo();
+const basesText = fillBannerText(banner.concurso.bases, {
+  monthName,
+  drawDateLabel,
+  instagramUsername: INSTAGRAM_USERNAME,
+}).trim();
 
 const inputClass =
   "w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-white/40 focus:border-terracota outline-none transition-colors";
@@ -18,7 +24,7 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
 ---
 
 <Layout title="Concurso: ramo sorpresa — Tapti">
-  <div class="min-h-screen pt-24 pb-12 px-4 space-y-8">
+  <div class="min-h-screen pt-4 md:pt-24 pb-12 px-4 space-y-8">
     {contestEnabled ? (
       <>
     {/* Encabezado del concurso */}
@@ -109,10 +115,26 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
           <label>No llenar <input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
         </div>
 
+        {basesText && (
+          <details id="contest-bases" class="group rounded-xl border border-white/10 bg-white/5">
+            <summary class="cursor-pointer list-none flex items-center justify-between gap-3 px-4 py-3 text-sm font-medium text-gray-200 [&::-webkit-details-marker]:hidden">
+              Bases del concurso de {monthName}
+              <svg class="transition-transform group-open:rotate-180" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </summary>
+            <div class="px-4 pb-4 text-sm text-gray-300 whitespace-pre-line leading-relaxed max-h-72 overflow-y-auto">{basesText}</div>
+          </details>
+        )}
+
         <label class="flex items-start gap-3 text-sm text-gray-300">
           <input type="checkbox" name="acceptTerms" required class="mt-1 accent-terracota" />
           <span>
-            Acepto las bases: un ganador por mes, sorteo el último día del mes, entrega dentro de nuestra zona de despacho.
+            {basesText ? (
+              <>Acepto las <a href="#contest-bases" id="open-bases" class="underline hover:text-white">bases del concurso</a>.</>
+            ) : (
+              <>Acepto las bases: un ganador por mes, sorteo el último día del mes, entrega dentro de nuestra zona de despacho.</>
+            )}
             Acepto la <a href="/politica-de-privacidad" class="underline hover:text-white">política de privacidad</a>.
           </span>
         </label>
@@ -179,6 +201,15 @@ const labelClass = "block text-sm font-medium text-gray-300 mb-2";
     const status = document.getElementById("contest-status") as HTMLParagraphElement;
     const success = document.getElementById("contest-success") as HTMLDivElement;
     const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+    // El link "bases del concurso" abre el desplegable de bases.
+    document.getElementById("open-bases")?.addEventListener("click", (e) => {
+      const details = document.getElementById("contest-bases") as HTMLDetailsElement | null;
+      if (!details) return;
+      e.preventDefault();
+      details.open = true;
+      details.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
 
     const showStatus = (msg: string) => {
       status.textContent = msg;

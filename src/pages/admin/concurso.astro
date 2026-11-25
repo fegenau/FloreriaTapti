@@ -1,0 +1,156 @@
+---
+import LayoutAdmin from "../../components/LayoutAdmin.astro";
+import { getAuthUser, isAdminEmail } from "../../lib/auth";
+import { getContestDrawInfo } from "../../data/promotions";
+import {
+  formatChileDateTime,
+  formatPlainDate,
+  isValidPeriod,
+  listContestEntries,
+  listContestPeriods,
+  periodLabel,
+  type ContestEntry,
+} from "../../lib/contestEntries";
+
+const user = await getAuthUser(Astro.cookies);
+if (!user || !isAdminEmail(user.email)) {
+  return Astro.redirect("/login");
+}
+
+const currentPeriod = getContestDrawInfo().periodKey;
+const requested = Astro.url.searchParams.get("periodo");
+const period = isValidPeriod(requested) ? requested : currentPeriod;
+
+let periods: string[] = [];
+let entries: ContestEntry[] = [];
+let loadError: string | null = null;
+try {
+  [periods, entries] = await Promise.all([listContestPeriods(), listContestEntries(period)]);
+} catch (error) {
+  console.error("Admin concurso: error leyendo participaciones:", error);
+  loadError = "No se pudieron cargar las participaciones. Intenta recargar la página.";
+}
+// El mes en curso y el seleccionado siempre aparecen en el selector, aunque no tengan inscritos.
+const periodOptions = [...new Set([currentPeriod, period, ...periods])].sort().reverse();
+---
+
+<LayoutAdmin title="Participantes del concurso | Tapti">
+  <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
+    <div class="border-b border-gray-200 bg-white shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-6 flex flex-wrap gap-4 justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-grafito">Participantes del concurso</h1>
+          <p class="text-gray-600 text-sm">Bienvenido, {user.email}</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <a href="/admin" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Catálogo</a>
+          <a href="/admin/banner" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Banner y bases</a>
+          <a href="/admin/reportes" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Reportes</a>
+          <a href="/api/auth/logout" class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition">
+            Cerrar Sesión
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 flex flex-wrap items-end gap-4 justify-between">
+        <form method="get" class="flex items-end gap-3" id="period-form">
+          <div>
+            <label for="periodo" class="block text-sm font-medium text-gray-700 mb-1">Mes del sorteo</label>
+            <select
+              id="periodo"
+              name="periodo"
+              class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:border-rose-400 outline-none"
+            >
+              {periodOptions.map((p) => (
+                <option value={p} selected={p === period}>
+                  {periodLabel(p)}{p === currentPeriod ? " (actual)" : ""}
+                </option>
+              ))}
+            </select>
+          </div>
+          <noscript><button class="px-4 py-2 border rounded-lg text-sm">Ver</button></noscript>
+        </form>
+
+        <div class="flex items-center gap-4">
+          <p class="text-sm text-gray-600">
+            <strong class="text-grafito text-lg">{entries.length}</strong>
+            {entries.length === 1 ? " participante" : " participantes"}
+          </p>
+          <a
+            href={`/api/contest-entries?period=${period}`}
+            class:list={[
+              "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition",
+              entries.length > 0
+                ? "bg-emerald-600 text-white hover:bg-emerald-700"
+                : "bg-gray-200 text-gray-500 pointer-events-none",
+            ]}
+            aria-disabled={entries.length === 0 ? "true" : undefined}
+            download
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+            Descargar Excel
+          </a>
+        </div>
+      </div>
+
+      {loadError && (
+        <p class="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm">{loadError}</p>
+      )}
+
+      {!loadError && entries.length === 0 && (
+        <p class="bg-white rounded-xl border border-gray-200 px-4 py-12 text-center text-gray-500">
+          Aún no hay participantes en {periodLabel(period)}.
+        </p>
+      )}
+
+      {entries.length > 0 && (
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-gray-50 text-gray-600 text-left">
+              <tr>
+                <th class="px-3 py-3 font-medium">N°</th>
+                <th class="px-3 py-3 font-medium whitespace-nowrap">Inscripción</th>
+                <th class="px-3 py-3 font-medium">Nombre</th>
+                <th class="px-3 py-3 font-medium">Contacto</th>
+                <th class="px-3 py-3 font-medium whitespace-nowrap">Fecha importante</th>
+                <th class="px-3 py-3 font-medium">Motivo</th>
+                <th class="px-3 py-3 font-medium min-w-[280px]">¿Por qué debería ganar?</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 align-top">
+              {entries.map((e, i) => (
+                <tr class="hover:bg-rose-50/40">
+                  <td class="px-3 py-3 text-gray-500">{i + 1}</td>
+                  <td class="px-3 py-3 whitespace-nowrap text-gray-600">{formatChileDateTime(e.created_at) || "—"}</td>
+                  <td class="px-3 py-3 font-medium text-grafito">{e.name}</td>
+                  <td class="px-3 py-3">
+                    <a href={`mailto:${e.email}`} class="block text-rose-600 hover:underline">{e.email}</a>
+                    <span class="block text-gray-600">{e.phone}</span>
+                    {e.instagram && (
+                      <a href={`https://www.instagram.com/${e.instagram}`} target="_blank" rel="noopener noreferrer" class="block text-gray-500 hover:underline">
+                        @{e.instagram}
+                      </a>
+                    )}
+                  </td>
+                  <td class="px-3 py-3 whitespace-nowrap text-gray-600">{formatPlainDate(e.important_date) || "—"}</td>
+                  <td class="px-3 py-3 text-gray-600">{e.motive}</td>
+                  <td class="px-3 py-3 text-gray-700 whitespace-pre-line">{e.reason}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  </div>
+</LayoutAdmin>
+
+<script>
+  // Cambiar de mes recarga la página con ese periodo.
+  const select = document.getElementById("periodo") as HTMLSelectElement | null;
+  select?.addEventListener("change", () => select.form?.submit());
+</script>
