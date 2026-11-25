@@ -14,6 +14,15 @@ const contestEnabled = await isContestEnabled();
 const currentPath = Astro.url.pathname;
 const isActive = (href: string) =>
   href === "/" ? currentPath === "/" : currentPath.startsWith(href);
+
+const mobileLinks = [
+  { href: "/", label: "Inicio", icon: "🏠" },
+  { href: "/catalogo", label: "Catálogo", icon: "🌸" },
+  { href: "/sobre", label: "Sobre Tapti", icon: "🌿" },
+  ...(contestEnabled ? [{ href: "/concurso", label: "Concurso", icon: "🎁" }] : []),
+  { href: "/contacto", label: "Contacto", icon: "📞" },
+  { href: "/carrito", label: "Carrito", icon: "🛒" },
+];
 ---
 
 <nav
@@ -184,134 +193,216 @@ const isActive = (href: string) =>
   });
 </script>
 
-<!-- Cabecera móvil (Marca): oculta cuando MainMenu ya muestra la marca (sesión activa) -->
-<div
+
+<!-- Cabecera móvil: hamburguesa + logo + carrito. Se oculta al hacer scroll hacia abajo
+     y reaparece al subir, para no tapar el contenido. Con sesión de admin va debajo de
+     la barra de MainMenu (no fija). -->
+<header
+  id="mobile-header"
+  data-fixed={hasAdminBar ? "0" : "1"}
   class:list={[
-    "md:hidden fixed top-0 left-0 right-0 z-40 bg-marfil/90 backdrop-blur-md border-b border-borde-claro px-6 py-4 flex justify-center items-center shadow-lg",
-    hasAdminBar && "hidden",
+    "md:hidden z-40 transition-transform duration-300",
+    hasAdminBar ? "relative" : "fixed top-0 left-0 right-0",
   ]}
 >
-  <a href="/" class="hover:opacity-80 transition-opacity">
-    <img src="/images/logo-tapti.png" alt="Tapti" class="h-10 w-auto" />
-  </a>
-</div>
+  <div class="relative z-20 bg-marfil/95 backdrop-blur-md border-b border-borde-claro shadow-md px-4 h-16 grid grid-cols-[48px_1fr_48px] items-center">
+    <button
+      id="mobile-menu-btn"
+      type="button"
+      class="hamburger w-12 h-12 -ml-1 flex items-center justify-center rounded-full text-azul-profundo active:bg-terracota/10"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+    >
+      <span class="hamburger-box" aria-hidden="true">
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+      </span>
+    </button>
 
-<!-- Barra de navegación móvil (inferior) -->
-<div
-  class="md:hidden fixed bottom-6 left-6 right-6 z-40 bg-marfil/95 backdrop-blur-md border border-borde-claro rounded-2xl p-4 shadow-xl"
->
-  <div class="grid grid-cols-5 gap-1">
-    <a
-      href="/"
-      aria-current={isActive("/") ? "page" : undefined}
-      class:list={[
-        "text-center py-2 transition-colors",
-        isActive("/")
-          ? "text-terracota font-semibold"
-          : "text-azul-profundo hover:text-terracota",
-      ]}
-    >
-      <div class="text-lg mb-1 flex justify-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          ><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"
-          ></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg
-        >
-      </div>
-      <span class="text-xs">Inicio</span>
+    <a href="/" class="justify-self-center hover:opacity-80 transition-opacity">
+      <img src="/images/logo-tapti.png" alt="Tapti" class="h-10 w-auto" />
     </a>
-    <a
-      href="/catalogo"
-      aria-current={isActive("/catalogo") ? "page" : undefined}
-      class:list={[
-        "text-center py-2 transition-colors",
-        isActive("/catalogo")
-          ? "text-terracota font-semibold"
-          : "text-azul-profundo hover:text-terracota",
-      ]}
-    >
-      <div class="text-lg mb-1">🌸</div>
-      <span class="text-xs">Catálogo</span>
-    </a>
-    {
-      /* <a
-      href="/membresias"
-      class="text-center py-2 text-azul-profundo hover:text-terracota transition-colors"
-    >
-      <div class="text-lg mb-1">💎</div>
-      <span class="text-xs">Membresías</span>
-    </a> */
-    }
-    <a
-      href="/sobre"
-      aria-current={isActive("/sobre") ? "page" : undefined}
-      class:list={[
-        "text-center py-2 transition-colors",
-        isActive("/sobre")
-          ? "text-terracota font-semibold"
-          : "text-azul-profundo hover:text-terracota",
-      ]}
-    >
-      <div class="text-lg mb-1">🌿</div>
-      <span class="text-xs">Sobre</span>
-    </a>
-    <a
-      href="/contacto"
-      aria-current={isActive("/contacto") ? "page" : undefined}
-      class:list={[
-        "text-center py-2 transition-colors",
-        isActive("/contacto")
-          ? "text-terracota font-semibold"
-          : "text-azul-profundo hover:text-terracota",
-      ]}
-    >
-      <div class="text-lg mb-1">📞</div>
-      <span class="text-xs">Contacto</span>
-    </a>
+
     <a
       href="/carrito"
       id="cart-btn-mobile"
+      aria-label="Carrito"
       aria-current={isActive("/carrito") ? "page" : undefined}
       class:list={[
-        "text-center py-2 transition-colors relative",
-        isActive("/carrito")
-          ? "text-terracota font-semibold"
-          : "text-azul-profundo hover:text-terracota",
+        "relative w-12 h-12 -mr-1 justify-self-end flex items-center justify-center rounded-full transition-colors",
+        isActive("/carrito") ? "text-terracota bg-terracota/10" : "text-azul-profundo active:bg-terracota/10",
       ]}
     >
-      <div class="text-lg mb-1 flex justify-center">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <circle cx="9" cy="21" r="1"></circle>
-          <circle cx="20" cy="21" r="1"></circle>
-          <path
-            d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"
-          ></path>
-        </svg>
-      </div>
-      <span class="text-xs">Carrito</span>
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="9" cy="21" r="1"></circle>
+        <circle cx="20" cy="21" r="1"></circle>
+        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+      </svg>
       <span
         id="cart-count-mobile"
-        class="absolute top-1 right-2 bg-terracota text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden"
+        class="absolute top-1.5 right-1.5 bg-terracota text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden"
         >0</span
       >
     </a>
   </div>
-</div>
+
+  <!-- Fondo oscuro detrás del menú -->
+  <div id="mobile-menu-backdrop" class="mobile-backdrop fixed inset-0 z-0 bg-azul-profundo/30"></div>
+
+  <!-- Menú desplegable -->
+  <nav
+    id="mobile-menu"
+    class="mobile-menu absolute left-0 right-0 top-full z-10 bg-marfil border-b border-borde-claro shadow-xl rounded-b-2xl"
+    aria-label="Menú principal"
+  >
+    <ul class="px-4 py-3">
+      {mobileLinks.map((link) => (
+        <li>
+          <a
+            href={link.href}
+            aria-current={isActive(link.href) ? "page" : undefined}
+            class:list={[
+              "flex items-center gap-3 px-4 py-3.5 rounded-xl text-base transition-colors",
+              isActive(link.href)
+                ? "text-terracota font-semibold bg-terracota/10"
+                : "text-azul-profundo active:bg-terracota/10",
+            ]}
+          >
+            <span class="text-lg w-6 text-center" aria-hidden="true">{link.icon}</span>
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</header>
+
+<style>
+  .hamburger-box {
+    position: relative;
+    display: block;
+    width: 22px;
+    height: 16px;
+  }
+  .hamburger-line {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+    transition:
+      transform 0.3s ease,
+      opacity 0.2s ease,
+      top 0.3s ease;
+  }
+  .hamburger-line:nth-child(1) { top: 0; }
+  .hamburger-line:nth-child(2) { top: 7px; }
+  .hamburger-line:nth-child(3) { top: 14px; }
+  .hamburger[aria-expanded="true"] .hamburger-line:nth-child(1) { top: 7px; transform: rotate(45deg); }
+  .hamburger[aria-expanded="true"] .hamburger-line:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger[aria-expanded="true"] .hamburger-line:nth-child(3) { top: 7px; transform: rotate(-45deg); }
+
+  .mobile-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-12px);
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease,
+      visibility 0s linear 0.25s;
+  }
+  .mobile-backdrop {
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.25s ease,
+      visibility 0s linear 0.25s;
+  }
+  #mobile-header.menu-open .mobile-menu,
+  #mobile-header.menu-open .mobile-backdrop {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition-delay: 0s;
+  }
+  #mobile-header.header-hidden {
+    transform: translateY(-100%);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hamburger-line,
+    .mobile-menu,
+    .mobile-backdrop,
+    #mobile-header {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  // Menú hamburguesa móvil y ocultar la cabecera al hacer scroll hacia abajo.
+  let scrollBound = false;
+  let lastY = 0;
+
+  function getHeader() {
+    return document.getElementById("mobile-header");
+  }
+
+  function setMenu(open: boolean) {
+    const header = getHeader();
+    const btn = document.getElementById("mobile-menu-btn");
+    if (!header || !btn) return;
+    const wasOpen = header.classList.contains("menu-open");
+    header.classList.toggle("menu-open", open);
+    if (open) header.classList.remove("header-hidden");
+    btn.setAttribute("aria-expanded", String(open));
+    btn.setAttribute("aria-label", open ? "Cerrar menú" : "Abrir menú");
+    // Solo tocar el overflow si cambia el estado (la animación de entrada también lo usa).
+    if (open !== wasOpen) document.documentElement.style.overflow = open ? "hidden" : "";
+  }
+
+  document.addEventListener("astro:page-load", () => {
+    setMenu(false);
+    lastY = window.scrollY;
+
+    document.getElementById("mobile-menu-btn")?.addEventListener("click", () => {
+      setMenu(!getHeader()?.classList.contains("menu-open"));
+    });
+    document.getElementById("mobile-menu-backdrop")?.addEventListener("click", () => setMenu(false));
+    document.querySelectorAll("#mobile-menu a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+
+    if (scrollBound) return;
+    scrollBound = true;
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && getHeader()?.classList.contains("menu-open")) setMenu(false);
+    });
+
+    // Al pasar a escritorio, cerrar el menú para no dejar el scroll bloqueado.
+    window.matchMedia("(min-width: 768px)").addEventListener("change", (e) => {
+      if (e.matches) setMenu(false);
+    });
+
+    window.addEventListener(
+      "scroll",
+      () => {
+        const header = getHeader();
+        // Con barra de admin la cabecera no es fija: no se oculta.
+        if (!header || header.dataset.fixed !== "1" || header.classList.contains("menu-open")) return;
+        const y = window.scrollY;
+        if (Math.abs(y - lastY) < 8) return;
+        header.classList.toggle("header-hidden", y > lastY && y > 80);
+        lastY = y;
+      },
+      { passive: true },
+    );
+  });
+
+  // Antes de cambiar de página (View Transitions) liberar el scroll.
+  document.addEventListener("astro:before-swap", () => {
+    document.documentElement.style.overflow = "";
+  });
+</script>

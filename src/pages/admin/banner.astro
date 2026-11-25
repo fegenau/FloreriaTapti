@@ -5,6 +5,7 @@ import { getCatalogData } from "../../lib/catalog";
 import {
   BUCKET_ROOT_URL,
   DEFAULT_CONCURSO_IMAGE,
+  DEFAULT_CONTEST_BASES,
   DEFAULT_HERO_IMAGE,
   MAX_RAMOS_DEL_MES,
   getBannerConfig,
@@ -46,6 +47,7 @@ const cardClass = "bg-white rounded-2xl shadow-sm border border-gray-200 p-6";
         </div>
         <div class="flex flex-wrap gap-2 md:gap-4">
           <a href="/admin" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Catálogo</a>
+          <a href="/admin/concurso" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Participantes</a>
           <a href="/admin/reportes" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Reportes</a>
           <a href="/" target="_blank" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Ver sitio</a>
           <a href="/api/auth/logout" class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition">Cerrar Sesión</a>
@@ -137,6 +139,24 @@ const cardClass = "bg-white rounded-2xl shadow-sm border border-gray-200 p-6";
               <textarea id="concurso-text" data-field="concurso.text" class={inputClass} maxlength="300" rows="3">{banner.concurso.text}</textarea>
             </div>
           </div>
+        </div>
+
+        <div class="mt-6 pt-6 border-t border-gray-100">
+          <div class="flex flex-wrap items-baseline justify-between gap-2 mb-1">
+            <label class={labelClass} for="concurso-bases">Bases del concurso</label>
+            <button type="button" id="reset-bases" class="text-xs text-rose-600 hover:underline">Restaurar bases por defecto</button>
+          </div>
+          <p class="text-sm text-gray-500 mb-2">
+            Se muestran en la página /concurso y el participante debe aceptarlas. Actualízalas cada mes;
+            puedes usar {"{mes}"}, {"{fecha_sorteo}"} e {"{instagram}"}. Una línea por punto.
+          </p>
+          <textarea
+            id="concurso-bases"
+            data-field="concurso.bases"
+            data-default={DEFAULT_CONTEST_BASES}
+            class={`${inputClass} font-mono text-sm`}
+            maxlength="5000"
+            rows="12">{banner.concurso.bases}</textarea>
         </div>
       </section>
 
@@ -302,6 +322,14 @@ const cardClass = "bg-white rounded-2xl shadow-sm border border-gray-200 p-6";
     update();
   });
 
+  // --- Restaurar bases por defecto ---
+  document.getElementById("reset-bases")?.addEventListener("click", () => {
+    const bases = document.getElementById("concurso-bases") as HTMLTextAreaElement | null;
+    if (!bases || !confirm("¿Reemplazar las bases actuales por las bases por defecto?")) return;
+    bases.value = bases.dataset.default ?? "";
+    setStatus("Recuerda guardar los cambios para aplicar las nuevas bases.");
+  });
+
   // --- Interruptor del concurso ---
   const contestToggle = document.getElementById("contest-enabled") as HTMLInputElement;
   const contestToggleLabel = document.getElementById("contest-toggle-label") as HTMLSpanElement;
@@ -350,6 +378,7 @@ const cardClass = "bg-white rounded-2xl shadow-sm border border-gray-200 p-6";
         eyebrow: val('[data-field="concurso.eyebrow"]'),
         title: val('[data-field="concurso.title"]'),
         text: val('[data-field="concurso.text"]'),
+        bases: val('[data-field="concurso.bases"]'),
       },
       ramosEyebrow: val('[data-field="ramosEyebrow"]'),
       ramos,

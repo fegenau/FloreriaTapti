@@ -84,7 +84,8 @@ const hasAdminBar = Boolean(user);
       <main
         class:list={[
           hideHeader ? "min-h-screen" : "min-h-[70vh]",
-          hasAdminBar ? "pt-4 md:pt-6" : "pt-25 md:pt-32",
+          // Móvil: 64px de cabecera fija (h-16) + aire. "pt-25" no existe en Tailwind 3.
+          hasAdminBar ? "pt-4 md:pt-6" : "pt-20 md:pt-32",
         ]}
       >
         <slot />
