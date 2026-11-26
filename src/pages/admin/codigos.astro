@@ -1,0 +1,220 @@
+---
+import LayoutAdmin from "../../components/LayoutAdmin.astro";
+import { getAuthUser, isAdminEmail } from "../../lib/auth";
+import { supabase } from "../../lib/supabase";
+import { isExpired, todayInChile, type PromoCode } from "../../lib/promoCodes";
+
+const user = await getAuthUser(Astro.cookies);
+if (!user || !isAdminEmail(user.email)) {
+  return Astro.redirect("/login");
+}
+
+let codes: PromoCode[] = [];
+let loadError: string | null = null;
+const { data, error } = await supabase
+  .from("promo_codes")
+  .select("*")
+  .order("created_at", { ascending: false });
+if (error) {
+  console.error("Admin códigos: error leyendo promo_codes:", error);
+  loadError =
+    error.code === "42P01" || /promo_codes/.test(error.message)
+      ? "Falta crear la tabla promo_codes en Supabase: ejecuta db_promo_codes.sql en el SQL Editor."
+      : "No se pudieron cargar los códigos. Intenta recargar la página.";
+} else {
+  codes = (data ?? []) as PromoCode[];
+}
+
+const formatDate = (d: string) => d.split("-").reverse().join("-");
+const statusOf = (c: PromoCode) =>
+  !c.is_active
+    ? { text: "Desactivado", cls: "bg-gray-100 text-gray-600" }
+    : isExpired(c)
+      ? { text: "Vencido", cls: "bg-amber-100 text-amber-700" }
+      : { text: "Activo", cls: "bg-green-100 text-green-700" };
+
+const inputClass =
+  "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-rose-400 focus:ring-2 focus:ring-rose-100 outline-none";
+const labelClass = "block text-sm font-medium text-gray-700 mb-1";
+const cardClass = "bg-white rounded-2xl shadow-sm border border-gray-200 p-6";
+---
+
+<LayoutAdmin title="Códigos promocionales | Tapti">
+  <div class="min-h-screen bg-gradient-to-br from-rose-50 to-pink-50">
+    <div class="border-b border-gray-200 bg-white shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-6 flex flex-wrap gap-4 justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-grafito">Códigos promocionales</h1>
+          <p class="text-gray-600 text-sm">Bienvenido, {user.email}</p>
+        </div>
+        <div class="flex flex-wrap gap-2 md:gap-4">
+          <a href="/admin" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Catálogo</a>
+          <a href="/admin/banner" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Banner</a>
+          <a href="/admin/concurso" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Participantes</a>
+          <a href="/admin/reportes" class="px-4 py-2 text-gray-700 hover:text-rose-500 transition">Reportes</a>
+          <a href="/api/auth/logout" class="px-4 py-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600 transition">Cerrar Sesión</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+      <form id="promo-form" class={cardClass}>
+        <h2 class="text-lg font-semibold text-grafito mb-4">Nuevo código</h2>
+        <div class="grid gap-4 md:grid-cols-4 items-end">
+          <div>
+            <label for="promo-code" class={labelClass}>Código</label>
+            <input
+              id="promo-code"
+              name="code"
+              required
+              minlength="3"
+              maxlength="30"
+              pattern="[A-Za-z0-9_\-]{3,30}"
+              placeholder="TAPTI10"
+              class={`${inputClass} uppercase`}
+            />
+          </div>
+          <div>
+            <label for="promo-percent" class={labelClass}>Descuento (%)</label>
+            <input id="promo-percent" name="percent" type="number" required min="1" max="100" step="1" placeholder="10" class={inputClass} />
+          </div>
+          <div>
+            <label for="promo-expires" class={labelClass}>Válido hasta (opcional)</label>
+            <input id="promo-expires" name="expires_at" type="date" min={todayInChile()} class={inputClass} />
+          </div>
+          <button
+            type="submit"
+            class="px-6 py-2 rounded-lg bg-rose-500 text-white font-semibold hover:bg-rose-600 transition disabled:opacity-60"
+          >
+            Crear código
+          </button>
+        </div>
+        <p class="text-xs text-gray-500 mt-3">
+          El descuento se aplica solo a los productos, no al envío. Sin fecha, el código no vence. La fecha
+          indicada es el último día en que funciona (hora de Chile).
+        </p>
+        <p id="form-message" class="hidden text-sm mt-3"></p>
+      </form>
+
+      <div class={cardClass}>
+        <h2 class="text-lg font-semibold text-grafito mb-4">Códigos ({codes.length})</h2>
+        {loadError ? (
+          <p class="text-red-600 text-sm">{loadError}</p>
+        ) : codes.length === 0 ? (
+          <p class="text-gray-500 text-sm">Aún no hay códigos. Crea el primero arriba.</p>
+        ) : (
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-left text-gray-500 border-b border-gray-200">
+                  <th class="py-2 pr-4">Código</th>
+                  <th class="py-2 pr-4">Descuento</th>
+                  <th class="py-2 pr-4">Vence</th>
+                  <th class="py-2 pr-4">Estado</th>
+                  <th class="py-2 text-right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {codes.map((c) => {
+                  const status = statusOf(c);
+                  return (
+                    <tr class="border-b border-gray-100 last:border-0">
+                      <td class="py-3 pr-4 font-mono font-semibold">{c.code}</td>
+                      <td class="py-3 pr-4">{c.percent}%</td>
+                      <td class="py-3 pr-4">{c.expires_at ? formatDate(c.expires_at) : "Sin vencimiento"}</td>
+                      <td class="py-3 pr-4">
+                        <span class={`px-2 py-1 rounded-full text-xs font-medium ${status.cls}`}>{status.text}</span>
+                      </td>
+                      <td class="py-3 text-right whitespace-nowrap">
+                        <button
+                          class="btn-toggle px-3 py-1 rounded border border-gray-300 hover:bg-gray-50"
+                          data-id={c.id}
+                          data-active={c.is_active ? "true" : "false"}
+                        >
+                          {c.is_active ? "Desactivar" : "Activar"}
+                        </button>
+                        <button
+                          class="btn-delete px-3 py-1 rounded border border-rose-300 text-rose-500 hover:bg-rose-50 ml-2"
+                          data-id={c.id}
+                          data-code={c.code}
+                        >
+                          Eliminar
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</LayoutAdmin>
+
+<script>
+  const form = document.getElementById("promo-form") as HTMLFormElement;
+  const message = document.getElementById("form-message")!;
+
+  function showMessage(text: string, ok: boolean) {
+    message.textContent = text;
+    message.className = `text-sm mt-3 ${ok ? "text-green-600" : "text-red-600"}`;
+  }
+
+  async function send(method: string, body: unknown) {
+    const res = await fetch("/api/promo-codes", {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || "Error inesperado");
+    return data;
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const btn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    btn.disabled = true;
+    try {
+      await send("POST", {
+        code: String(fd.get("code") || ""),
+        percent: Number(fd.get("percent")),
+        expires_at: String(fd.get("expires_at") || "") || null,
+      });
+      location.reload();
+    } catch (err) {
+      showMessage((err as Error).message, false);
+      btn.disabled = false;
+    }
+  });
+
+  document.querySelectorAll<HTMLButtonElement>(".btn-toggle").forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      btn.disabled = true;
+      try {
+        await send("PATCH", { id: btn.dataset.id, is_active: btn.dataset.active !== "true" });
+        location.reload();
+      } catch (err) {
+        alert((err as Error).message);
+        btn.disabled = false;
+      }
+    }),
+  );
+
+  document.querySelectorAll<HTMLButtonElement>(".btn-delete").forEach((btn) =>
+    btn.addEventListener("click", async () => {
+      if (!confirm(`¿Eliminar el código ${btn.dataset.code}? Los pedidos que ya lo usaron no cambian.`)) return;
+      btn.disabled = true;
+      try {
+        await send("DELETE", { id: btn.dataset.id });
+        location.reload();
+      } catch (err) {
+        alert((err as Error).message);
+        btn.disabled = false;
+      }
+    }),
+  );
+</script>
