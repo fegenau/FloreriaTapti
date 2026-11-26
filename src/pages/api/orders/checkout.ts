@@ -3,7 +3,7 @@ import { supabase } from '../../../lib/supabase';
 import { initTransaction } from '../../../lib/webpay';
 import { z } from 'zod';
 import { validateRut } from '../../../lib/rutValidator';
-import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
+import { getCommunePrice, EXPRESS_DELIVERY_PRICE, EXPRESS_DELIVERY_ENABLED } from '../../../utils/communes';
 import { priceCartItems, PricingError } from '../../../lib/checkoutPricing';
 import { DELIVERY_DATE_MESSAGE_PREFIX, getMinDeliveryDate, isValidDeliveryDate, formatDeliveryDate } from '../../../utils/deliveryDate';
 import { findValidPromo, discountFor, PromoError } from '../../../lib/promoCodes';
@@ -34,7 +34,15 @@ const CheckoutSchema = z.object({
     price: z.number()
   }).passthrough()).min(1, "El carrito está vacío").max(50, "Límite de ítems excedido")
 }).superRefine((data, ctx) => {
-  if (data.delivery_type !== 'express' && !isValidDeliveryDate(data.delivery_date)) {
+  if (data.delivery_type === 'express' && !EXPRESS_DELIVERY_ENABLED) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['delivery_type'],
+      message: "El Delivery Express no está disponible por ahora.",
+    });
+    return;
+  }
+  if (data.delivery_type !== 'express' &&!isValidDeliveryDate(data.delivery_date)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       path: ['delivery_date'],
