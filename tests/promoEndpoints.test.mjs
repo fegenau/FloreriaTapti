@@ -109,7 +109,7 @@ describe("POST /api/orders/checkout (todo simulado: sin Supabase ni Webpay reale
     email: "test@example.com",
     phone: "+56911111111",
     address: "Av. Siempre Viva 123",
-    commune: "Las Condes", // despacho $1.990
+    commune: "Las Condes", // despacho $2.490
     delivery_type: "normal",
     delivery_date: getMinDeliveryDate(),
     items: [
@@ -124,9 +124,9 @@ describe("POST /api/orders/checkout (todo simulado: sin Supabase ni Webpay reale
   test("sin codigo: total = subtotal + envio y NO envia columnas promo_code/discount_amount", async () => {
     const r = await call(checkoutPOST, { ...base(), promo_code: null });
     assert.equal(r.status, 200, JSON.stringify(r.body));
-    assert.equal(globalThis.__webpay.amount, 41970 + 1990);
+    assert.equal(globalThis.__webpay.amount, 41970 + 2490);
     const o = orderInsert();
-    assert.equal(o.total_amount, 43960);
+    assert.equal(o.total_amount, 44460);
     assert.ok(!("promo_code" in o) && !("discount_amount" in o));
     assert.ok(!globalThis.__calls.some((c) => c.table === "promo_codes"), "no debe consultar promo_codes");
   });
@@ -146,15 +146,15 @@ describe("POST /api/orders/checkout (todo simulado: sin Supabase ni Webpay reale
     const o = orderInsert();
     assert.equal(o.discount_amount, discount);
     assert.equal(o.promo_code, "TAPTI15");
-    assert.equal(o.shipping_cost, 1990);
-    assert.equal(o.total_amount, 41970 - discount + 1990);
+    assert.equal(o.shipping_cost, 2490);
+    assert.equal(o.total_amount, 41970 - discount + 2490);
     assert.equal(globalThis.__webpay.amount, o.total_amount);
   });
   test("con 100%: se paga solo el envio", async () => {
     globalThis.__db = { promo: row({ percent: 100 }) };
     const r = await call(checkoutPOST, { ...base(), promo_code: "TAPTI10" });
     assert.equal(r.status, 200);
-    assert.equal(globalThis.__webpay.amount, 1990);
+    assert.equal(globalThis.__webpay.amount, 2490);
   });
   test("codigo vencido/inexistente -> 400 promoError y no se crea pedido ni transaccion", async () => {
     globalThis.__db = { promo: null };
