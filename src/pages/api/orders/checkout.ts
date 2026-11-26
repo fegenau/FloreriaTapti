@@ -6,6 +6,7 @@ import { validateRut } from '../../../lib/rutValidator';
 import { getCommunePrice, EXPRESS_DELIVERY_PRICE } from '../../../utils/communes';
 import { priceCartItems, PricingError } from '../../../lib/checkoutPricing';
 import { DELIVERY_DATE_MESSAGE_PREFIX, getMinDeliveryDate, isValidDeliveryDate, formatDeliveryDate } from '../../../utils/deliveryDate';
+import { findValidPromo, discountFor, PromoError } from '../../../lib/promoCodes';
 
 // Checkout is permanently enabled
 
@@ -23,6 +24,7 @@ const CheckoutSchema = z.object({
   receiver_name: z.string().optional(),
   receiver_phone: z.string().optional(),
   dedication: z.string().optional(),
+  promo_code: z.string().max(50).optional().nullable(),
   items: z.array(z.object({
     id: z.string(),
     name: z.string().optional(),
@@ -46,7 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   try {
     const body = await request.json();
-    const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items: cartItems, receiver_name, receiver_phone, dedication } = CheckoutSchema.parse(body);
+    const { name, rut, address, email, phone, commune, delivery_type, delivery_date, important_date, reason, items: cartItems, receiver_name, receiver_phone, dedication, promo_code } = CheckoutSchema.parse(body);
 
     // Precios siempre desde la BD; si el carrito tenía precios desactualizados
     // se devuelven para que el cliente los corrija antes de pagar.
@@ -88,8 +90,16 @@ export const POST: APIRoute = async ({ request }) => {
       shippingCost = communePrice;
     }
 
+    // Código promocional: se valida de nuevo aquí; el descuento aplica solo a los productos.
+    const subtotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const promo = promo_code?.trim() ? await findValidPromo(promo_code) : null;
+    const discountAmount = promo ? discountFor(subtotal, promo.percent) : 0;
+
     // Calculate total incl. shipping
-    const totalAmount = items.reduce((sum, item) => sum + (item.price * item.quantity), 0) + shippingCost;
+    const totalAmount = subtotal - discountAmount + shippingCost;
+    if (totalAmount < 1) {
+      throw new PromoError("El total a pagar debe ser mayor a $0. Escríbenos por WhatsApp para coordinar tu pedido.");
+    }
     const buyOrder = `CART-${Date.now()}`;
 
     // Format the final shipping address including receiver details
@@ -116,7 +126,10 @@ export const POST: APIRoute = async ({ request }) => {
           delivery_date: delivery_type === 'express' ? 'HOY' : (delivery_date || null),
           total_amount: totalAmount,
           items: items,
-          status: 'draft'
+          status: 'draft',
+          // Solo se envían con un código aplicado, para que el checkout normal
+          // siga funcionando aunque aún no se hayan creado las columnas.
+          ...(promo ? { promo_code: promo.code, discount_amount: discountAmount } : {})
       }])
       .select()
       .single();
@@ -174,6 +187,13 @@ export const POST: APIRoute = async ({ request }) => {
         error: "Error de validación", 
         fieldErrors 
       }), { 
+        status: 400,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
+
+    if (e instanceof PromoError) {
+      return new Response(JSON.stringify({ error: e.message, promoError: true }), {
         status: 400,
         headers: { "Content-Type": "application/json" }
       });
