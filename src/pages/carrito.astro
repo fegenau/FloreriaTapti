@@ -361,12 +361,42 @@ const accessories = catalog.accessories || [];
         </div>
 
         <div class="border-t border-white/10 pt-6 mt-8">
+          <!-- Código promocional -->
+          <div class="mb-6">
+            <label for="input-promo" class="block text-sm text-cherry-blossom-200 mb-2"
+              >¿Tienes un código promocional?</label
+            >
+            <div class="flex gap-2">
+              <input
+                type="text"
+                id="input-promo"
+                maxlength="30"
+                autocomplete="off"
+                placeholder="Ingresa tu código"
+                class="flex-1 min-w-0 px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white uppercase placeholder:normal-case placeholder:text-gray-400 focus:outline-none focus:border-honey-bronze-400"
+              />
+              <button
+                type="button"
+                id="btn-promo"
+                class="px-5 py-2 rounded-xl border border-honey-bronze-400 text-honey-bronze-200 font-semibold hover:bg-honey-bronze-500/20 transition-colors disabled:opacity-60"
+                >Aplicar</button
+              >
+            </div>
+            <p id="promo-message" class="hidden text-sm mt-2"></p>
+          </div>
+
           <div class="space-y-2 mb-6">
             <div
               class="flex justify-between items-center text-lg text-cherry-blossom-100"
             >
               <span>Subtotal Productos</span>
               <span id="cart-subtotal">$0</span>
+            </div>
+            <div class="hidden" id="discount-row">
+              <div class="flex justify-between items-center text-lg text-green-300">
+                <span id="discount-label">Descuento</span>
+                <span id="cart-discount">-$0</span>
+              </div>
             </div>
             <div
               class="flex justify-between items-center text-lg text-cherry-blossom-100"
@@ -546,6 +576,74 @@ const accessories = catalog.accessories || [];
       let subtotalGlobal = 0;
       let shippingGlobal = 0;
 
+      // Código promocional aplicado (el servidor lo vuelve a validar al pagar).
+      let appliedPromo: { code: string; percent: number } | null = null;
+      const inputPromo = document.getElementById("input-promo") as HTMLInputElement | null;
+      const btnPromo = document.getElementById("btn-promo") as HTMLButtonElement | null;
+      const promoMessage = document.getElementById("promo-message");
+      const discountRow = document.getElementById("discount-row");
+      const discountLabel = document.getElementById("discount-label");
+      const cartDiscount = document.getElementById("cart-discount");
+
+      const discountAmount = () =>
+        appliedPromo
+          ? Math.min(subtotalGlobal, Math.round((subtotalGlobal * appliedPromo.percent) / 100))
+          : 0;
+
+      function showPromoMessage(text: string, ok: boolean) {
+        if (!promoMessage) return;
+        promoMessage.textContent = text;
+        promoMessage.className = `text-sm mt-2 ${ok ? "text-green-300" : "text-red-400"}`;
+      }
+
+      function clearPromo(message?: string) {
+        appliedPromo = null;
+        if (btnPromo) btnPromo.innerText = "Aplicar";
+        if (inputPromo) inputPromo.readOnly = false;
+        if (message) showPromoMessage(message, false);
+        else promoMessage?.classList.add("hidden");
+        updateTotalsDisplay();
+      }
+
+      async function applyPromo() {
+        if (appliedPromo) return clearPromo();
+        const code = inputPromo?.value.trim() ?? "";
+        if (!code) return showPromoMessage("Ingresa un código.", false);
+
+        if (btnPromo) btnPromo.disabled = true;
+        try {
+          const res = await fetch("/api/promo/validate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code }),
+          });
+          const data = await res.json();
+          if (!res.ok) return showPromoMessage(data.error || "El código no es válido.", false);
+
+          appliedPromo = { code: data.code, percent: data.percent };
+          if (inputPromo) {
+            inputPromo.value = data.code;
+            inputPromo.readOnly = true;
+          }
+          if (btnPromo) btnPromo.innerText = "Quitar";
+          showPromoMessage(`¡Código aplicado! ${data.percent}% de descuento en tus productos.`, true);
+          updateTotalsDisplay();
+        } catch {
+          showPromoMessage("No pudimos validar el código. Intenta de nuevo.", false);
+        } finally {
+          if (btnPromo) btnPromo.disabled = false;
+        }
+      }
+
+      btnPromo?.addEventListener("click", applyPromo);
+      // Enter en el campo aplica el código en vez de enviar el formulario de pago.
+      inputPromo?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          applyPromo();
+        }
+      });
+
       let currentItems: any[] = [];
 
       function renderCart(items: any) {
@@ -637,8 +735,14 @@ const accessories = catalog.accessories || [];
 
         if (cartShipping)
           cartShipping.innerText = `$${shippingGlobal.toLocaleString("es-CL")}`;
+        const discount = discountAmount();
+        discountRow?.classList.toggle("hidden", !appliedPromo);
+        if (discountLabel && appliedPromo)
+          discountLabel.innerText = `Descuento ${appliedPromo.code} (${appliedPromo.percent}%)`;
+        if (cartDiscount)
+          cartDiscount.innerText = `-$${discount.toLocaleString("es-CL")}`;
         if (cartTotal)
-          cartTotal.innerText = `$${(subtotalGlobal + shippingGlobal).toLocaleString("es-CL")}`;
+          cartTotal.innerText = `$${(subtotalGlobal - discount + shippingGlobal).toLocaleString("es-CL")}`;
       }
 
       function updateDatepickerVisibility() {
@@ -802,6 +906,7 @@ const accessories = catalog.accessories || [];
           receiver_name: formData.get("receiver_name"),
           receiver_phone: formData.get("receiver_phone"),
           dedication: formData.get("dedication"),
+          promo_code: appliedPromo?.code ?? null,
           items: currentItems,
         };
 
@@ -842,6 +947,8 @@ const accessories = catalog.accessories || [];
               });
               cartItems.set(updated);
             }
+            // El código dejó de ser válido (venció o se desactivó) desde que se aplicó.
+            if (data.promoError && appliedPromo) clearPromo(data.error);
             throw new Error(data.error || "Error desconocido");
           }
 
